@@ -19,24 +19,24 @@ File : main.c
 #include "stm32f4xx_tim.h"
 
 //******************************************************************************
-//void usart_setup(void);
-//void adc_setup(void);
+void usart_setup(void);
+void adc_setup(void);
 void spi_setup(void);
-//int fputc(int ch, FILE *f);
+int fputc(int ch, FILE *f);
 void delay(void);
-//void scanf1(void);
-//void adc_printf(void);
+void scanf1(void);
+void adc_printf(void);
 //******************************* Variable **************************************
-//unsigned char msg ;
-//char channal_DAC;
+unsigned char msg ;
+char channal_DAC;
 uint16_t adc_value, DAC_data, DAC_real;
 
 //******************************* Main Function ********************************
 int main()
 {	
   /* Set Up config System*/
-//  usart_setup();
-//  adc_setup();
+  usart_setup();
+  adc_setup();
   spi_setup();
   STM_EVAL_LEDInit(LED3);
   STM_EVAL_LEDInit(LED4);
@@ -72,8 +72,8 @@ int main()
 	Don't care 2 bits (X1,X0)
   */
 
-  DAC_real = 0x03FF;
-  DAC_data =(DAC_real<<2) | 0xF000;
+  DAC_real = 0x0128;
+  DAC_data =(DAC_real<<2) | 0xA000;
   while(1)
   {
    
@@ -97,21 +97,21 @@ int main()
 //******************************************************************************
 
 
-//void scanf1(void)
-//{
-//  while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET);
-//  msg = USART_ReceiveData(USART2);
-//}
-//int fputc(int ch, FILE *f)
-//{
-//  /* Place your implementation of fputc here */
-//  /* e.g. write a character to the USART */
-//  USART_SendData(USART2, (uint8_t) ch);
-//  /* Loop until the end of transmission */
-//  while (USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET)
-//  {}
-//  return ch;
-//}
+void scanf1(void)
+{
+  while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET);
+  msg = USART_ReceiveData(USART2);
+}
+int fputc(int ch, FILE *f)
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART */
+  USART_SendData(USART2, (uint8_t) ch);
+  /* Loop until the end of transmission */
+  while (USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET)
+  {}
+  return ch;
+}
 //*********************** SPI setup ************************************
 void spi_setup(void)
 {
@@ -183,17 +183,13 @@ void delay(void)
 }
 
 /*This Function is Analog to Digital Converter and Sent data via RS-232 (USART)(Printf) */
-//void adc_printf(void)
-//{
-//  adc_value = 0;
-//  //Start ADC Convertor
-//  ADC_SoftwareStartConv(ADC1);
-//  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
-//  adc_value = ADC_GetConversionValue(ADC1);
-//  printf("The Value from ADC = %d \n", &adc_value);
-//}
+void adc_printf(void)
+{
+  adc_value = 0;
+  //Start ADC Convertor
+  ADC_SoftwareStartConv(ADC1);
+  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
+  adc_value = ADC_GetConversionValue(ADC1);
+  printf("The Value from ADC = %d \n", &adc_value);
+}
 //*************************** Interrupt ****************************************
-//void SPI2_IRQHandler(void)
-//{
-//  
-//}

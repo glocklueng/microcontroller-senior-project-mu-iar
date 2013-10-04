@@ -13969,24 +13969,24 @@ void Delay(volatile uint32_t nTime);
  
 
 
-
-
+void usart_setup(void);
+void adc_setup(void);
 void spi_setup(void);
-
+int fputc(int ch, FILE *f);
 void delay(void);
+void scanf1(void);
+void adc_printf(void);
 
-
-
-
-
+unsigned char msg ;
+char channal_DAC;
 uint16_t adc_value, DAC_data, DAC_real;
 
 
 int main()
 {	
    
-
-
+  usart_setup();
+  adc_setup();
   spi_setup();
   STM_EVAL_LEDInit(LED3);
   STM_EVAL_LEDInit(LED4);
@@ -14022,8 +14022,8 @@ int main()
 
  
 
-  DAC_real = 0x03FF;
-  DAC_data =(DAC_real<<2) | 0xF000;
+  DAC_real = 0x0128;
+  DAC_data =(DAC_real<<2) | 0xA000;
   while(1)
   {
    
@@ -14047,21 +14047,21 @@ int main()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void scanf1(void)
+{
+  while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0020)) == RESET);
+  msg = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));
+}
+int fputc(int ch, FILE *f)
+{
+   
+   
+  USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), (uint8_t) ch);
+   
+  while (USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0040)) == RESET)
+  {}
+  return ch;
+}
 
 void spi_setup(void)
 {
@@ -14133,17 +14133,13 @@ void delay(void)
 }
 
  
-
-
-
-
-
-
-
-
-
-
-
-
-
+void adc_printf(void)
+{
+  adc_value = 0;
+  
+  ADC_SoftwareStartConv(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
+  while(ADC_GetFlagStatus(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x02)) == RESET);
+  adc_value = ADC_GetConversionValue(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
+  printf("The Value from ADC = %d \n", &adc_value);
+}
 
