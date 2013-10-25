@@ -303,6 +303,7 @@
           <state>$PROJ_DIR$\</state>
           <state>$PROJ_DIR$\STM32F4xx_StdPeriph_Driver\inc</state>
           <state>$PROJ_DIR$\Utilities\STM32F4-Discovery</state>
+          <state>$PROJ_DIR$\Application</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1953,13 +1954,19 @@
   <group>
     <name>User</name>
     <file>
+      <name>$PROJ_DIR$\Application\DAC_LTC1661.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\main.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\stm32f4xx_it.c</name>
+      <name>$PROJ_DIR$\Application\Oxygen_Pulse_Meter.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\system_setup.c</name>
+      <name>$PROJ_DIR$\Application\Oxygen_sensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\stm32f4xx_it.c</name>
     </file>
   </group>
 </project>

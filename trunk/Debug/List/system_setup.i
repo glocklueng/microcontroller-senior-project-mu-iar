@@ -23,6 +23,30 @@
 
 
 
+  
+  
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -12495,308 +12519,6 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
  
 
  
- 
- 
-
-  #pragma system_include
-
- 
- 
-
- 
-
-  #pragma system_include
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
- 
- 
-
-
-  #pragma system_include
-
- 
- 
-
- 
-
-  #pragma system_include
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-                 
-typedef _Sizet size_t;
-
-typedef unsigned int __data_size_t;
-
-
-
-
- 
- 
-
-  #pragma system_include
-
-
-
-
-  struct __FILE
-  {        
-    unsigned short _Mode;
-    unsigned char _Lockno;
-    signed char _Handle;
-
-     
-     
-     
-    unsigned char *_Buf, *_Bend, *_Next;
-     
-     
-    
-  
-    unsigned char *_Rend, *_Wend, *_Rback;
-
-    
-  
-    _Wchart *_WRback, _WBack[2];
-
-     
-     
-     
-    unsigned char *_Rsave, *_WRend, *_WWend;
-
-    _Mbstatet _Wstate;
-    char *_Tmpnam;
-    unsigned char _Back[1], _Cbuf;
-  };
-
-
-
- 
-
-__intrinsic __nounwind int remove(const char *);
-__intrinsic __nounwind int rename(const char *, const char *);
-
-
-
-
-
-
-
-
-
- 
-
-
-
- 
-#pragma rtmodel="__dlib_file_descriptor","1"
-
-                 
-
-  typedef _Filet FILE;
-
-
-    
-     extern FILE __iar_Stdin;
-     extern FILE __iar_Stdout;
-     extern FILE __iar_Stderr;
-    
-
-
-
-
-
-
-                 
-typedef _Fpost fpos_t;
-
-                 
-#pragma language=save
-#pragma language=extended
-
-
-                 
-  
-
-  __intrinsic __nounwind void clearerr(FILE *);
-  __intrinsic __nounwind int fclose(FILE *);
-  __intrinsic __nounwind int feof(FILE *);
-  __intrinsic __nounwind int ferror(FILE *);
-  __intrinsic __nounwind int fflush(FILE *);
-  __intrinsic __nounwind int fgetc(FILE *);
-  __intrinsic __nounwind int fgetpos(FILE *, fpos_t *);
-  __intrinsic __nounwind char * fgets(char *, int, FILE *);
-  __intrinsic __nounwind FILE * fopen(const char *, const char *);
-  _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int fprintf(FILE *, const char *, 
-                                      ...);
-  __intrinsic __nounwind int fputc(int, FILE *);
-  __intrinsic __nounwind int fputs(const char *, FILE *);
-  __intrinsic __nounwind size_t fread(void *, size_t, size_t, FILE *);
-  __intrinsic __nounwind FILE * freopen(const char *, const char *,
-                              FILE *);
-  _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown") __intrinsic __nounwind int fscanf(FILE *, const char *, 
-                                    ...);
-  __intrinsic __nounwind int fseek(FILE *, long, int);
-  __intrinsic __nounwind int fsetpos(FILE *, const fpos_t *);
-  __intrinsic __nounwind long ftell(FILE *);
-  __intrinsic __nounwind size_t fwrite(const void *, size_t, size_t, 
-                             FILE *);
-
-  __intrinsic __nounwind void rewind(FILE *);
-  __intrinsic __nounwind void setbuf(FILE *, char *);
-  __intrinsic __nounwind int setvbuf(FILE *, char *, int, size_t);
-  __intrinsic __nounwind FILE * tmpfile(void);
-  __intrinsic __nounwind int ungetc(int, FILE *);
-  _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vfprintf(FILE *, 
-                                       const char *, __Va_list);
-    _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int vfscanf(FILE *, const char *,
-                                        __Va_list);
-
-    __intrinsic __nounwind FILE * fdopen(signed char, const char *);
-    __intrinsic __nounwind signed char fileno(FILE *);
-    __intrinsic __nounwind int getw(FILE *);
-    __intrinsic __nounwind int putw(int, FILE *);
-
-  __intrinsic __nounwind int getc(FILE *);
-  __intrinsic __nounwind int putc(int, FILE *);
-  
-
-
-              
-_Pragma("function_effects = no_read(1)")    __intrinsic __nounwind char * __gets(char *, int);
-_Pragma("function_effects = no_read(1)")    __intrinsic __nounwind char * gets(char *);
-_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind void perror(const char *);
-_Pragma("function_effects = no_write(1)")    _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int printf(const char *, ...);
-_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind int puts(const char *);
-_Pragma("function_effects = no_write(1)")    _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int scanf(const char *, ...);
-_Pragma("function_effects = no_read(1), no_write(2)") _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int sprintf(char *, 
-                                                 const char *, ...);
-_Pragma("function_effects = no_write(1,2)") _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int sscanf(const char *, 
-                                                const char *, ...);
-             __intrinsic __nounwind char * tmpnam(char *);
-              
-             __intrinsic __nounwind int __ungetchar(int);
-_Pragma("function_effects = no_write(1)")    _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vprintf(const char *,
-                                                 __Va_list);
-  _Pragma("function_effects = no_write(1)")    _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int vscanf(const char *, 
-                                                  __Va_list);
-  _Pragma("function_effects = no_write(1,2)") _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int vsscanf(const char *, 
-                                                   const char *, 
-                                                   __Va_list);
-_Pragma("function_effects = no_read(1), no_write(2)")  _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vsprintf(char *, 
-                                                   const char *,
-                                                   __Va_list);
-               
-_Pragma("function_effects = no_write(1)")      __intrinsic __nounwind size_t __write_array(const void *, size_t, size_t);
-  _Pragma("function_effects = no_read(1), no_write(3)") _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int snprintf(char *, size_t, 
-                                                    const char *, ...);
-  _Pragma("function_effects = no_read(1), no_write(3)") _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vsnprintf(char *, size_t,
-                                                     const char *, 
-                                                     __Va_list);
-
-              __intrinsic __nounwind int getchar(void);
-              __intrinsic __nounwind int putchar(int);
-
-
-
-#pragma language=restore
-
-               
-    #pragma inline
-    int (getc)(FILE *_Str)
-    {
-      return fgetc(_Str);
-    }
-
-    #pragma inline
-    int (putc)(int _C, FILE *_Str)
-    {
-      return fputc(_C, _Str);
-    }
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
- 
-
- 
 
 
 
@@ -13796,6 +13518,276 @@ uint32_t LIS302DL_TIMEOUT_UserCallback(void);
  
  
 
+  #pragma system_include
+
+ 
+ 
+
+ 
+
+  #pragma system_include
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+ 
+
+
+  #pragma system_include
+
+ 
+ 
+
+ 
+
+  #pragma system_include
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+                 
+typedef _Sizet size_t;
+
+typedef unsigned int __data_size_t;
+
+
+
+
+ 
+ 
+
+  #pragma system_include
+
+
+
+
+  struct __FILE
+  {        
+    unsigned short _Mode;
+    unsigned char _Lockno;
+    signed char _Handle;
+
+     
+     
+     
+    unsigned char *_Buf, *_Bend, *_Next;
+     
+     
+    
+  
+    unsigned char *_Rend, *_Wend, *_Rback;
+
+    
+  
+    _Wchart *_WRback, _WBack[2];
+
+     
+     
+     
+    unsigned char *_Rsave, *_WRend, *_WWend;
+
+    _Mbstatet _Wstate;
+    char *_Tmpnam;
+    unsigned char _Back[1], _Cbuf;
+  };
+
+
+
+ 
+
+__intrinsic __nounwind int remove(const char *);
+__intrinsic __nounwind int rename(const char *, const char *);
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+#pragma rtmodel="__dlib_file_descriptor","1"
+
+                 
+
+  typedef _Filet FILE;
+
+
+    
+     extern FILE __iar_Stdin;
+     extern FILE __iar_Stdout;
+     extern FILE __iar_Stderr;
+    
+
+
+
+
+
+
+                 
+typedef _Fpost fpos_t;
+
+                 
+#pragma language=save
+#pragma language=extended
+
+
+                 
+  
+
+  __intrinsic __nounwind void clearerr(FILE *);
+  __intrinsic __nounwind int fclose(FILE *);
+  __intrinsic __nounwind int feof(FILE *);
+  __intrinsic __nounwind int ferror(FILE *);
+  __intrinsic __nounwind int fflush(FILE *);
+  __intrinsic __nounwind int fgetc(FILE *);
+  __intrinsic __nounwind int fgetpos(FILE *, fpos_t *);
+  __intrinsic __nounwind char * fgets(char *, int, FILE *);
+  __intrinsic __nounwind FILE * fopen(const char *, const char *);
+  _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int fprintf(FILE *, const char *, 
+                                      ...);
+  __intrinsic __nounwind int fputc(int, FILE *);
+  __intrinsic __nounwind int fputs(const char *, FILE *);
+  __intrinsic __nounwind size_t fread(void *, size_t, size_t, FILE *);
+  __intrinsic __nounwind FILE * freopen(const char *, const char *,
+                              FILE *);
+  _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown") __intrinsic __nounwind int fscanf(FILE *, const char *, 
+                                    ...);
+  __intrinsic __nounwind int fseek(FILE *, long, int);
+  __intrinsic __nounwind int fsetpos(FILE *, const fpos_t *);
+  __intrinsic __nounwind long ftell(FILE *);
+  __intrinsic __nounwind size_t fwrite(const void *, size_t, size_t, 
+                             FILE *);
+
+  __intrinsic __nounwind void rewind(FILE *);
+  __intrinsic __nounwind void setbuf(FILE *, char *);
+  __intrinsic __nounwind int setvbuf(FILE *, char *, int, size_t);
+  __intrinsic __nounwind FILE * tmpfile(void);
+  __intrinsic __nounwind int ungetc(int, FILE *);
+  _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vfprintf(FILE *, 
+                                       const char *, __Va_list);
+    _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int vfscanf(FILE *, const char *,
+                                        __Va_list);
+
+    __intrinsic __nounwind FILE * fdopen(signed char, const char *);
+    __intrinsic __nounwind signed char fileno(FILE *);
+    __intrinsic __nounwind int getw(FILE *);
+    __intrinsic __nounwind int putw(int, FILE *);
+
+  __intrinsic __nounwind int getc(FILE *);
+  __intrinsic __nounwind int putc(int, FILE *);
+  
+
+
+              
+_Pragma("function_effects = no_read(1)")    __intrinsic __nounwind char * __gets(char *, int);
+_Pragma("function_effects = no_read(1)")    __intrinsic __nounwind char * gets(char *);
+_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind void perror(const char *);
+_Pragma("function_effects = no_write(1)")    _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int printf(const char *, ...);
+_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind int puts(const char *);
+_Pragma("function_effects = no_write(1)")    _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int scanf(const char *, ...);
+_Pragma("function_effects = no_read(1), no_write(2)") _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int sprintf(char *, 
+                                                 const char *, ...);
+_Pragma("function_effects = no_write(1,2)") _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int sscanf(const char *, 
+                                                const char *, ...);
+             __intrinsic __nounwind char * tmpnam(char *);
+              
+             __intrinsic __nounwind int __ungetchar(int);
+_Pragma("function_effects = no_write(1)")    _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vprintf(const char *,
+                                                 __Va_list);
+  _Pragma("function_effects = no_write(1)")    _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int vscanf(const char *, 
+                                                  __Va_list);
+  _Pragma("function_effects = no_write(1,2)") _Pragma("__scanf_args") _Pragma("library_default_requirements _Scanf = unknown")  __intrinsic __nounwind int vsscanf(const char *, 
+                                                   const char *, 
+                                                   __Va_list);
+_Pragma("function_effects = no_read(1), no_write(2)")  _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vsprintf(char *, 
+                                                   const char *,
+                                                   __Va_list);
+               
+_Pragma("function_effects = no_write(1)")      __intrinsic __nounwind size_t __write_array(const void *, size_t, size_t);
+  _Pragma("function_effects = no_read(1), no_write(3)") _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int snprintf(char *, size_t, 
+                                                    const char *, ...);
+  _Pragma("function_effects = no_read(1), no_write(3)") _Pragma("__printf_args") _Pragma("library_default_requirements _Printf = unknown") __intrinsic __nounwind int vsnprintf(char *, size_t,
+                                                     const char *, 
+                                                     __Va_list);
+
+              __intrinsic __nounwind int getchar(void);
+              __intrinsic __nounwind int putchar(int);
+
+
+
+#pragma language=restore
+
+               
+    #pragma inline
+    int (getc)(FILE *_Str)
+    {
+      return fgetc(_Str);
+    }
+
+    #pragma inline
+    int (putc)(int _C, FILE *_Str)
+    {
+      return fputc(_C, _Str);
+    }
+
+
+
+
 
 
 
@@ -13970,66 +13962,103 @@ void Delay(volatile uint32_t nTime);
 
 
 
-void usart_setup(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  USART_InitTypeDef USART_InitStruct;
-	
-  RCC_APB1PeriphClockCmd(((uint32_t)0x00020000), ENABLE);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE);
-   
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x02), ((uint8_t)0x07));
-   
-  GPIO_PinAFConfig( ((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x03), ((uint8_t)0x07));
-	
-  
 
 
  
-	
-   
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0004) | ((uint16_t)0x0008);
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
-	
-	
-   
-  USART_InitStruct.USART_BaudRate = 9600;
-  USART_InitStruct.USART_WordLength = ((uint16_t)0x0000);
-  USART_InitStruct.USART_StopBits = ((uint16_t)0x0000);
-  USART_InitStruct.USART_Parity = ((uint16_t)0x0000) ;
-  USART_InitStruct.USART_Mode = ((uint16_t)0x0004) | ((uint16_t)0x0008);
-  USART_InitStruct.USART_HardwareFlowControl = ((uint16_t)0x0000);  
-  USART_Init(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), &USART_InitStruct);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
-  USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ENABLE);
-}
 
-void adc_setup(void)
+
+
+ 
+
+
+
+ 
+    
+
+
+
+ 
+
+  
+
+ 
+
+ 
+ 
+ 
+
+
+
+
+
+ 
+
+
+void USART_Setup(void);
+void ADC_Setup(void);
+void SPI_Setup(void);
+
+
+void ADC_Setup(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
   ADC_InitTypeDef ADC_InitStruct;
+  ADC_CommonInitTypeDef ADC_CommonInitStruct;
   
 
  
   RCC_APB2PeriphClockCmd(((uint32_t)0x00000100), ENABLE); 
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE); 
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE); 
 	
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0040);
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0002);
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
-	
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
 	
    
-  ADC_InitStruct.ADC_Resolution = ((uint32_t)0x00000000);
+   
+  ADC_InitStruct.ADC_Resolution = ((uint32_t)0x01000000);
    
   ADC_InitStruct.ADC_ScanConvMode = DISABLE;
    
@@ -14046,64 +14075,18 @@ void adc_setup(void)
 	
   
   ADC_Cmd(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ENABLE);
-	
-  ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x10), 1,((uint8_t)0x02));
+  
+   
+    
+  ADC_CommonInitStruct.ADC_Mode = ((uint32_t)0x00000000);
+   
+  ADC_CommonInitStruct.ADC_Prescaler = ((uint32_t)0x00000000);
+   
+  ADC_CommonInitStruct.ADC_DMAAccessMode = ((uint32_t)0x00000000);
+   
+  ADC_CommonInitStruct.ADC_TwoSamplingDelay = ((uint32_t)0x00000000);
+  ADC_CommonInit(&ADC_CommonInitStruct);
+  
+  ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x09), 1,((uint8_t)0x02));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

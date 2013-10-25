@@ -23,6 +23,30 @@
 
 
 
+  
+  
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -12514,30 +12538,6 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
 
 
-  
-  
- 
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   
   
@@ -13959,17 +13959,38 @@ void Delay(volatile uint32_t nTime);
 
 
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
- 
 
 
 
 
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t Channel);
 
- 
+
+uint16_t DAC_data;
+uint8_t channel;
 
 
-void usart_setup(void);
+
 void adc_setup(void);
 void spi_setup(void);
 int fputc(int ch, FILE *f);
@@ -13979,147 +14000,31 @@ void adc_printf(void);
 
 unsigned char msg ;
 char channal_DAC;
-uint16_t adc_value, DAC_data, DAC_real;
+uint16_t DAC_data;
 
 
 int main()
 {	
    
-  usart_setup();
-  adc_setup();
-  spi_setup();
+  LTC1661_Setup();
   STM_EVAL_LEDInit(LED3);
   STM_EVAL_LEDInit(LED4);
   STM_EVAL_LEDInit(LED5);
   STM_EVAL_LEDOn(LED3);
   STM_EVAL_LEDOn(LED4);
   STM_EVAL_LEDOn(LED5);
-	
-  
 
-
-
-
-
-
-
-
-
-
-
- 
-	
-  
-  
-
-
-
-
-
-
-
-
-
- 
-
-  DAC_real = 0x0128;
-  DAC_data =(DAC_real<<2) | 0xA000;
-  while(1)
-  {
-   
-    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
-    while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0080)) == RESET)
-    {
-      while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0002)) == SET)
-      {
-        SPI_I2S_SendData(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), DAC_data);
-      }
-    }
-    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
     delay();
 
-
-
+    while(1)
+  {
+ 
   }
+  
 }
 	
 
 
-
-
-void scanf1(void)
-{
-  while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0020)) == RESET);
-  msg = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));
-}
-int fputc(int ch, FILE *f)
-{
-   
-   
-  USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), (uint8_t) ch);
-   
-  while (USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0040)) == RESET)
-  {}
-  return ch;
-}
-
-void spi_setup(void)
-{
-  
-
- 
-  GPIO_InitTypeDef GPIO_InitStruct;
-  SPI_InitTypeDef SPI_InitStruct;
-  
-  
-
-
-
-
-
- 
-	
-  RCC_APB1PeriphClockCmd(((uint32_t)0x00004000), ENABLE);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
-    
-   
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x2000) | ((uint16_t)0x8000) ;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
-  
-   
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x1000);
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
-  
-  
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0C) ,((uint8_t)0x05));
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0D) ,((uint8_t)0x05));
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0F) ,((uint8_t)0x05));
-	
-  
-  SPI_InitStruct.SPI_Direction = ((uint16_t)0xC000);			
-  SPI_InitStruct.SPI_Mode = ((uint16_t)0x0104);
-  SPI_InitStruct.SPI_DataSize = ((uint16_t)0x0800);				
-  SPI_InitStruct.SPI_CPOL = ((uint16_t)0x0000);
-  SPI_InitStruct.SPI_CPHA = ((uint16_t)0x0000);
-  
-  SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0030);
-  SPI_InitStruct.SPI_FirstBit = ((uint16_t)0x0000);
-  SPI_Init(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), &SPI_InitStruct);
-  
-  
-  SPI_SSOutputCmd(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ENABLE);
-  
-  SPI_Cmd(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)),ENABLE);
-
-}
 
 
 void delay(void)
@@ -14131,15 +14036,3 @@ void delay(void)
   }
   
 }
-
- 
-void adc_printf(void)
-{
-  adc_value = 0;
-  
-  ADC_SoftwareStartConv(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
-  while(ADC_GetFlagStatus(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x02)) == RESET);
-  adc_value = ADC_GetConversionValue(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
-  printf("The Value from ADC = %d \n", &adc_value);
-}
-
