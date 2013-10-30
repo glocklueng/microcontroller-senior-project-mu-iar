@@ -23,4 +23,4 @@ LTC 1661
 
 // Define Function -------------------------------------------------------------
 void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t Channel);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);

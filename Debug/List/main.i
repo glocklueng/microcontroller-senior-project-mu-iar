@@ -13983,49 +13983,67 @@ void Delay(volatile uint32_t nTime);
 
 
 void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t Channel);
-
-
-uint16_t DAC_data;
-uint8_t channel;
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
-void adc_setup(void);
-void spi_setup(void);
+
+ 
+
+
+void Oxygen_PM(void);
 int fputc(int ch, FILE *f);
+
+
+
+
+ 
+
+
+
+void OxygenSensor_Setup(void);
+float Oxygen_convert(void);
+void timer_setting (void);
+void Calibrate_OxygenSensor(void);
+void Timer6_SetUp (void);
+
+
+
 void delay(void);
-void scanf1(void);
-void adc_printf(void);
 
 unsigned char msg ;
-char channal_DAC;
-uint16_t DAC_data;
+uint32_t count;
 
 
 int main()
 {	
    
   LTC1661_Setup();
+  OxygenSensor_Setup();
+  STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
+  Timer6_SetUp();
+  
   STM_EVAL_LEDInit(LED3);
   STM_EVAL_LEDInit(LED4);
   STM_EVAL_LEDInit(LED5);
+  STM_EVAL_LEDInit(LED6);
   STM_EVAL_LEDOn(LED3);
   STM_EVAL_LEDOn(LED4);
   STM_EVAL_LEDOn(LED5);
+  STM_EVAL_LEDOn(LED6);
 
-    delay();
-
-    while(1)
-  {
- 
-  }
   
+  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), DISABLE);
+  
+  while(1)
+  {
+    SentData_DAC (0x03FF, 1);
+    delay();
+    SentData_DAC (0x0128, 1);
+    delay();
+  }
 }
 	
-
-
-
 
 void delay(void)
 {
@@ -14035,4 +14053,21 @@ void delay(void)
     for(j=0;j<500;j++);
   }
   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void EXTI0_IRQHandler(void)
+{
+  Calibrate_OxygenSensor();
 }

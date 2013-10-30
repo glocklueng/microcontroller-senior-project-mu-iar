@@ -13971,8 +13971,33 @@ void Delay(volatile uint32_t nTime);
 
  
 
-extern uint16_t DAC_data;
-extern uint8_t channel;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+uint16_t  DAC_data,DAC_sent;
+uint8_t channel;
 
 
 void LTC1661_Setup(void)
@@ -14003,16 +14028,18 @@ void LTC1661_Setup(void)
   
    
   GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x1000);                                      
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
   
   
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0C) ,((uint8_t)0x05));
+  
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0D) ,((uint8_t)0x05));
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0F) ,((uint8_t)0x05));
+  
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
 	
   
   SPI_InitStruct.SPI_Direction = ((uint16_t)0xC000);			
@@ -14020,11 +14047,12 @@ void LTC1661_Setup(void)
   SPI_InitStruct.SPI_DataSize = ((uint16_t)0x0800);				
   SPI_InitStruct.SPI_CPOL = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_CPHA = ((uint16_t)0x0000);
-  
+  SPI_InitStruct.SPI_NSS = ((uint16_t)0x0200);
   SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0030);
   SPI_InitStruct.SPI_FirstBit = ((uint16_t)0x0000);
   SPI_Init(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), &SPI_InitStruct);
   
+  SPI_NSSInternalSoftwareConfig(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0100));
   
   SPI_SSOutputCmd(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ENABLE);
   
@@ -14036,31 +14064,40 @@ void LTC1661_Setup(void)
 
 
 
+
  
 
-void SentData_DAC (uint16_t DAC_real, uint8_t Channel)
+void SentData_DAC (uint16_t DAC_data, uint8_t channel)
 {
+   
   if(channel == 1)
   {
-    DAC_data = (DAC_data << 2) | 0x9000;
+    DAC_data = DAC_data;
+    DAC_sent = (DAC_data << 2) | 0x9000;
   }
   else if(channel == 2)
   {
-    DAC_data = (DAC_data << 2) | 0xA000;    
+    DAC_data = DAC_data;
+    DAC_sent = (DAC_data << 2) | 0xA000;    
   }
   else if(channel == 3)
   {
-    DAC_data = (DAC_data << 2) | 0xF000;      
+    DAC_data = DAC_data;
+    DAC_sent = (DAC_data << 2) | 0xF000;      
   }
+  
    
-    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
-    while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0080)) == RESET)
+  uint16_t i;
+  GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
+  while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0080)) == RESET)
+  {
+    while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0002)) == SET)
     {
-      while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0002)) == SET)
-      {
-        SPI_I2S_SendData(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), DAC_data);
-      }
+      SPI_I2S_SendData(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), DAC_sent);
     }
-    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
+  }
+  for(i=0;i<1500;i++);
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
 }
+
 
