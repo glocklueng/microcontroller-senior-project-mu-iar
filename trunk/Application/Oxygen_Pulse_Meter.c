@@ -8,7 +8,7 @@ Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SaO2)
 #include "main.h"
 #include "Oxygen_Pulse_Meter.h"
 //------------------------------------------------------------------------------
-unsigned char DataFromOPM[150];                                                 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 150 Bytes But real 155 Bytes
+unsigned char DataFromOPM[133];                                                 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 150 Bytes But real 133 Bytes
 uint8_t tx_index = 0;
 uint8_t rx_index = 0;
 
@@ -52,7 +52,7 @@ void Oxygen_PM_Setup(void)
   NVIC_InitTypeDef NVIC_InitStruct;
   //ENABLE USART2 Interruper
   NVIC_InitStruct.NVIC_IRQChannel = USART2_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
@@ -80,11 +80,12 @@ void USART2_IRQHandler(void)
       rx_index = 0;
     }
   }
-  if(USART_GetITStatus(USART2, USART_IT_TXE))
+  if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)
   {
     USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
   }
 }
+
 
 // Function can use printf(); in sent data
 int fputc(int ch, FILE *f)

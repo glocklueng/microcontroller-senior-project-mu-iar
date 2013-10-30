@@ -9,3 +9,6 @@ File : Oxygen_sensor.h
 //define Function --------------------------------------------------------------
 void OxygenSensor_Setup(void);
 float Oxygen_convert(void);
+void timer_setting (void);
+void Calibrate_OxygenSensor(void);
+void Timer6_SetUp (void);

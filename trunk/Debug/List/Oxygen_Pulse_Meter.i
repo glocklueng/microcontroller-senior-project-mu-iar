@@ -13970,7 +13970,7 @@ void Delay(volatile uint32_t nTime);
 void Oxygen_PM(void);
 int fputc(int ch, FILE *f);
 
-unsigned char DataFromOPM[150];                                                 
+unsigned char DataFromOPM[133];                                                 
 uint8_t tx_index = 0;
 uint8_t rx_index = 0;
 
@@ -14014,7 +14014,7 @@ void Oxygen_PM_Setup(void)
   NVIC_InitTypeDef NVIC_InitStruct;
   
   NVIC_InitStruct.NVIC_IRQChannel = USART2_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
@@ -14042,11 +14042,12 @@ void USART2_IRQHandler(void)
       rx_index = 0;
     }
   }
-  if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727)))
+  if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727)) != RESET)
   {
     USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727), DISABLE);
   }
 }
+
 
 
 int fputc(int ch, FILE *f)

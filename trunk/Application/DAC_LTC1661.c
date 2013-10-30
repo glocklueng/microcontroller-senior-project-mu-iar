@@ -21,6 +21,7 @@ LTC 1661
 #include "stm32f4xx.h"
 #include "main.h"
 #include <stdio.h>
+#include "DAC_LTC1661.h"
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_conf.h"
 #include "stm32f4xx_rcc.h"
@@ -30,8 +31,8 @@ LTC 1661
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_tim.h"
 //------------------------------------------------------------------------------
-extern uint16_t DAC_data;
-extern uint8_t channel;
+uint16_t  DAC_data,DAC_sent;
+uint8_t channel;
 
 // Function --------------------------------------------------------------------
 void LTC1661_Setup(void)
@@ -62,16 +63,18 @@ void LTC1661_Setup(void)
   
   /* set GPIO init structure parameters values */
   GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_12;                                      //Set for NSS Pin
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOB, &GPIO_InitStruct);
   
   //Enable Altinate Function for SPI Protocal (PB12,PB13,PB14,PB15)
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource12 ,GPIO_AF_SPI2);
+  //GPIO_PinAFConfig(GPIOB,GPIO_PinSource12 ,GPIO_AF_SPI2);
   GPIO_PinAFConfig(GPIOB,GPIO_PinSource13 ,GPIO_AF_SPI2);
   GPIO_PinAFConfig(GPIOB,GPIO_PinSource15 ,GPIO_AF_SPI2);
+  
+  GPIO_SetBits(GPIOB, GPIO_Pin_12);
 	
   //Config SPI                       	
   SPI_InitStruct.SPI_Direction = SPI_Direction_1Line_Tx;			// Tx Only
@@ -79,47 +82,57 @@ void LTC1661_Setup(void)
   SPI_InitStruct.SPI_DataSize = SPI_DataSize_16b;				//Data size is 16 bits for transfer data 10 bits to DAC IC
   SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
   SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
-  //SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set;
+  SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
   SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
   SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
   SPI_Init(SPI2, &SPI_InitStruct);
   
+  SPI_NSSInternalSoftwareConfig(SPI2, SPI_NSSInternalSoft_Set);
   //Enable select output
   SPI_SSOutputCmd(SPI2, ENABLE);
   //Enable SPI2
   SPI_Cmd(SPI2,ENABLE);
 }
+
 /*
-    uint16_t DAC_real   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
+    uint16_t DAC_data   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
     uint8_t Channel     : Select Channel 
                           1 - Channel 1
                           2 - Channel 2
-                          3 - Both Channel 1 and 2
+                          3 - Channel 1 and 2
 */
 
-void SentData_DAC (uint16_t DAC_real, uint8_t Channel)
+void SentData_DAC (uint16_t DAC_data, uint8_t channel)
 {
+  /* Select Channel */
   if(channel == 1)
   {
-    DAC_data = (DAC_data << 2) | 0x9000;
+    DAC_data = DAC_data;
+    DAC_sent = (DAC_data << 2) | 0x9000;
   }
   else if(channel == 2)
   {
-    DAC_data = (DAC_data << 2) | 0xA000;    
+    DAC_data = DAC_data;
+    DAC_sent = (DAC_data << 2) | 0xA000;    
   }
   else if(channel == 3)
   {
-    DAC_data = (DAC_data << 2) | 0xF000;      
+    DAC_data = DAC_data;
+    DAC_sent = (DAC_data << 2) | 0xF000;      
   }
-   
-    GPIO_ResetBits(GPIOB, GPIO_Pin_12);
-    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == RESET)
+  
+  /* Sent Data */
+  uint16_t i;
+  GPIO_ResetBits(GPIOB, GPIO_Pin_12);
+  while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == RESET)
+  {
+    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == SET)
     {
-      while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == SET)
-      {
-        SPI_I2S_SendData(SPI2, DAC_data);
-      }
+      SPI_I2S_SendData(SPI2, DAC_sent);
     }
-    GPIO_SetBits(GPIOB, GPIO_Pin_12);
+  }
+  for(i=0;i<1500;i++);
+  GPIO_SetBits(GPIOB, GPIO_Pin_12);
 }
+
 //------------------------------------------------------------------------------
