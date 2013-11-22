@@ -9,9 +9,10 @@ File : Oxygen_sensor.c
 #include "DAC_LTC1661.h"
 //------------------------------------------------------------------------------
 // Define Variable -------------------------------------------------------------
-uint16_t ADC_Value;
+uint16_t ADC_Value, ADC_V;
 uint16_t time = 0;
-float ADC_Voltage;
+uint16_t ADC_Voltage;
+double ADC_fValue;
 float FiO2_PureOxygen[60], FiO2_PureAir[60];
 float FiO2_Upper, FiO2_Lower;
 // Function --------------------------------------------------------------------
@@ -68,6 +69,7 @@ void OxygenSensor_Setup(void)
   ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 1,ADC_SampleTime_28Cycles);
 }
 
+//------------------------------------------------------------------------------
 void Timer6_SetUp(void)
 {
   /*
@@ -89,9 +91,10 @@ void Timer6_SetUp(void)
   /*Timer Interrupt*/
   /* Set interrupt: NVIC_Setup */
   NVIC_InitTypeDef NVIC_InitStruct;
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
   //ENABLE TIM6 Interruper
   NVIC_InitStruct.NVIC_IRQChannel = TIM6_DAC_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
@@ -103,24 +106,35 @@ void Timer6_SetUp(void)
   TIM_Cmd(TIM6, ENABLE);
 }
 
+//------------------------------------------------------------------------------
 float Oxygen_convert(void)
 {
   ADC_SoftwareStartConv(ADC1);
   while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
   /*Store ADC Sample*/
   ADC_Value = ADC_GetConversionValue(ADC1);
-  ADC_Voltage = ADC_Value*(float)2.94/(float)1023;                              //VDD is vary (time1 = 3.02, time2 = 2.94)
+  
+  ADC_Voltage = (ADC_Value*2940)/1023;                                          //VDD is vary (time1 = 3.02, time2 = 2.94)
+  
+  ADC_V = ((float)(ADC_Value*2.94))/1023;
+  
+  //Convert int to float
+  ADC_fValue = ADC_Voltage/1000;
+  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 1000)/100) * 0.1);
+  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 100)/10) * 0.01);
+  ADC_fValue = ADC_fValue + (float)(((uint32_t)ADC_Voltage % 10/1) * 0.001);
   
   return ADC_Voltage;
 }
 
+//------------------------------------------------------------------------------
 void Calibrate_OxygenSensor(void)
 {
   // Calibrate Oxygen Concentration (Pure Oxygen)
   SentData_DAC(0x03FF, 1);
-  //delay();
   SentData_DAC(0x0000, 2);
   time = 0;
+
   while(time <= 60)                                                             
   {
     TIM_Cmd(TIM6, ENABLE);
@@ -137,9 +151,8 @@ void Calibrate_OxygenSensor(void)
   //Calibrate Oxygen Concentration (Pure Air)
   time = 0;
   SentData_DAC(0x0000, 1);
-  //delay();
   SentData_DAC(0x03FF, 2);
-
+  
   while(time <= 60)
   {  
     TIM_Cmd(TIM6, ENABLE);
@@ -154,8 +167,29 @@ void Calibrate_OxygenSensor(void)
   
   FiO2_Lower = (FiO2_PureAir[55] + FiO2_PureAir[56] +FiO2_PureAir[57] +FiO2_PureAir[58] +FiO2_PureAir[59])/5;
   
+  //Close Air and Oxygen Valve
+  SentData_DAC(0x0000, 3);
+}
+
+//------------------------------------------------------------------------------
+// Interrupt Push Botton User (Blue Botton)
+void EXTI0_IRQHandler(void)
+{
+  Calibrate_OxygenSensor();
   // Clear Flag Interrupt
   EXTI_ClearITPendingBit(EXTI_Line0);
 }
+
+//void TIM6_DAC_IRQHandler(void)
+//{
+//  if (TIM_GetITStatus (TIM6, TIM_IT_Update) == RESET)
+//  {
+//    FiO2_PureOxygen[time] = Oxygen_convert();
+//    time = time + 1;
+//    STM_EVAL_LEDOff(LED5);
+//    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
+//  }
+//}
+
 
 //------------------------------------------------------------------------------

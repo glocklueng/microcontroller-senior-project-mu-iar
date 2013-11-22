@@ -12,40 +12,32 @@ File : main.c
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#include "GLCD5110.h"
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 void delay(void);
+void LCD_SetUp(void);
+void System_Init(void);
+
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
 uint32_t count;
+extern uint16_t time;
 
 // Main Function ---------------------------------------------------------------
 int main()
 {	
   /* Set Up config System*/
-  LTC1661_Setup();
-  OxygenSensor_Setup();
-  STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
-  Timer6_SetUp();
-  // LED Set UP
-  STM_EVAL_LEDInit(LED3);
-  STM_EVAL_LEDInit(LED4);
-  STM_EVAL_LEDInit(LED5);
-  STM_EVAL_LEDInit(LED6);
-  STM_EVAL_LEDOn(LED3);
-  STM_EVAL_LEDOn(LED4);
-  STM_EVAL_LEDOn(LED5);
-  STM_EVAL_LEDOn(LED6);
-
-  // Disable Timer 6
-  TIM_Cmd(TIM6, DISABLE);
-  
+  System_Init();
+  lcdInit();
+  lcdString (1,1,"Hello");
   while(1)
   {
-    SentData_DAC (0x03FF, 1);
-    delay();
-    SentData_DAC (0x0128, 1);
+    //SentData_DAC (0x0100, 1);
+    lcdString (1,1,"Hello");
+    lcdString (1,2,"Phattaradanai");
+    lcdUpdate();
     delay();
   }
 }
@@ -60,19 +52,30 @@ void delay(void)
   }
 }
 
+//------------------------------------------------------------------------------
+void System_Init(void)
+{
+  LTC1661_Setup();
+  OxygenSensor_Setup();
+  STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
+  Timer6_SetUp();
+  // LED Set UP
+  STM_EVAL_LEDInit(LED3);
+  STM_EVAL_LEDInit(LED4);
+  STM_EVAL_LEDInit(LED5);
+  STM_EVAL_LEDInit(LED6);
+  STM_EVAL_LEDOn(LED3);
+  STM_EVAL_LEDOn(LED4);
+  STM_EVAL_LEDOn(LED5);
+  STM_EVAL_LEDOn(LED6);
+}
+
 //void TIM6_DAC_IRQHandler(void)
 //{
 //  if (TIM_GetITStatus (TIM6, TIM_IT_Update) != RESET)
 //  {
-//    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
 //    time = time + 1;
 //    STM_EVAL_LEDOff(LED5);
-//    delay();
+//    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
 //  }
 //}
-
-// Interrupt Push Botton User (Blue Botton)
-void EXTI0_IRQHandler(void)
-{
-  Calibrate_OxygenSensor();
-}

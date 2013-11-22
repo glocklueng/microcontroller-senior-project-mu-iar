@@ -2,20 +2,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  
 
 
@@ -13962,14 +13948,6 @@ void Delay(volatile uint32_t nTime);
 
 
  
- 
- 
-
-
-
-
-
- 
 
 
 
@@ -13996,14 +13974,263 @@ void Delay(volatile uint32_t nTime);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
-uint16_t  DAC_data,DAC_sent;
-uint8_t channel;
 
 
-void LTC1661_Setup(void)
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+ 
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+typedef enum
+{
+    LCD_CMD  = 0,
+    LCD_DATA = 1
+
+} LcdCmdData;
+
+
+ 
+void lcdInit(void);
+void lcdClear(void);
+void lcdUpdate(void);
+void lcdGotoXY(unsigned char x,unsigned char y);
+void lcdChar(char ch);
+void lcdString(unsigned char _x,unsigned char _y,char *dataPtr);
+void lcdPixel(unsigned char x, unsigned char y, unsigned char mode);
+void lcdLine(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2, unsigned char mode);
+void lcdProgBar(    unsigned char _x, 
+				    unsigned char _y, 
+				    unsigned char width, 
+				    unsigned char high, 
+				    unsigned char percentage);
+void configGlcd(void);
+void lcdBackLight(char set);
+
+
+ 
+
+
+static void lcdSend(unsigned char Data_Send, LcdCmdData cd);
+void delay_ms(volatile unsigned long ms);
+
+
+
+
+ 
+static const unsigned char FontLookup [][5] =
+{
+    { 0x00, 0x00, 0x00, 0x00, 0x00 },  
+    { 0x00, 0x00, 0x2f, 0x00, 0x00 },   
+    { 0x00, 0x07, 0x00, 0x07, 0x00 },   
+    { 0x14, 0x7f, 0x14, 0x7f, 0x14 },   
+    { 0x24, 0x2a, 0x7f, 0x2a, 0x12 },   
+    { 0x23, 0x13, 0x08, 0x64, 0x62 },   
+    { 0x36, 0x49, 0x55, 0x22, 0x50 },   
+    { 0x00, 0x05, 0x03, 0x00, 0x00 },   
+    { 0x00, 0x1c, 0x22, 0x41, 0x00 },   
+    { 0x00, 0x41, 0x22, 0x1c, 0x00 },   
+    { 0x14, 0x08, 0x3E, 0x08, 0x14 },   
+    { 0x08, 0x08, 0x3E, 0x08, 0x08 },   
+    { 0x00, 0x00, 0x50, 0x30, 0x00 },   
+    { 0x10, 0x10, 0x10, 0x10, 0x10 },   
+    { 0x00, 0x60, 0x60, 0x00, 0x00 },   
+    { 0x20, 0x10, 0x08, 0x04, 0x02 },   
+    { 0x3E, 0x51, 0x49, 0x45, 0x3E },   
+    { 0x00, 0x42, 0x7F, 0x40, 0x00 },   
+    { 0x42, 0x61, 0x51, 0x49, 0x46 },   
+    { 0x21, 0x41, 0x45, 0x4B, 0x31 },   
+    { 0x18, 0x14, 0x12, 0x7F, 0x10 },   
+    { 0x27, 0x45, 0x45, 0x45, 0x39 },   
+    { 0x3C, 0x4A, 0x49, 0x49, 0x30 },   
+    { 0x01, 0x71, 0x09, 0x05, 0x03 },   
+    { 0x36, 0x49, 0x49, 0x49, 0x36 },   
+    { 0x06, 0x49, 0x49, 0x29, 0x1E },   
+    { 0x00, 0x36, 0x36, 0x00, 0x00 },   
+    { 0x00, 0x56, 0x36, 0x00, 0x00 },   
+    { 0x08, 0x14, 0x22, 0x41, 0x00 },   
+    { 0x14, 0x14, 0x14, 0x14, 0x14 },   
+    { 0x00, 0x41, 0x22, 0x14, 0x08 },   
+    { 0x02, 0x01, 0x51, 0x09, 0x06 },   
+    { 0x32, 0x49, 0x59, 0x51, 0x3E },   
+    { 0x7E, 0x11, 0x11, 0x11, 0x7E },   
+    { 0x7F, 0x49, 0x49, 0x49, 0x36 },   
+    { 0x3E, 0x41, 0x41, 0x41, 0x22 },   
+    { 0x7F, 0x41, 0x41, 0x22, 0x1C },   
+    { 0x7F, 0x49, 0x49, 0x49, 0x41 },   
+    { 0x7F, 0x09, 0x09, 0x09, 0x01 },   
+    { 0x3E, 0x41, 0x49, 0x49, 0x7A },   
+    { 0x7F, 0x08, 0x08, 0x08, 0x7F },   
+    { 0x00, 0x41, 0x7F, 0x41, 0x00 },   
+    { 0x20, 0x40, 0x41, 0x3F, 0x01 },   
+    { 0x7F, 0x08, 0x14, 0x22, 0x41 },   
+    { 0x7F, 0x40, 0x40, 0x40, 0x40 },   
+    { 0x7F, 0x02, 0x0C, 0x02, 0x7F },   
+    { 0x7F, 0x04, 0x08, 0x10, 0x7F },   
+    { 0x3E, 0x41, 0x41, 0x41, 0x3E },   
+    { 0x7F, 0x09, 0x09, 0x09, 0x06 },   
+    { 0x3E, 0x41, 0x51, 0x21, 0x5E },   
+    { 0x7F, 0x09, 0x19, 0x29, 0x46 },   
+    { 0x46, 0x49, 0x49, 0x49, 0x31 },   
+    { 0x01, 0x01, 0x7F, 0x01, 0x01 },   
+    { 0x3F, 0x40, 0x40, 0x40, 0x3F },   
+    { 0x1F, 0x20, 0x40, 0x20, 0x1F },   
+    { 0x3F, 0x40, 0x38, 0x40, 0x3F },   
+    { 0x63, 0x14, 0x08, 0x14, 0x63 },   
+    { 0x07, 0x08, 0x70, 0x08, 0x07 },   
+    { 0x61, 0x51, 0x49, 0x45, 0x43 },   
+    { 0x00, 0x7F, 0x41, 0x41, 0x00 },   
+    { 0x02, 0x04, 0x08, 0x10, 0x20 },   
+    { 0x00, 0x41, 0x41, 0x7F, 0x00 },   
+    { 0x04, 0x02, 0x01, 0x02, 0x04 },   
+    { 0x40, 0x40, 0x40, 0x40, 0x40 },   
+    { 0x00, 0x01, 0x02, 0x04, 0x00 },   
+    { 0x20, 0x54, 0x54, 0x54, 0x78 },   
+    { 0x7F, 0x48, 0x44, 0x44, 0x38 },   
+    { 0x38, 0x44, 0x44, 0x44, 0x20 },   
+    { 0x38, 0x44, 0x44, 0x48, 0x7F },   
+    { 0x38, 0x54, 0x54, 0x54, 0x18 },   
+    { 0x08, 0x7E, 0x09, 0x01, 0x02 },   
+    { 0x0C, 0x52, 0x52, 0x52, 0x3E },   
+    { 0x7F, 0x08, 0x04, 0x04, 0x78 },   
+    { 0x00, 0x44, 0x7D, 0x40, 0x00 },   
+    { 0x20, 0x40, 0x44, 0x3D, 0x00 },   
+    { 0x7F, 0x10, 0x28, 0x44, 0x00 },   
+    { 0x00, 0x41, 0x7F, 0x40, 0x00 },   
+    { 0x7C, 0x04, 0x18, 0x04, 0x78 },   
+    { 0x7C, 0x08, 0x04, 0x04, 0x78 },   
+    { 0x38, 0x44, 0x44, 0x44, 0x38 },   
+    { 0x7C, 0x14, 0x14, 0x14, 0x08 },   
+    { 0x08, 0x14, 0x14, 0x18, 0x7C },   
+    { 0x7C, 0x08, 0x04, 0x04, 0x08 },   
+    { 0x48, 0x54, 0x54, 0x54, 0x20 },   
+    { 0x04, 0x3F, 0x44, 0x40, 0x20 },   
+    { 0x3C, 0x40, 0x40, 0x20, 0x7C },   
+    { 0x1C, 0x20, 0x40, 0x20, 0x1C },   
+    { 0x3C, 0x40, 0x30, 0x40, 0x3C },   
+    { 0x44, 0x28, 0x10, 0x28, 0x44 },   
+    { 0x0C, 0x50, 0x50, 0x50, 0x3C },   
+    { 0x44, 0x64, 0x54, 0x4C, 0x44 }    
+};
+
+
+ 
+
+
+
+ 
+static unsigned char  LcdCache [ ((84 * 48) / 8) ];
+
+static int   LcdCacheIdx;
+static int   LoWaterMark;
+static int   HiWaterMark;
+static char  UpdateLcd;
+unsigned char glcd_ini=0;
+
+
+
+
+void delay_ms(volatile unsigned long ms)  
+{
+   volatile unsigned long i,j;
+	for (i = 0; i < ms; i++ )
+	for (j = 0; j < 5525; j++ );
+}
+
+void port_init()
 {
    
-  
   GPIO_InitTypeDef GPIO_InitStruct;
   SPI_InitTypeDef SPI_InitStruct;
   
@@ -14012,51 +14239,442 @@ void LTC1661_Setup(void)
 
 
 
-
  
 	
-  RCC_APB1PeriphClockCmd(((uint32_t)0x00004000), ENABLE);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
+
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);  
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000008), ENABLE);
     
-   
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x2000) | ((uint16_t)0x8000) ;                       
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
+
+
+
+
+
+
+
   
-   
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x1000);                                      
+  
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0002) ;                                     
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStruct);
   
   
+
+
+
+
+
+ 
+
+   
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0004) | ((uint16_t)0x0008) | ((uint16_t)0x0040);             
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStruct);
   
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0D) ,((uint8_t)0x05));
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0F) ,((uint8_t)0x05));
+
+
+
   
-  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));                                              
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
-  SPI_InitStruct.SPI_Direction = ((uint16_t)0xC000);			
-  SPI_InitStruct.SPI_Mode = ((uint16_t)0x0104);
-  SPI_InitStruct.SPI_DataSize = ((uint16_t)0x0800);				
-  SPI_InitStruct.SPI_CPOL = ((uint16_t)0x0000);
-  SPI_InitStruct.SPI_CPHA = ((uint16_t)0x0000);
-  SPI_InitStruct.SPI_NSS = ((uint16_t)0x0200);
-  SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0028);
-  SPI_InitStruct.SPI_FirstBit = ((uint16_t)0x0000);
-  SPI_Init(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), &SPI_InitStruct);
   
-  SPI_NSSInternalSoftwareConfig(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0100));
+  SPI_DataSizeConfig(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0000));
   
-  SPI_SSOutputCmd(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ENABLE);
   
-  SPI_Cmd(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)),ENABLE);
+  
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0004));
+}
+
+
+void lcdInit ( void )
+{
+   port_init();
+   delay_ms(10); 
+   GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0040));						
+   GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0040));
+   
+   GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));						
+   lcdSend( 0x21, LCD_CMD );  
+   lcdSend( 0xC8, LCD_CMD );  
+   lcdSend( 0x06, LCD_CMD );  
+   lcdSend( 0x13, LCD_CMD );  
+   lcdSend( 0x20, LCD_CMD );  
+   lcdSend( 0x0C, LCD_CMD );  
+    
+   
+   LoWaterMark = ((84 * 48) / 8);
+   HiWaterMark = 0;
+   lcdClear();
+   lcdUpdate();
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdClear ( void )
+{
+    int i;
+
+    for ( i = 0; i < ((84 * 48) / 8); i++ )
+    {
+        LcdCache[i] = 0x00;
+    }
+
+    
+    LoWaterMark = 0;
+    HiWaterMark = ((84 * 48) / 8) - 1;
+
+    UpdateLcd = 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdGotoXY ( unsigned char x, unsigned char y )
+{
+    configGlcd();
+    LcdCacheIdx = (x - 1) * 6 + (y - 1) * 84;
+}
+
+void configGlcd()
+{
+    if(glcd_ini==0)
+    {
+        glcd_ini=1;
+        lcdInit();
+        lcdClear();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
+{
+    
+
+
+
+ 
+  
+    uint16_t i;
+    if ( cd == LCD_DATA )
+    {
+      
+      GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0008));
+    }
+    else 
+    {
+      
+      GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0008));
+    }
+    
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));						
+    
+    while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0080)) == RESET)
+    {
+      while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0002)) == SET)
+      {
+        SPI_I2S_SendData(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), Data_Send);
+      }
+    }
+    for(i=0;i<750;i++);
+    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));						
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdChar (char ch )
+{
+    unsigned char i;
+    configGlcd();
+    if ( LcdCacheIdx < LoWaterMark )
+    {
+        
+        LoWaterMark = LcdCacheIdx;
+    }
+
+    if ( (ch < 0x20) || (ch > 0x7b) )
+    {
+        
+        ch = 92;
+    }
+
+    for ( i = 0; i < 5; i++ )
+    {
+        LcdCache[LcdCacheIdx++] = FontLookup[ch - 32][i] << 1;
+    }
+    if ( LcdCacheIdx > HiWaterMark )
+    {
+        
+        HiWaterMark = LcdCacheIdx;
+    }
+
+    
+    LcdCache[LcdCacheIdx++] = 0x00;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdString (unsigned char _x,unsigned char _y,char *dataPtr)
+{
+    configGlcd();
+    lcdGotoXY(_x,_y);
+    while (*dataPtr)
+    {
+        lcdChar(*dataPtr++);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdPixel(unsigned char x, unsigned char y, unsigned char mode)
+{
+    unsigned int  index;
+    unsigned char  offset;
+    unsigned char  data;
+
+    configGlcd();
+    if ( x > 84 ) return;
+    if ( y > 48 ) return;
+
+    index = ((y / 8) * 84) + x;
+    offset  = y - ((y / 8) * 8);
+
+    data = LcdCache[index];
+
+    if ( mode == 0 )
+	{
+        data &= (~(0x01 << offset));
+    }
+    else if ( mode == 1 )
+    {
+        data |= (0x01 << offset);
+    }
+    else if ( mode  == 1 )
+    {
+        data ^= (0x01 << offset);
+    }
+
+    LcdCache[index] = data;
+
+    if ( index < LoWaterMark )
+    {
+        
+        LoWaterMark = index;
+    }
+
+    if ( index > HiWaterMark )
+    {
+        
+        HiWaterMark = index;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdLine ( unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2, unsigned char mode )
+{
+    int dx, dy, stepx, stepy, fraction;
+    configGlcd();
+    dy = y2 - y1;
+    dx = x2 - x1;
+
+    if ( dy < 0 )
+    {
+        dy    = -dy;
+        stepy = -1;
+    }
+    else
+    {
+        stepy = 1;
+    }
+
+    if ( dx < 0 )
+    {
+        dx    = -dx;
+        stepx = -1;
+    }
+    else
+    {
+        stepx = 1;
+    }
+
+    dx <<= 1;
+    dy <<= 1;
+
+    lcdPixel( x1, y1, mode );
+
+    if ( dx > dy )
+    {
+        fraction = dy - (dx >> 1);
+        while ( x1 != x2 )
+        {
+            if ( fraction >= 0 )
+            {
+                y1 += stepy;
+                fraction -= dx;
+            }
+            x1 += stepx;
+            fraction += dy;
+            lcdPixel( x1, y1, mode );
+        }
+    }
+    else
+    {
+        fraction = dx - (dy >> 1);
+        while ( y1 != y2 )
+        {
+            if ( fraction >= 0 )
+            {
+                x1 += stepx;
+                fraction -= dy;
+            }
+            y1 += stepy;
+            fraction += dx;
+            lcdPixel( x1, y1, mode );
+        }
+    }
+
+    UpdateLcd = 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+void lcdUpdate ( void )
+{
+    int i;
+
+    if ( LoWaterMark < 0 )
+        LoWaterMark = 0;
+    else if ( LoWaterMark >= ((84 * 48) / 8) )
+        LoWaterMark = ((84 * 48) / 8) - 1;
+
+    if ( HiWaterMark < 0 )
+        HiWaterMark = 0;
+    else if ( HiWaterMark >= ((84 * 48) / 8) )
+        HiWaterMark = ((84 * 48) / 8) - 1;
+
+    
+    lcdSend( 0x80 | (LoWaterMark % 84), LCD_CMD );
+    lcdSend( 0x40 | (LoWaterMark / 84), LCD_CMD );
+
+    
+    for ( i = LoWaterMark; i <= HiWaterMark; i++ )
+    {
+        lcdSend( LcdCache[i], LCD_DATA );
+    }
+
+    
+    LoWaterMark = ((84 * 48) / 8) - 1;
+    HiWaterMark = 0;
+
+    UpdateLcd = 0;
 }
 
 
@@ -14066,38 +14684,77 @@ void LTC1661_Setup(void)
 
 
  
-
-void SentData_DAC (uint16_t DAC_data, uint8_t channel)
+void lcdRect(	unsigned char x1, 
+				unsigned char y1, 
+				unsigned char x2, 
+				unsigned char y2, 
+				unsigned char fill, 
+				unsigned char color)
 {
-   
-  if(channel == 1)
-  {
-    DAC_data = DAC_data;
-    DAC_sent = (DAC_data << 2) | 0x9000;
-  }
-  else if(channel == 2)
-  {
-    DAC_data = DAC_data;
-    DAC_sent = (DAC_data << 2) | 0xA000;    
-  }
-  else if(channel == 3)
-  {
-    DAC_data = DAC_data;
-    DAC_sent = (DAC_data << 2) | 0xF000;      
-  }
-  
-   
-  uint16_t i;
-  GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
-  while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0080)) == RESET)
-  {
-    while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0002)) == SET)
-    {
-      SPI_I2S_SendData(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), DAC_sent);
-    }
-  }
-  for(i=0;i<1500;i++);
-  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint16_t)0x1000));
+   if(fill)
+   {
+      unsigned char  i, xmin, xmax, ymin, ymax;
+      
+      if(x1 < x2)     
+      {
+         xmin = x1;
+         xmax = x2;
+      }
+      else
+      {
+         xmin = x2;
+         xmax = x1;
+      }
+
+      if(y1 < y2)                            
+      {
+         ymin = y1;
+         ymax = y2;
+      }
+      else
+      {
+         ymin = y2;
+         ymax = y1;
+      }
+
+      for(; xmin <= xmax; ++xmin)
+      {
+         for(i=ymin; i<=ymax; ++i)
+         {
+            lcdPixel(xmin, i, color);
+         }
+      }
+   }
+   else
+   {
+      lcdLine(x1, y1, x2, y1, color);      
+      lcdLine(x1, y2, x2, y2, color);
+      lcdLine(x1, y1, x1, y2, color);
+      lcdLine(x2, y1, x2, y2, color);
+   }
 }
 
 
+
+void lcdProgBar(    unsigned char _x, 
+				    unsigned char _y, 
+				    unsigned char width, 
+				    unsigned char high, 
+				    unsigned char percentage)
+{
+    lcdRect(_x,_y,_x+width,_y+high,0,1);   
+    lcdRect(_x+1,_y+1,_x+width-1,_y+high-1,1,0);    
+    lcdRect(_x,_y,_x+((percentage*width)/100),_y+high,1,1); 
+
+}
+void lcdBackLight(char set)
+{
+  if(set == SET)
+  {
+    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)),((uint16_t)0x0004));                                             
+  }
+  else if (set ==  RESET)
+  {
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0004));                                          
+  }
+}

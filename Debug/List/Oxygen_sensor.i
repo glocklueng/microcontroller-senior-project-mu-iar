@@ -13999,9 +13999,10 @@ void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
-uint16_t ADC_Value;
+uint16_t ADC_Value, ADC_V;
 uint16_t time = 0;
-float ADC_Voltage;
+uint16_t ADC_Voltage;
+double ADC_fValue;
 float FiO2_PureOxygen[60], FiO2_PureAir[60];
 float FiO2_Upper, FiO2_Lower;
 
@@ -14058,6 +14059,7 @@ void OxygenSensor_Setup(void)
   ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x09), 1,((uint8_t)0x02));
 }
 
+
 void Timer6_SetUp(void)
 {
   
@@ -14079,9 +14081,10 @@ void Timer6_SetUp(void)
    
    
   NVIC_InitTypeDef NVIC_InitStruct;
+  NVIC_PriorityGroupConfig(((uint32_t)0x600));
   
   NVIC_InitStruct.NVIC_IRQChannel = TIM6_DAC_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
@@ -14093,24 +14096,35 @@ void Timer6_SetUp(void)
   TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
 }
 
+
 float Oxygen_convert(void)
 {
   ADC_SoftwareStartConv(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
   while(ADC_GetFlagStatus(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x02)) == RESET);
    
   ADC_Value = ADC_GetConversionValue(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
-  ADC_Voltage = ADC_Value*(float)2.94/(float)1023;                              
+  
+  ADC_Voltage = (ADC_Value*2940)/1023;                                          
+  
+  ADC_V = ((float)(ADC_Value*2.94))/1023;
+  
+  
+  ADC_fValue = ADC_Voltage/1000;
+  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 1000)/100) * 0.1);
+  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 100)/10) * 0.01);
+  ADC_fValue = ADC_fValue + (float)(((uint32_t)ADC_Voltage % 10/1) * 0.001);
   
   return ADC_Voltage;
 }
+
 
 void Calibrate_OxygenSensor(void)
 {
   
   SentData_DAC(0x03FF, 1);
-  
   SentData_DAC(0x0000, 2);
   time = 0;
+
   while(time <= 60)                                                             
   {
     TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
@@ -14127,9 +14141,8 @@ void Calibrate_OxygenSensor(void)
   
   time = 0;
   SentData_DAC(0x0000, 1);
-  
   SentData_DAC(0x03FF, 2);
-
+  
   while(time <= 60)
   {  
     TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
@@ -14145,7 +14158,28 @@ void Calibrate_OxygenSensor(void)
   FiO2_Lower = (FiO2_PureAir[55] + FiO2_PureAir[56] +FiO2_PureAir[57] +FiO2_PureAir[58] +FiO2_PureAir[59])/5;
   
   
+  SentData_DAC(0x0000, 3);
+}
+
+
+
+void EXTI0_IRQHandler(void)
+{
+  Calibrate_OxygenSensor();
+  
   EXTI_ClearITPendingBit(((uint32_t)0x00001));
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
