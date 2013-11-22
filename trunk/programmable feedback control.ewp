@@ -1957,6 +1957,9 @@
       <name>$PROJ_DIR$\Application\DAC_LTC1661.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\Application\GLCD5110.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\main.c</name>
     </file>
     <file>
