@@ -12577,6 +12577,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
 
 
+
  
   
 
@@ -12594,6 +12595,16 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -12629,7 +12640,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
  
-
+ 
 
  
 
@@ -12652,11 +12663,6 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
- 
-
-     
-
- 
 
 
 
@@ -14474,6 +14480,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -14601,23 +14613,15 @@ void USB_OTG_BSP_EnableInterrupt (USB_OTG_CORE_HANDLE *pdev);
 
 
 
+  
 
-
+ 
 
 
 
 
   
 
-
-
-
-  
-
-
-
-
-  
 
 
   
@@ -14716,11 +14720,7 @@ void USB_OTG_BSP_EnableInterrupt (USB_OTG_CORE_HANDLE *pdev);
 
 void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
 {
-  GPIO_InitTypeDef GPIO_InitStructure;
-
-  
- 
-
+  GPIO_InitTypeDef GPIO_InitStructure;   
   RCC_AHB1PeriphClockCmd( ((uint32_t)0x00000001) , ENABLE);  
   
    
@@ -14736,8 +14736,8 @@ void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStructure);  
   
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x08),((uint8_t)0xA)) ;
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x09),((uint8_t)0xA)) ; 
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x0B),((uint8_t)0xA)) ; 
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x09),((uint8_t)0xA)) ;
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x0B),((uint8_t)0xA)) ;
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x0C),((uint8_t)0xA)) ;
   
    
@@ -14748,21 +14748,22 @@ void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;  
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStructure);  
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x0A),((uint8_t)0xA)) ;   
-
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint8_t)0x0A),((uint8_t)0xA)) ;
+ 
   RCC_APB2PeriphClockCmd(((uint32_t)0x00004000), ENABLE);
-  RCC_AHB2PeriphClockCmd(((uint32_t)0x00000080), ENABLE) ; 
+  RCC_AHB2PeriphClockCmd(((uint32_t)0x00000080), ENABLE) ;
 
-  
-   
-  RCC_APB1PeriphResetCmd(((uint32_t)0x10000000), ENABLE);   
-  
-   
-  STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
-  
-  
 
-  EXTI_ClearITPendingBit(((uint32_t)0x00001));  
+
+   
+  RCC_APB1PeriphResetCmd(((uint32_t)0x10000000), ENABLE);
+
+
+
+
+  EXTI_ClearITPendingBit(((uint32_t)0x00001));
+
+
 }
 
 

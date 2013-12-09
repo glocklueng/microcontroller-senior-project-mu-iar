@@ -118,6 +118,14 @@ typedef enum
 /** @defgroup STM32F4_DISCOVERY_LOW_LEVEL_Exported_Macros
   * @{
   */  
+
+#define DISCOVERY_COM                USART1
+
+/**
+ * @brief IRQ
+ */
+#define DISCOVERY_COM_IRQn           USART1_IRQn
+
 /**
   * @}
   */ 
