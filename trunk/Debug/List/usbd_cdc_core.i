@@ -276,9 +276,6 @@
  
 
 
- 
- 
-
 
 
  
@@ -4175,15 +4172,15 @@ typedef struct
   volatile uint32_t ALRMAR;   
   volatile uint32_t ALRMBR;   
   volatile uint32_t WPR;      
-  volatile uint32_t SSR;      
-  volatile uint32_t SHIFTR;   
-  volatile uint32_t TSTR;     
-  volatile uint32_t TSDR;     
-  volatile uint32_t TSSSR;    
-  volatile uint32_t CALR;     
-  volatile uint32_t TAFCR;    
-  volatile uint32_t ALRMASSR; 
-  volatile uint32_t ALRMBSSR; 
+  volatile uint32_t SSR;        
+  volatile uint32_t SHIFTR;     
+  volatile uint32_t TSTR;       
+  volatile uint32_t TSDR;       
+  volatile uint32_t TSSSR;      
+  volatile uint32_t CALR;       
+  volatile uint32_t TAFCR;      
+  volatile uint32_t ALRMASSR;   
+  volatile uint32_t ALRMBSSR;   
   uint32_t RESERVED7;     
   volatile uint32_t BKP0R;    
   volatile uint32_t BKP1R;    
@@ -4402,7 +4399,6 @@ typedef struct
  
 
 
- 
 
 
  
@@ -4979,9 +4975,7 @@ typedef struct
 
 
  
- 
 
- 
  
 
  
@@ -5049,9 +5043,7 @@ typedef struct
 
  
 
- 
 
- 
  
 
  
@@ -5104,7 +5096,6 @@ typedef struct
 
  
 
- 
  
 
  
@@ -5316,7 +5307,6 @@ typedef struct
  
    
 
- 
  
 
  
@@ -5512,7 +5502,6 @@ typedef struct
  
 
 
- 
  
 
  
@@ -12741,6 +12730,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -12780,23 +12775,15 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+  
 
-
+ 
 
 
 
 
   
 
-
-
-
-  
-
-
-
-
-  
 
 
   
@@ -13001,6 +12988,7 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+
  
   
 
@@ -13018,6 +13006,16 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -13053,34 +13051,29 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
  
  
-
-
- 
-
- 
  
 
  
 
-
-
-
-
-
-
-
+ 
+ 
 
  
 
-     
 
- 
+
+
+
+
+
+
 
  
 
      
 
  
+
 
 
 
@@ -15243,7 +15236,7 @@ extern USBD_Class_cb_TypeDef  USBD_CDC_cb;
 
   
 extern  uint8_t USBD_DeviceDesc  [18];
-extern  uint8_t USBD_StrDesc[64];
+extern  uint8_t USBD_StrDesc[50];
 extern  uint8_t USBD_OtherSpeedCfgDesc[0x09]; 
 extern  uint8_t USBD_DeviceQualifierDesc[0x0A];
 extern  uint8_t USBD_LangIDDesc[4];
@@ -15438,7 +15431,7 @@ static uint8_t  *USBD_cdc_GetCfgDesc (uint8_t speed, uint16_t *length);
 
 
   
-extern CDC_IF_Prop_TypeDef  APP_FOPS;
+extern CDC_IF_Prop_TypeDef  VCP_fops;
 extern uint8_t USBD_DeviceDesc   [18];
 
  uint8_t usbd_cdc_CfgDesc  [(67)]  ;
@@ -15447,12 +15440,12 @@ extern uint8_t USBD_DeviceDesc   [18];
 
  static volatile uint32_t  usbd_cdc_AltSet   = 0;
 
- uint8_t USB_Rx_Buffer   [CDC_DATA_MAX_PACKET_SIZE]  ;
+ uint8_t USB_Rx_Buffer   [64]  ;
 
- uint8_t APP_Rx_Buffer   [APP_RX_DATA_SIZE]  ; 
+ uint8_t APP_Rx_Buffer   [2048]  ; 
 
 
- uint8_t CmdBuff[CDC_CMD_PACKET_SZE]  ;
+ uint8_t CmdBuff[8]  ;
 
 uint32_t APP_Rx_ptr_in  = 0;
 uint32_t APP_Rx_ptr_out = 0;
@@ -15537,10 +15530,10 @@ USBD_Class_cb_TypeDef  USBD_CDC_cb =
    
   0x07,                            
   0x05,    
-  CDC_CMD_EP,                      
+  0x82,                      
   0x03,                            
-  ((uint8_t)(CDC_CMD_PACKET_SZE & 0x00FF)),      
-  ((uint8_t)((CDC_CMD_PACKET_SZE & 0xFF00) >>8)),
+  ((uint8_t)(8 & 0x00FF)),      
+  ((uint8_t)((8 & 0xFF00) >>8)),
   0xFF,                            
   
    
@@ -15559,19 +15552,19 @@ USBD_Class_cb_TypeDef  USBD_CDC_cb =
    
   0x07,    
   0x05,       
-  CDC_OUT_EP,                         
+  0x01,                         
   0x02,                               
-  ((uint8_t)(CDC_DATA_MAX_PACKET_SIZE & 0x00FF)),   
-  ((uint8_t)((CDC_DATA_MAX_PACKET_SIZE & 0xFF00) >>8)),
+  ((uint8_t)(64 & 0x00FF)),   
+  ((uint8_t)((64 & 0xFF00) >>8)),
   0x00,                               
   
    
   0x07,    
   0x05,       
-  CDC_IN_EP,                          
+  0x81,                          
   0x02,                               
-  ((uint8_t)(CDC_DATA_MAX_PACKET_SIZE & 0x00FF)),   
-  ((uint8_t)((CDC_DATA_MAX_PACKET_SIZE & 0xFF00) >>8)),
+  ((uint8_t)(64 & 0x00FF)),   
+  ((uint8_t)((64 & 0xFF00) >>8)),
   0x00                                
 } ;
 
@@ -15598,20 +15591,20 @@ static uint8_t  usbd_cdc_Init (void  *pdev,
 
    
   DCD_EP_Open(pdev,
-              CDC_IN_EP,
+              0x81,
               *(uint16_t *)(((USB_OTG_CORE_HANDLE *)pdev)->dev . pConfig_descriptor + 57),
               2);
   
    
   DCD_EP_Open(pdev,
-              CDC_OUT_EP,
+              0x01,
               *(uint16_t *)(((USB_OTG_CORE_HANDLE *)pdev)->dev . pConfig_descriptor + 64),
               2);
   
    
   DCD_EP_Open(pdev,
-              CDC_CMD_EP,
-              CDC_CMD_PACKET_SZE,
+              0x82,
+              8,
               3);
   
   pbuf = (uint8_t *)USBD_DeviceDesc;
@@ -15619,11 +15612,11 @@ static uint8_t  usbd_cdc_Init (void  *pdev,
   pbuf[5] = 0x00;
   
    
-  APP_FOPS.pIf_Init();
+  VCP_fops .pIf_Init();
 
    
   DCD_EP_PrepareRx(pdev,
-                   CDC_OUT_EP,
+                   0x01,
                    (uint8_t*)(USB_Rx_Buffer),
                    *(uint16_t *)(((USB_OTG_CORE_HANDLE *)pdev)->dev . pConfig_descriptor + 64));
   
@@ -15642,18 +15635,18 @@ static uint8_t  usbd_cdc_DeInit (void  *pdev,
 {
    
   DCD_EP_Close(pdev,
-              CDC_IN_EP);
+              0x81);
   
    
   DCD_EP_Close(pdev,
-              CDC_OUT_EP);
+              0x01);
   
    
   DCD_EP_Close(pdev,
-              CDC_CMD_EP);
+              0x82);
 
    
-  APP_FOPS.pIf_DeInit();
+  VCP_fops .pIf_DeInit();
   
   return USBD_OK;
 }
@@ -15682,7 +15675,7 @@ static uint8_t  usbd_cdc_Setup (void  *pdev,
         if (req->bmRequest & 0x80)
         {
            
-          APP_FOPS.pIf_Ctrl(req->bRequest, CmdBuff, req->wLength);
+          VCP_fops .pIf_Ctrl(req->bRequest, CmdBuff, req->wLength);
           
            
           USBD_CtlSendData (pdev, 
@@ -15706,7 +15699,7 @@ static uint8_t  usbd_cdc_Setup (void  *pdev,
       else  
       {
          
-        APP_FOPS.pIf_Ctrl(req->bRequest, 0, 0);
+        VCP_fops .pIf_Ctrl(req->bRequest, 0, 0);
       }
       
       return USBD_OK;
@@ -15766,7 +15759,7 @@ static uint8_t  usbd_cdc_EP0_RxReady (void  *pdev)
   if (cdcCmd != 0xFF)
   {
      
-    APP_FOPS.pIf_Ctrl(cdcCmd, CmdBuff, cdcLen);
+    VCP_fops .pIf_Ctrl(cdcCmd, CmdBuff, cdcLen);
     
      
     cdcCmd = 0xFF;
@@ -15813,7 +15806,7 @@ static uint8_t  usbd_cdc_DataIn (void *pdev, uint8_t epnum)
       
        
       DCD_EP_Tx (pdev,
-                 CDC_IN_EP,
+                 0x81,
                  (uint8_t*)&APP_Rx_Buffer[USB_Tx_ptr],
                  USB_Tx_length);
     }
@@ -15838,11 +15831,11 @@ static uint8_t  usbd_cdc_DataOut (void *pdev, uint8_t epnum)
   
   
  
-  APP_FOPS.pIf_DataRx(USB_Rx_Buffer, USB_Rx_Cnt);
+  VCP_fops .pIf_DataRx(USB_Rx_Buffer, USB_Rx_Cnt);
   
    
   DCD_EP_PrepareRx(pdev,
-                   CDC_OUT_EP,
+                   0x01,
                    (uint8_t*)(USB_Rx_Buffer),
                    *(uint16_t *)(((USB_OTG_CORE_HANDLE *)pdev)->dev . pConfig_descriptor + 64));
 
@@ -15860,7 +15853,7 @@ static uint8_t  usbd_cdc_SOF (void *pdev)
 {      
   static uint32_t FrameCount = 0;
   
-  if (FrameCount++ == CDC_IN_FRAME_INTERVAL)
+  if (FrameCount++ == 5)
   {
      
     FrameCount = 0;
@@ -15885,7 +15878,7 @@ static void Handle_USBAsynchXfer (void *pdev)
   
   if(USB_Tx_State != 1)
   {
-    if (APP_Rx_ptr_out == APP_RX_DATA_SIZE)
+    if (APP_Rx_ptr_out == 2048)
     {
       APP_Rx_ptr_out = 0;
     }
@@ -15898,7 +15891,7 @@ static void Handle_USBAsynchXfer (void *pdev)
     
     if(APP_Rx_ptr_out > APP_Rx_ptr_in)  
     { 
-      APP_Rx_length = APP_RX_DATA_SIZE - APP_Rx_ptr_out;
+      APP_Rx_length = 2048 - APP_Rx_ptr_out;
     
     }
     else 
@@ -15926,7 +15919,7 @@ static void Handle_USBAsynchXfer (void *pdev)
     USB_Tx_State = 1; 
 
     DCD_EP_Tx (pdev,
-               CDC_IN_EP,
+               0x81,
                (uint8_t*)&APP_Rx_Buffer[USB_Tx_ptr],
                USB_Tx_length);
   }  

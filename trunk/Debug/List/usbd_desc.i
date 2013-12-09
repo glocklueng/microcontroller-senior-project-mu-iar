@@ -12600,6 +12600,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
 
 
+
  
   
 
@@ -12617,6 +12618,16 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -12652,7 +12663,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
  
-
+ 
 
  
 
@@ -12675,11 +12686,6 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
- 
-
-     
-
- 
 
 
 
@@ -14666,6 +14672,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -14705,23 +14717,15 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+  
 
-
+ 
 
 
 
 
   
 
-
-
-
-  
-
-
-
-
-  
 
 
   
@@ -14974,7 +14978,7 @@ USBD_Status USBD_SetCfg(USB_OTG_CORE_HANDLE  *pdev, uint8_t cfgidx);
 
   
 extern  uint8_t USBD_DeviceDesc  [18];
-extern  uint8_t USBD_StrDesc[64];
+extern  uint8_t USBD_StrDesc[50];
 extern  uint8_t USBD_OtherSpeedCfgDesc[0x09]; 
 extern  uint8_t USBD_DeviceQualifierDesc[0x0A];
 extern  uint8_t USBD_LangIDDesc[4];
@@ -15132,6 +15136,9 @@ void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 
 
 
+  
+
+
 
 
 
@@ -15176,8 +15183,8 @@ USBD_DEVICE USR_desc =
     64,       
     ((uint8_t)(0x0483 & 0x00FF)),            
     ((uint8_t)((0x0483 & 0xFF00) >>8)),            
-    ((uint8_t)(0x5710 & 0x00FF)),            
-    ((uint8_t)((0x5710 & 0xFF00) >>8)),            
+    ((uint8_t)(0x5740 & 0x00FF)),            
+    ((uint8_t)((0x5740 & 0xFF00) >>8)),            
     0x00,                        
     0x02,
     0x01,            
@@ -15266,11 +15273,11 @@ uint8_t *  USBD_USR_ProductStrDescriptor( uint8_t speed , uint16_t *length)
   
   if(speed == 0)
   {   
-    USBD_GetString ("Joystick in HS mode", USBD_StrDesc, length);
+    USBD_GetString ("STM32 Virtual ComPort in HS mode", USBD_StrDesc, length);
   }
   else
   {
-    USBD_GetString ("Joystick in FS Mode", USBD_StrDesc, length);    
+    USBD_GetString ("STM32 Virtual ComPort in FS Mode", USBD_StrDesc, length);    
   }
   return USBD_StrDesc;
 }
@@ -15299,11 +15306,11 @@ uint8_t *  USBD_USR_SerialStrDescriptor( uint8_t speed , uint16_t *length)
 {
   if(speed  == 0)
   {    
-    USBD_GetString ("00000000011B", USBD_StrDesc, length);
+    USBD_GetString ("00000000050B", USBD_StrDesc, length);
   }
   else
   {
-    USBD_GetString ("00000000011C", USBD_StrDesc, length);    
+    USBD_GetString ("00000000050C", USBD_StrDesc, length);    
   }
   return USBD_StrDesc;
 }
@@ -15319,11 +15326,11 @@ uint8_t *  USBD_USR_ConfigStrDescriptor( uint8_t speed , uint16_t *length)
 {
   if(speed  == 0)
   {  
-    USBD_GetString ("HID Config", USBD_StrDesc, length);
+    USBD_GetString ("VCP Config", USBD_StrDesc, length);
   }
   else
   {
-    USBD_GetString ("HID Config", USBD_StrDesc, length); 
+    USBD_GetString ("VCP Config", USBD_StrDesc, length); 
   }
   return USBD_StrDesc;  
 }
@@ -15340,11 +15347,11 @@ uint8_t *  USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
 {
   if(speed == 0)
   {
-    USBD_GetString ("HID Interface", USBD_StrDesc, length);
+    USBD_GetString ("VCP Interface", USBD_StrDesc, length);
   }
   else
   {
-    USBD_GetString ("HID Interface", USBD_StrDesc, length);
+    USBD_GetString ("VCP Interface", USBD_StrDesc, length);
   }
   return USBD_StrDesc;  
 }

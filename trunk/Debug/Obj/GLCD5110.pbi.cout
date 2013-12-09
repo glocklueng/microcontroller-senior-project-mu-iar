@@ -12,6 +12,12 @@ E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\micro
 -I
 E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\Application
 -I
+E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\STM32_USB_Device_Library\Class\cdc\inc
+-I
+E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\STM32_USB_Device_Library\Core\inc
+-I
+E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\STM32_USB_OTG_Driver\inc
+-I
 C:\Program Files\IAR Systems\Embedded Workbench 6.5\arm\CMSIS\Include
 -I
 C:\Program Files\IAR Systems\Embedded Workbench 6.5\arm\inc
@@ -28,10 +34,18 @@ E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\micro
 -I
 E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\Application
 -I
+E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\STM32_USB_Device_Library\Class\cdc\inc
+-I
+E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\STM32_USB_Device_Library\Core\inc
+-I
+E:\My document\Programmable Feedback Control of Airflow (Pre-term) Project\microcontroller-senior-project-mu-iar\STM32_USB_OTG_Driver\inc
+-I
 C:\Program Files\IAR Systems\Embedded Workbench 6.5\arm\CMSIS\Include
 -DSTM32F4XX_VG=0
 -DUSE_STDPERIPH_DRIVER=0
 -DHSE=8000000
+-DUSE_STM32F4_DISCOVERY=0
+-DUSE_USB_OTG_FS=0
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0
@@ -238,8 +252,8 @@ C:\Program Files\IAR Systems\Embedded Workbench 6.5\arm\CMSIS\Include
 -D__HAS_LOCATED_DECLARATION__=1
 -D__HAS_LOCATED_WITH_INIT__=1
 -D__IAR_COMPILERBASE__=593160
--D__DATE__="Nov 22 2013"
--D__TIME__="20:02:44"
+-D__DATE__="Dec  9 2013"
+-D__TIME__="16:35:15"
 -D__STDC__=1
 -D__STDC_VERSION__=199901L
 -D__STDC_HOSTED__=1
@@ -267,6 +281,8 @@ C:\Program Files\IAR Systems\Embedded Workbench 6.5\arm\CMSIS\Include
 -DSTM32F4XX_VG=1
 -DUSE_STDPERIPH_DRIVER=1
 -DHSE=8000000
+-DUSE_STM32F4_DISCOVERY=1
+-DUSE_USB_OTG_FS=1
 -D_DLIB_CONFIG_FILE_HEADER_NAME="C:\Program Files\IAR Systems\Embedded Workbench 6.5\arm\INC\c\DLib_Config_Full.h"
 -D_DLIB_CONFIG_FILE_STRING="C:\\Program Files\\IAR Systems\\Embedded Workbench 6.5\\arm\\INC\\c\\DLib_Config_Full.h"
 -D__VERSION__="IAR ANSI C/C++ Compiler V6.50.3.4676/W32 for ARM"

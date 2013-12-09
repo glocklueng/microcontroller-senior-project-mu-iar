@@ -12668,6 +12668,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -12707,23 +12713,15 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+  
 
-
+ 
 
 
 
 
   
 
-
-
-
-  
-
-
-
-
-  
 
 
   
@@ -12928,6 +12926,7 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+
  
   
 
@@ -12945,6 +12944,16 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -12980,34 +12989,29 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
  
  
-
-
- 
-
- 
  
 
  
 
-
-
-
-
-
-
-
+ 
+ 
 
  
 
-     
 
- 
+
+
+
+
+
+
 
  
 
      
 
  
+
 
 
 
@@ -15180,7 +15184,7 @@ uint16_t  USBD_GetRxCount (USB_OTG_CORE_HANDLE  *pdev ,
 
   
 extern  uint8_t USBD_DeviceDesc  [18];
-extern  uint8_t USBD_StrDesc[64];
+extern  uint8_t USBD_StrDesc[50];
 extern  uint8_t USBD_OtherSpeedCfgDesc[0x09]; 
 extern  uint8_t USBD_DeviceQualifierDesc[0x0A];
 extern  uint8_t USBD_LangIDDesc[4];
@@ -15263,7 +15267,7 @@ uint8_t *     USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
 
  uint32_t  USBD_cfg_status   = 0;  
 
- uint8_t USBD_StrDesc[64]  ;
+ uint8_t USBD_StrDesc[50]  ;
 
 
   

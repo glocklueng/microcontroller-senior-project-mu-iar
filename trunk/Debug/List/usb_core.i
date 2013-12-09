@@ -12552,6 +12552,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
 
 
+
  
   
 
@@ -12569,6 +12570,16 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -12604,7 +12615,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
  
-
+ 
 
  
 
@@ -12627,11 +12638,6 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
- 
-
-     
-
- 
 
 
 
@@ -14473,6 +14479,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -15182,7 +15194,7 @@ USB_OTG_STS USB_OTG_CoreInitDev (USB_OTG_CORE_HANDLE *pdev)
     (*(volatile uint32_t *)&pdev->regs . GREGS->GRXFSIZ = 128);
     
      
-    nptxfifosize.b.depth     = 64;
+    nptxfifosize.b.depth     = 32;
     nptxfifosize.b.startaddr = 128;
     (*(volatile uint32_t *)&pdev->regs . GREGS->DIEPTXF0_HNPTXFSIZ = nptxfifosize . d32);
     
@@ -15195,7 +15207,7 @@ USB_OTG_STS USB_OTG_CoreInitDev (USB_OTG_CORE_HANDLE *pdev)
     
      
     txfifosize.b.startaddr += txfifosize.b.depth;
-    txfifosize.b.depth = 0;
+    txfifosize.b.depth = 32;
     (*(volatile uint32_t *)&pdev->regs . GREGS->DIEPTXF[1] = txfifosize . d32);
     
     

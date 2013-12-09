@@ -25,6 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
+#include <stdlib.h>
 #include "stm32f4_discovery.h"
 #include "stm32f4_discovery_audio_codec.h"
 #include "stm32f4_discovery_lis302dl.h"
@@ -38,6 +39,11 @@
 #include "stm32f4xx_adc.h"
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_tim.h"
+#include "DefinePin.h"
+#include "usbd_cdc_core.h"
+#include "usbd_cdc_vcp.h"
+#include "usbd_usr.h"
+#include "usbd_desc.h"
 
 #ifdef MEDIA_USB_KEY
  #include "waverecorder.h"

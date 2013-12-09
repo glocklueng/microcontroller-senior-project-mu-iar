@@ -12668,6 +12668,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -12707,23 +12713,15 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+  
 
-
+ 
 
 
 
 
   
 
-
-
-
-  
-
-
-
-
-  
 
 
   
@@ -12928,6 +12926,7 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+
  
   
 
@@ -12945,6 +12944,16 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -12980,34 +12989,29 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
  
  
-
-
- 
-
- 
  
 
  
 
-
-
-
-
-
-
-
+ 
+ 
 
  
 
-     
 
- 
+
+
+
+
+
+
 
  
 
      
 
  
+
 
 
 

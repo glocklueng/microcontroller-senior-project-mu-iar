@@ -12520,6 +12520,351 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
  
 
  
+ 
+ 
+
+
+  #pragma system_include
+
+ 
+ 
+
+ 
+
+  #pragma system_include
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+ 
+
+
+  #pragma system_include
+
+ 
+ 
+
+ 
+
+  #pragma system_include
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+                 
+typedef _Sizet size_t;
+
+typedef unsigned int __data_size_t;
+
+
+
+
+
+ 
+#pragma rtmodel="__dlib_full_locale_support",   "1"
+
+
+
+
+extern int __aeabi_MB_CUR_MAX(void);
+
+
+
+
+
+                 
+
+
+
+                 
+  typedef _Wchart wchar_t;
+
+typedef struct
+{        
+  int quot;
+  int rem;
+} div_t;
+
+typedef struct
+{        
+  long quot;
+  long rem;
+} ldiv_t;
+
+    #pragma language=save
+    #pragma language=extended
+    typedef struct
+    {      
+      _Longlong quot;
+      _Longlong rem;
+    } lldiv_t;
+    #pragma language=restore
+
+                 
+  
+__intrinsic __nounwind int atexit(void (*)(void));
+  __intrinsic __noreturn __nounwind void _Exit(int) ;
+__intrinsic __noreturn __nounwind void exit(int) ;
+__intrinsic __nounwind char * getenv(const char *);
+__intrinsic __nounwind int system(const char *);
+
+
+
+             __intrinsic __noreturn __nounwind void abort(void) ;
+_Pragma("function_effects = no_state, no_errno")     __intrinsic __nounwind int abs(int);
+             __intrinsic __nounwind void * calloc(size_t, size_t);
+_Pragma("function_effects = no_state, no_errno")     __intrinsic __nounwind div_t div(int, int);
+             __intrinsic __nounwind void free(void *);
+_Pragma("function_effects = no_state, no_errno")     __intrinsic __nounwind long labs(long);
+_Pragma("function_effects = no_state, no_errno")     __intrinsic __nounwind ldiv_t ldiv(long, long);
+    #pragma language=save
+    #pragma language=extended
+    _Pragma("function_effects = no_state, no_errno") __intrinsic __nounwind long long llabs(long long);
+    _Pragma("function_effects = no_state, no_errno") __intrinsic __nounwind lldiv_t lldiv(long long, long long);
+    #pragma language=restore
+             __intrinsic __nounwind void * malloc(size_t);
+_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind int mblen(const char *, size_t);
+_Pragma("function_effects = no_read(1), no_write(2)") __intrinsic __nounwind size_t mbstowcs(wchar_t *, 
+                                          const char *, size_t);
+_Pragma("function_effects = no_read(1), no_write(2)") __intrinsic __nounwind int mbtowc(wchar_t *, const char *, 
+                                     size_t);
+             __intrinsic __nounwind int rand(void);
+             __intrinsic __nounwind void srand(unsigned int);
+             __intrinsic __nounwind void * realloc(void *, size_t);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind long strtol(const char *, 
+                                      char **, int);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind unsigned long strtoul(const char *, char **, int);
+_Pragma("function_effects = no_read(1), no_write(2)") __intrinsic __nounwind size_t wcstombs(char *, 
+                                          const wchar_t *, size_t);
+_Pragma("function_effects = no_read(1)")    __intrinsic __nounwind int wctomb(char *, wchar_t);
+    #pragma language=save
+    #pragma language=extended
+    _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind long long strtoll(const char *, char **, int);
+    _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind unsigned long long strtoull(const char *, 
+                                                          char **, int);
+    #pragma language=restore
+
+
+
+
+
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind unsigned long __iar_Stoul(const char *, char **, 
+                                                    int);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind float         __iar_Stof(const char *, char **, long);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind double        __iar_Stod(const char *, char **, long);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind long double   __iar_Stold(const char *, char **, 
+                                                      long);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind long          __iar_Stolx(const char *, char **, int, 
+                                                    int *);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind unsigned long __iar_Stoulx(const char *, char **,
+                                                     int, int *);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind float         __iar_Stofx(const char *, char **, 
+                                                    long, int *);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind double        __iar_Stodx(const char *, char **, 
+                                                    long, int *);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind long double   __iar_Stoldx(const char *, char **, 
+                                                     long, int *);
+  #pragma language=save
+  #pragma language=extended
+  _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind _Longlong   __iar_Stoll(const char *, char **, 
+                                                    int);
+  _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind _ULonglong   __iar_Stoull(const char *, char **, 
+                                                      int);
+  _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind _Longlong    __iar_Stollx(const char *, char **, 
+                                                      int, int *);
+  _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind _ULonglong   __iar_Stoullx(const char *, char **, 
+                                                       int, int *);
+  #pragma language=restore
+
+
+typedef int _Cmpfun(const void *, const void *);
+
+_Pragma("function_effects = no_write(1,2)") __intrinsic void * bsearch(const void *, 
+                                                   const void *, size_t,
+                                                   size_t, _Cmpfun *);
+             __intrinsic void qsort(void *, size_t, size_t, 
+                                               _Cmpfun *);
+             __intrinsic void __qsortbbl(void *, size_t, size_t, 
+                                                    _Cmpfun *);
+_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind double atof(const char *);
+_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind int atoi(const char *);
+_Pragma("function_effects = no_write(1)")    __intrinsic __nounwind long atol(const char *);
+    #pragma language=save
+    #pragma language=extended
+    _Pragma("function_effects = no_write(1)") __intrinsic __nounwind long long atoll(const char *);
+    #pragma language=restore
+  _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind float strtof(const char *, 
+                                         char **);
+  _Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind long double strtold(const char *, char **);
+_Pragma("function_effects = no_write(1), no_read(2)") __intrinsic __nounwind double strtod(const char *, 
+                                        char **);
+             __intrinsic __nounwind size_t __iar_Mbcurmax(void);
+
+_Pragma("function_effects = no_state, no_errno")     __intrinsic __nounwind int __iar_DLib_library_version(void);
+
+
+
+
+  
+  typedef void _Atexfun(void);
+  
+
+                 
+    #pragma inline=no_body
+    double atof(const char *_S)
+    {       
+      return (__iar_Stod(_S, 0, 0));
+    }
+
+    #pragma inline=no_body
+    int atoi(const char *_S)
+    {       
+      return ((int)__iar_Stoul(_S, 0, 10));
+    }
+
+    #pragma inline=no_body
+    long atol(const char *_S)
+    {       
+      return ((long)__iar_Stoul(_S, 0, 10));
+    }
+
+        #pragma language=save
+        #pragma language=extended
+        #pragma inline=no_body
+        long long atoll(const char *_S)
+        {       
+            return ((long long)__iar_Stoull(_S, 0, 10));
+        }
+        #pragma language=restore
+
+    #pragma inline=no_body
+    double strtod(const char * _S, char ** _Endptr)
+    {       
+      return (__iar_Stod(_S, _Endptr, 0));
+    }
+
+      #pragma inline=no_body
+      float strtof(const char * _S, char ** _Endptr)
+      {       
+        return (__iar_Stof(_S, _Endptr, 0));
+      }
+
+      #pragma inline=no_body
+      long double strtold(const char * _S, char ** _Endptr)
+      {       
+        return (__iar_Stold(_S, _Endptr, 0));
+      }
+
+    #pragma inline=no_body
+    long strtol(const char * _S, char ** _Endptr, 
+                int _Base)
+    {       
+      return (__iar_Stolx(_S, _Endptr, _Base, 0));
+    }
+
+    #pragma inline=no_body
+    unsigned long strtoul(const char * _S, char ** _Endptr, 
+                          int _Base)
+    {       
+      return (__iar_Stoul(_S, _Endptr, _Base));
+    }
+
+        #pragma language=save
+        #pragma language=extended
+        #pragma inline=no_body
+        long long strtoll(const char * _S, char ** _Endptr,
+                          int _Base)
+        {       
+            return (__iar_Stoll(_S, _Endptr, _Base));
+        }
+
+        #pragma inline=no_body
+        unsigned long long strtoull(const char * _S, 
+                                    char ** _Endptr, int _Base)
+        {       
+            return (__iar_Stoull(_S, _Endptr, _Base));
+        }
+        #pragma language=restore
+
+
+  #pragma inline=no_body
+  int abs(int i)
+  {       
+    return (i < 0 ? -i : i);
+  }
+
+  #pragma inline=no_body
+  long labs(long i)
+  {       
+    return (i < 0 ? -i : i);
+  }
+
+      #pragma language=save
+      #pragma language=extended
+      #pragma inline=no_body
+      long long llabs(long long i)
+      {       
+        return (i < 0 ? -i : i);
+      }
+      #pragma language=restore
+
+
+
+
+
+
+
+
+ 
 
 
 
@@ -12613,6 +12958,12 @@ typedef enum
 
 
    
+
+
+
+
+ 
+
 
 
   
@@ -13558,50 +13909,6 @@ uint32_t LIS302DL_TIMEOUT_UserCallback(void);
  
 
 
-  #pragma system_include
-
- 
- 
-
- 
-
-  #pragma system_include
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-                 
-typedef _Sizet size_t;
-
-typedef unsigned int __data_size_t;
-
-
-
 
  
  
@@ -13941,6 +14248,2838 @@ uint32_t ReadUnit(uint8_t *buffer, uint8_t idx, uint8_t NbrOfBytes, Endianness B
 
  
 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+  
+
+
+
+  
+
+ 
+
+
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+ 
+
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+ 
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+
+
+
+  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+     
+
+ 
+
+
+
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+ 
+typedef struct _USB_OTG_GREGS  
+{
+  volatile uint32_t GOTGCTL;       
+  volatile uint32_t GOTGINT;       
+  volatile uint32_t GAHBCFG;       
+  volatile uint32_t GUSBCFG;       
+  volatile uint32_t GRSTCTL;       
+  volatile uint32_t GINTSTS;       
+  volatile uint32_t GINTMSK;       
+  volatile uint32_t GRXSTSR;       
+  volatile uint32_t GRXSTSP;       
+  volatile uint32_t GRXFSIZ;       
+  volatile uint32_t DIEPTXF0_HNPTXFSIZ;    
+  volatile uint32_t HNPTXSTS;      
+  volatile uint32_t GI2CCTL;       
+  uint32_t Reserved34;   
+  volatile uint32_t GCCFG;         
+  volatile uint32_t CID;           
+  uint32_t  Reserved40[48];    
+  volatile uint32_t HPTXFSIZ;  
+  volatile uint32_t DIEPTXF[15]; 
+}
+USB_OTG_GREGS;
+
+
+ 
+
+
+
+
+ 
+typedef struct _USB_OTG_DREGS 
+{
+  volatile uint32_t DCFG;          
+  volatile uint32_t DCTL;          
+  volatile uint32_t DSTS;          
+  uint32_t Reserved0C;            
+  volatile uint32_t DIEPMSK;    
+  volatile uint32_t DOEPMSK;   
+  volatile uint32_t DAINT;      
+  volatile uint32_t DAINTMSK;  
+  uint32_t  Reserved20;           
+  uint32_t Reserved9;        
+  volatile uint32_t DVBUSDIS;     
+  volatile uint32_t DVBUSPULSE;   
+  volatile uint32_t DTHRCTL;      
+  volatile uint32_t DIEPEMPMSK;  
+  volatile uint32_t DEACHINT;     
+  volatile uint32_t DEACHMSK;       
+  uint32_t Reserved40;       
+  volatile uint32_t DINEP1MSK;   
+  uint32_t  Reserved44[15];       
+  volatile uint32_t DOUTEP1MSK;     
+}
+USB_OTG_DREGS;
+
+
+ 
+
+
+
+
+ 
+typedef struct _USB_OTG_INEPREGS
+{
+  volatile uint32_t DIEPCTL;  
+  uint32_t Reserved04;              
+  volatile uint32_t DIEPINT;  
+  uint32_t Reserved0C;              
+  volatile uint32_t DIEPTSIZ;  
+  volatile uint32_t DIEPDMA;  
+  volatile uint32_t DTXFSTS; 
+  uint32_t Reserved18;              
+}
+USB_OTG_INEPREGS;
+
+
+ 
+
+
+
+
+ 
+typedef struct _USB_OTG_OUTEPREGS
+{
+  volatile uint32_t DOEPCTL;        
+  volatile uint32_t DOUTEPFRM;    
+  volatile uint32_t DOEPINT;               
+  uint32_t Reserved0C;                     
+  volatile uint32_t DOEPTSIZ;  
+  volatile uint32_t DOEPDMA;               
+  uint32_t Reserved18[2];                  
+}
+USB_OTG_OUTEPREGS;
+
+
+ 
+
+
+
+
+ 
+typedef struct _USB_OTG_HREGS
+{
+  volatile uint32_t HCFG;              
+  volatile uint32_t HFIR;       
+  volatile uint32_t HFNUM;          
+  uint32_t Reserved40C;                    
+  volatile uint32_t HPTXSTS;    
+  volatile uint32_t HAINT;    
+  volatile uint32_t HAINTMSK;    
+}
+USB_OTG_HREGS;
+
+
+ 
+
+
+
+
+ 
+typedef struct _USB_OTG_HC_REGS
+{
+  volatile uint32_t HCCHAR;
+  volatile uint32_t HCSPLT;
+  volatile uint32_t HCINT;
+  volatile uint32_t HCGINTMSK;
+  volatile uint32_t HCTSIZ;
+  volatile uint32_t HCDMA;
+  uint32_t Reserved[2];
+}
+USB_OTG_HC_REGS;
+
+
+ 
+
+
+
+
+ 
+typedef struct USB_OTG_core_regs 
+{
+  USB_OTG_GREGS         *GREGS;
+  USB_OTG_DREGS         *DREGS;
+  USB_OTG_HREGS         *HREGS;
+  USB_OTG_INEPREGS      *INEP_REGS[15];
+  USB_OTG_OUTEPREGS     *OUTEP_REGS[15];
+  USB_OTG_HC_REGS       *HC_REGS[15];
+  volatile uint32_t         *HPRT0;
+  volatile uint32_t         *DFIFO[15];
+  volatile uint32_t         *PCGCCTL;
+}
+USB_OTG_CORE_REGS , *PUSB_OTG_CORE_REGS;
+typedef union _USB_OTG_OTGCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t sesreqscs :
+    1;
+uint32_t sesreq :
+    1;
+uint32_t Reserved2_7 :
+    6;
+uint32_t hstnegscs :
+    1;
+uint32_t hnpreq :
+    1;
+uint32_t hstsethnpen :
+    1;
+uint32_t devhnpen :
+    1;
+uint32_t Reserved12_15 :
+    4;
+uint32_t conidsts :
+    1;
+uint32_t Reserved17 :
+    1;
+uint32_t asesvld :
+    1;
+uint32_t bsesvld :
+    1;
+uint32_t currmod :
+    1;
+uint32_t Reserved21_31 :
+    11;
+  }
+  b;
+} USB_OTG_OTGCTL_TypeDef ;
+typedef union _USB_OTG_GOTGINT_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t Reserved0_1 :
+    2;
+uint32_t sesenddet :
+    1;
+uint32_t Reserved3_7 :
+    5;
+uint32_t sesreqsucstschng :
+    1;
+uint32_t hstnegsucstschng :
+    1;
+uint32_t reserver10_16 :
+    7;
+uint32_t hstnegdet :
+    1;
+uint32_t adevtoutchng :
+    1;
+uint32_t debdone :
+    1;
+uint32_t Reserved31_20 :
+    12;
+  }
+  b;
+} USB_OTG_GOTGINT_TypeDef ;
+typedef union _USB_OTG_GAHBCFG_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t glblintrmsk :
+    1;
+uint32_t hburstlen :
+    4;
+uint32_t dmaenable :
+    1;
+uint32_t Reserved :
+    1;
+uint32_t nptxfemplvl_txfemplvl :
+    1;
+uint32_t ptxfemplvl :
+    1;
+uint32_t Reserved9_31 :
+    23;
+  }
+  b;
+} USB_OTG_GAHBCFG_TypeDef ;
+typedef union _USB_OTG_GUSBCFG_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t toutcal :
+    3;
+uint32_t phyif :
+    1;
+uint32_t ulpi_utmi_sel :
+    1;
+uint32_t fsintf :
+    1;
+uint32_t physel :
+    1;
+uint32_t ddrsel :
+    1;
+uint32_t srpcap :
+    1;
+uint32_t hnpcap :
+    1;
+uint32_t usbtrdtim :
+    4;
+uint32_t nptxfrwnden :
+    1;
+uint32_t phylpwrclksel :
+    1;
+uint32_t otgutmifssel :
+    1;
+uint32_t ulpi_fsls :
+    1;
+uint32_t ulpi_auto_res :
+    1;
+uint32_t ulpi_clk_sus_m :
+    1;
+uint32_t ulpi_ext_vbus_drv :
+    1;
+uint32_t ulpi_int_vbus_indicator :
+    1;
+uint32_t term_sel_dl_pulse :
+    1;
+uint32_t Reserved :
+    6;
+uint32_t force_host :
+    1;
+uint32_t force_dev :
+    1;
+uint32_t corrupt_tx :
+    1;
+  }
+  b;
+} USB_OTG_GUSBCFG_TypeDef ;
+typedef union _USB_OTG_GRSTCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t csftrst :
+    1;
+uint32_t hsftrst :
+    1;
+uint32_t hstfrm :
+    1;
+uint32_t intknqflsh :
+    1;
+uint32_t rxfflsh :
+    1;
+uint32_t txfflsh :
+    1;
+uint32_t txfnum :
+    5;
+uint32_t Reserved11_29 :
+    19;
+uint32_t dmareq :
+    1;
+uint32_t ahbidle :
+    1;
+  }
+  b;
+} USB_OTG_GRSTCTL_TypeDef ;
+typedef union _USB_OTG_GINTMSK_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t Reserved0 :
+    1;
+uint32_t modemismatch :
+    1;
+uint32_t otgintr :
+    1;
+uint32_t sofintr :
+    1;
+uint32_t rxstsqlvl :
+    1;
+uint32_t nptxfempty :
+    1;
+uint32_t ginnakeff :
+    1;
+uint32_t goutnakeff :
+    1;
+uint32_t Reserved8 :
+    1;
+uint32_t i2cintr :
+    1;
+uint32_t erlysuspend :
+    1;
+uint32_t usbsuspend :
+    1;
+uint32_t usbreset :
+    1;
+uint32_t enumdone :
+    1;
+uint32_t isooutdrop :
+    1;
+uint32_t eopframe :
+    1;
+uint32_t Reserved16 :
+    1;
+uint32_t epmismatch :
+    1;
+uint32_t inepintr :
+    1;
+uint32_t outepintr :
+    1;
+uint32_t incomplisoin :
+    1;
+uint32_t incomplisoout :
+    1;
+uint32_t Reserved22_23 :
+    2;
+uint32_t portintr :
+    1;
+uint32_t hcintr :
+    1;
+uint32_t ptxfempty :
+    1;
+uint32_t Reserved27 :
+    1;
+uint32_t conidstschng :
+    1;
+uint32_t disconnect :
+    1;
+uint32_t sessreqintr :
+    1;
+uint32_t wkupintr :
+    1;
+  }
+  b;
+} USB_OTG_GINTMSK_TypeDef ;
+typedef union _USB_OTG_GINTSTS_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t curmode :
+    1;
+uint32_t modemismatch :
+    1;
+uint32_t otgintr :
+    1;
+uint32_t sofintr :
+    1;
+uint32_t rxstsqlvl :
+    1;
+uint32_t nptxfempty :
+    1;
+uint32_t ginnakeff :
+    1;
+uint32_t goutnakeff :
+    1;
+uint32_t Reserved8 :
+    1;
+uint32_t i2cintr :
+    1;
+uint32_t erlysuspend :
+    1;
+uint32_t usbsuspend :
+    1;
+uint32_t usbreset :
+    1;
+uint32_t enumdone :
+    1;
+uint32_t isooutdrop :
+    1;
+uint32_t eopframe :
+    1;
+uint32_t intimerrx :
+    1;
+uint32_t epmismatch :
+    1;
+uint32_t inepint:
+    1;
+uint32_t outepintr :
+    1;
+uint32_t incomplisoin :
+    1;
+uint32_t incomplisoout :
+    1;
+uint32_t Reserved22_23 :
+    2;
+uint32_t portintr :
+    1;
+uint32_t hcintr :
+    1;
+uint32_t ptxfempty :
+    1;
+uint32_t Reserved27 :
+    1;
+uint32_t conidstschng :
+    1;
+uint32_t disconnect :
+    1;
+uint32_t sessreqintr :
+    1;
+uint32_t wkupintr :
+    1;
+  }
+  b;
+} USB_OTG_GINTSTS_TypeDef ;
+typedef union _USB_OTG_DRXSTS_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t epnum :
+    4;
+uint32_t bcnt :
+    11;
+uint32_t dpid :
+    2;
+uint32_t pktsts :
+    4;
+uint32_t fn :
+    4;
+uint32_t Reserved :
+    7;
+  }
+  b;
+} USB_OTG_DRXSTS_TypeDef ;
+typedef union _USB_OTG_GRXSTS_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t chnum :
+    4;
+uint32_t bcnt :
+    11;
+uint32_t dpid :
+    2;
+uint32_t pktsts :
+    4;
+uint32_t Reserved :
+    11;
+  }
+  b;
+} USB_OTG_GRXFSTS_TypeDef ;
+typedef union _USB_OTG_FSIZ_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t startaddr :
+    16;
+uint32_t depth :
+    16;
+  }
+  b;
+} USB_OTG_FSIZ_TypeDef ;
+typedef union _USB_OTG_HNPTXSTS_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t nptxfspcavail :
+    16;
+uint32_t nptxqspcavail :
+    8;
+uint32_t nptxqtop_terminate :
+    1;
+uint32_t nptxqtop_timer :
+    2;
+uint32_t nptxqtop :
+    2;
+uint32_t chnum :
+    2;    
+uint32_t Reserved :
+    1;
+  }
+  b;
+} USB_OTG_HNPTXSTS_TypeDef ;
+typedef union _USB_OTG_DTXFSTSn_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t txfspcavail :
+    16;
+uint32_t Reserved :
+    16;
+  }
+  b;
+} USB_OTG_DTXFSTSn_TypeDef ;
+typedef union _USB_OTG_GI2CCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t rwdata :
+    8;
+uint32_t regaddr :
+    8;
+uint32_t addr :
+    7;
+uint32_t i2cen :
+    1;
+uint32_t ack :
+    1;
+uint32_t i2csuspctl :
+    1;
+uint32_t i2cdevaddr :
+    2;
+uint32_t dat_se0:
+    1;
+uint32_t Reserved :
+    1;
+uint32_t rw :
+    1;
+uint32_t bsydne :
+    1;
+  }
+  b;
+} USB_OTG_GI2CCTL_TypeDef ;
+typedef union _USB_OTG_GCCFG_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t Reserved_in :
+    16;
+uint32_t pwdn :
+    1;
+uint32_t i2cifen :
+    1;
+uint32_t vbussensingA :
+    1;
+uint32_t vbussensingB :
+    1;
+uint32_t sofouten :
+    1;
+uint32_t disablevbussensing :
+    1;
+uint32_t Reserved_out :
+    10;
+  }
+  b;
+} USB_OTG_GCCFG_TypeDef ;
+
+typedef union _USB_OTG_DCFG_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t devspd :
+    2;
+uint32_t nzstsouthshk :
+    1;
+uint32_t Reserved3 :
+    1;
+uint32_t devaddr :
+    7;
+uint32_t perfrint :
+    2;
+uint32_t Reserved13_17 :
+    5;
+uint32_t epmscnt :
+    4;
+  }
+  b;
+} USB_OTG_DCFG_TypeDef ;
+typedef union _USB_OTG_DCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t rmtwkupsig :
+    1;
+uint32_t sftdiscon :
+    1;
+uint32_t gnpinnaksts :
+    1;
+uint32_t goutnaksts :
+    1;
+uint32_t tstctl :
+    3;
+uint32_t sgnpinnak :
+    1;
+uint32_t cgnpinnak :
+    1;
+uint32_t sgoutnak :
+    1;
+uint32_t cgoutnak :
+    1;
+uint32_t Reserved :
+    21;
+  }
+  b;
+} USB_OTG_DCTL_TypeDef ;
+typedef union _USB_OTG_DSTS_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t suspsts :
+    1;
+uint32_t enumspd :
+    2;
+uint32_t errticerr :
+    1;
+uint32_t Reserved4_7:
+    4;
+uint32_t soffn :
+    14;
+uint32_t Reserved22_31 :
+    10;
+  }
+  b;
+} USB_OTG_DSTS_TypeDef ;
+typedef union _USB_OTG_DIEPINTn_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfercompl :
+    1;
+uint32_t epdisabled :
+    1;
+uint32_t ahberr :
+    1;
+uint32_t timeout :
+    1;
+uint32_t intktxfemp :
+    1;
+uint32_t intknepmis :
+    1;
+uint32_t inepnakeff :
+    1;
+uint32_t emptyintr :
+    1;
+uint32_t txfifoundrn :
+    1;
+uint32_t Reserved08_31 :
+    23;
+  }
+  b;
+} USB_OTG_DIEPINTn_TypeDef ;
+typedef union _USB_OTG_DIEPINTn_TypeDef   USB_OTG_DIEPMSK_TypeDef ;
+typedef union _USB_OTG_DOEPINTn_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfercompl :
+    1;
+uint32_t epdisabled :
+    1;
+uint32_t ahberr :
+    1;
+uint32_t setup :
+    1;
+uint32_t Reserved04_31 :
+    28;
+  }
+  b;
+} USB_OTG_DOEPINTn_TypeDef ;
+typedef union _USB_OTG_DOEPINTn_TypeDef   USB_OTG_DOEPMSK_TypeDef ;
+
+typedef union _USB_OTG_DAINT_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t in :
+    16;
+uint32_t out :
+    16;
+  }
+  ep;
+} USB_OTG_DAINT_TypeDef ;
+
+typedef union _USB_OTG_DTHRCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t non_iso_thr_en :
+    1;
+uint32_t iso_thr_en :
+    1;
+uint32_t tx_thr_len :
+    9;
+uint32_t Reserved11_15 :
+    5;
+uint32_t rx_thr_en :
+    1;
+uint32_t rx_thr_len :
+    9;
+uint32_t Reserved26_31 :
+    6;
+  }
+  b;
+} USB_OTG_DTHRCTL_TypeDef ;
+typedef union _USB_OTG_DEPCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t mps :
+    11;
+uint32_t reserved :
+    4;
+uint32_t usbactep :
+    1;
+uint32_t dpid :
+    1;
+uint32_t naksts :
+    1;
+uint32_t eptype :
+    2;
+uint32_t snp :
+    1;
+uint32_t stall :
+    1;
+uint32_t txfnum :
+    4;
+uint32_t cnak :
+    1;
+uint32_t snak :
+    1;
+uint32_t setd0pid :
+    1;
+uint32_t setd1pid :
+    1;
+uint32_t epdis :
+    1;
+uint32_t epena :
+    1;
+  }
+  b;
+} USB_OTG_DEPCTL_TypeDef ;
+typedef union _USB_OTG_DEPXFRSIZ_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfersize :
+    19;
+uint32_t pktcnt :
+    10;
+uint32_t mc :
+    2;
+uint32_t Reserved :
+    1;
+  }
+  b;
+} USB_OTG_DEPXFRSIZ_TypeDef ;
+typedef union _USB_OTG_DEP0XFRSIZ_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfersize :
+    7;
+uint32_t Reserved7_18 :
+    12;
+uint32_t pktcnt :
+    2;
+uint32_t Reserved20_28 :
+    9;
+uint32_t supcnt :
+    2;
+    uint32_t Reserved31;
+  }
+  b;
+} USB_OTG_DEP0XFRSIZ_TypeDef ;
+typedef union _USB_OTG_HCFG_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t fslspclksel :
+    2;
+uint32_t fslssupp :
+    1;
+  }
+  b;
+} USB_OTG_HCFG_TypeDef ;
+typedef union _USB_OTG_HFRMINTRVL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t frint :
+    16;
+uint32_t Reserved :
+    16;
+  }
+  b;
+} USB_OTG_HFRMINTRVL_TypeDef ;
+
+typedef union _USB_OTG_HFNUM_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t frnum :
+    16;
+uint32_t frrem :
+    16;
+  }
+  b;
+} USB_OTG_HFNUM_TypeDef ;
+typedef union _USB_OTG_HPTXSTS_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t ptxfspcavail :
+    16;
+uint32_t ptxqspcavail :
+    8;
+uint32_t ptxqtop_terminate :
+    1;
+uint32_t ptxqtop_timer :
+    2;
+uint32_t ptxqtop :
+    2;
+uint32_t chnum :
+    2;
+uint32_t ptxqtop_odd :
+    1;
+  }
+  b;
+} USB_OTG_HPTXSTS_TypeDef ;
+typedef union _USB_OTG_HPRT0_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t prtconnsts :
+    1;
+uint32_t prtconndet :
+    1;
+uint32_t prtena :
+    1;
+uint32_t prtenchng :
+    1;
+uint32_t prtovrcurract :
+    1;
+uint32_t prtovrcurrchng :
+    1;
+uint32_t prtres :
+    1;
+uint32_t prtsusp :
+    1;
+uint32_t prtrst :
+    1;
+uint32_t Reserved9 :
+    1;
+uint32_t prtlnsts :
+    2;
+uint32_t prtpwr :
+    1;
+uint32_t prttstctl :
+    4;
+uint32_t prtspd :
+    2;
+uint32_t Reserved19_31 :
+    13;
+  }
+  b;
+} USB_OTG_HPRT0_TypeDef ;
+typedef union _USB_OTG_HAINT_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t chint :
+    16;
+uint32_t Reserved :
+    16;
+  }
+  b;
+} USB_OTG_HAINT_TypeDef ;
+typedef union _USB_OTG_HAINTMSK_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t chint :
+    16;
+uint32_t Reserved :
+    16;
+  }
+  b;
+} USB_OTG_HAINTMSK_TypeDef ;
+typedef union _USB_OTG_HCCHAR_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t mps :
+    11;
+uint32_t epnum :
+    4;
+uint32_t epdir :
+    1;
+uint32_t Reserved :
+    1;
+uint32_t lspddev :
+    1;
+uint32_t eptype :
+    2;
+uint32_t multicnt :
+    2;
+uint32_t devaddr :
+    7;
+uint32_t oddfrm :
+    1;
+uint32_t chdis :
+    1;
+uint32_t chen :
+    1;
+  }
+  b;
+} USB_OTG_HCCHAR_TypeDef ;
+typedef union _USB_OTG_HCSPLT_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t prtaddr :
+    7;
+uint32_t hubaddr :
+    7;
+uint32_t xactpos :
+    2;
+uint32_t compsplt :
+    1;
+uint32_t Reserved :
+    14;
+uint32_t spltena :
+    1;
+  }
+  b;
+} USB_OTG_HCSPLT_TypeDef ;
+typedef union _USB_OTG_HCINTn_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfercompl :
+    1;
+uint32_t chhltd :
+    1;
+uint32_t ahberr :
+    1;
+uint32_t stall :
+    1;
+uint32_t nak :
+    1;
+uint32_t ack :
+    1;
+uint32_t nyet :
+    1;
+uint32_t xacterr :
+    1;
+uint32_t bblerr :
+    1;
+uint32_t frmovrun :
+    1;
+uint32_t datatglerr :
+    1;
+uint32_t Reserved :
+    21;
+  }
+  b;
+} USB_OTG_HCINTn_TypeDef ;
+typedef union _USB_OTG_HCTSIZn_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfersize :
+    19;
+uint32_t pktcnt :
+    10;
+uint32_t pid :
+    2;
+uint32_t dopng :
+    1;
+  }
+  b;
+} USB_OTG_HCTSIZn_TypeDef ;
+typedef union _USB_OTG_HCGINTMSK_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t xfercompl :
+    1;
+uint32_t chhltd :
+    1;
+uint32_t ahberr :
+    1;
+uint32_t stall :
+    1;
+uint32_t nak :
+    1;
+uint32_t ack :
+    1;
+uint32_t nyet :
+    1;
+uint32_t xacterr :
+    1;
+uint32_t bblerr :
+    1;
+uint32_t frmovrun :
+    1;
+uint32_t datatglerr :
+    1;
+uint32_t Reserved :
+    21;
+  }
+  b;
+} USB_OTG_HCGINTMSK_TypeDef ;
+typedef union _USB_OTG_PCGCCTL_TypeDef 
+{
+  uint32_t d32;
+  struct
+  {
+uint32_t stoppclk :
+    1;
+uint32_t gatehclk :
+    1;
+uint32_t Reserved :
+    30;
+  }
+  b;
+} USB_OTG_PCGCCTL_TypeDef ;
+
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+  
+
+typedef enum
+{
+  USB_OTG_HS_CORE_ID = 0,
+  USB_OTG_FS_CORE_ID = 1
+}USB_OTG_CORE_ID_TypeDef;
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+
+ 
+
+
+
+ 
+enum USB_OTG_SPEED {
+  USB_SPEED_UNKNOWN = 0,
+  USB_SPEED_LOW,
+  USB_SPEED_FULL,
+  USB_SPEED_HIGH
+};
+
+
+
+
+
+  
+
+
+
+  
+ 
+
+
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+
+  
+
+
+ 
+
+
+  
+
+
+
+  
+
+
+typedef enum {
+  USB_OTG_OK = 0,
+  USB_OTG_FAIL
+}USB_OTG_STS;
+
+typedef enum {
+  HC_IDLE = 0,
+  HC_XFRC,
+  HC_HALTED,
+  HC_NAK,
+  HC_NYET,
+  HC_STALL,
+  HC_XACTERR,  
+  HC_BBLERR,   
+  HC_DATATGLERR,  
+}HC_STATUS;
+
+typedef enum {
+  URB_IDLE = 0,
+  URB_DONE,
+  URB_NOTREADY,
+  URB_ERROR,
+  URB_STALL
+}URB_STATE;
+
+typedef enum {
+  CTRL_START = 0,
+  CTRL_XFRC,
+  CTRL_HALTED,
+  CTRL_NAK,
+  CTRL_STALL,
+  CTRL_XACTERR,  
+  CTRL_BBLERR,   
+  CTRL_DATATGLERR,  
+  CTRL_FAIL
+}CTRL_STATUS;
+
+
+typedef struct USB_OTG_hc
+{
+  uint8_t       dev_addr ;
+  uint8_t       ep_num;
+  uint8_t       ep_is_in;
+  uint8_t       speed;
+  uint8_t       do_ping;  
+  uint8_t       ep_type;
+  uint16_t      max_packet;
+  uint8_t       data_pid;
+  uint8_t       *xfer_buff;
+  uint32_t      xfer_len;
+  uint32_t      xfer_count;  
+  uint8_t       toggle_in;
+  uint8_t       toggle_out;
+  uint32_t       dma_addr;  
+}
+USB_OTG_HC , *PUSB_OTG_HC;
+
+typedef struct USB_OTG_ep
+{
+  uint8_t        num;
+  uint8_t        is_in;
+  uint8_t        is_stall;  
+  uint8_t        type;
+  uint8_t        data_pid_start;
+  uint8_t        even_odd_frame;
+  uint16_t       tx_fifo_num;
+  uint32_t       maxpacket;
+   
+  uint8_t        *xfer_buff;
+  uint32_t       dma_addr;  
+  uint32_t       xfer_len;
+  uint32_t       xfer_count;
+     
+  uint32_t       rem_data_len;
+  uint32_t       total_data_len;
+  uint32_t       ctl_data_len;  
+
+}
+
+USB_OTG_EP , *PUSB_OTG_EP;
+
+
+
+typedef struct USB_OTG_core_cfg
+{
+  uint8_t       host_channels;
+  uint8_t       dev_endpoints;
+  uint8_t       speed;
+  uint8_t       dma_enable;
+  uint16_t      mps;
+  uint16_t      TotalFifoSize;
+  uint8_t       phy_itface;
+  uint8_t       Sof_output;
+  uint8_t       low_power;
+  uint8_t       coreID;
+ 
+}
+USB_OTG_CORE_CFGS, *PUSB_OTG_CORE_CFGS;
+
+
+
+typedef  struct  usb_setup_req {
+    
+    uint8_t   bmRequest;                      
+    uint8_t   bRequest;                           
+    uint16_t  wValue;                             
+    uint16_t  wIndex;                             
+    uint16_t  wLength;                            
+} USB_SETUP_REQ;
+
+typedef struct _Device_TypeDef
+{
+  uint8_t  *(*GetDeviceDescriptor)( uint8_t speed , uint16_t *length);  
+  uint8_t  *(*GetLangIDStrDescriptor)( uint8_t speed , uint16_t *length); 
+  uint8_t  *(*GetManufacturerStrDescriptor)( uint8_t speed , uint16_t *length);  
+  uint8_t  *(*GetProductStrDescriptor)( uint8_t speed , uint16_t *length);  
+  uint8_t  *(*GetSerialStrDescriptor)( uint8_t speed , uint16_t *length);  
+  uint8_t  *(*GetConfigurationStrDescriptor)( uint8_t speed , uint16_t *length);  
+  uint8_t  *(*GetInterfaceStrDescriptor)( uint8_t speed , uint16_t *length);   
+} USBD_DEVICE, *pUSBD_DEVICE;
+
+typedef struct USB_OTG_hPort
+{
+  void (*Disconnect) (void *phost);
+  void (*Connect) (void *phost); 
+  uint8_t ConnStatus;
+  uint8_t DisconnStatus;
+  uint8_t ConnHandled;
+  uint8_t DisconnHandled;
+} USB_OTG_hPort_TypeDef;
+
+typedef struct _Device_cb
+{
+  uint8_t  (*Init)         (void *pdev , uint8_t cfgidx);
+  uint8_t  (*DeInit)       (void *pdev , uint8_t cfgidx);
+  
+  uint8_t  (*Setup)        (void *pdev , USB_SETUP_REQ  *req);  
+  uint8_t  (*EP0_TxSent)   (void *pdev );    
+  uint8_t  (*EP0_RxReady)  (void *pdev );  
+   
+  uint8_t  (*DataIn)       (void *pdev , uint8_t epnum);   
+  uint8_t  (*DataOut)      (void *pdev , uint8_t epnum); 
+  uint8_t  (*SOF)          (void *pdev); 
+  uint8_t  (*IsoINIncomplete)  (void *pdev); 
+  uint8_t  (*IsoOUTIncomplete)  (void *pdev);   
+
+  uint8_t  *(*GetConfigDescriptor)( uint8_t speed , uint16_t *length); 
+
+  
+} USBD_Class_cb_TypeDef;
+
+
+
+typedef struct _USBD_USR_PROP
+{
+  void (*Init)(void);   
+  void (*DeviceReset)(uint8_t speed); 
+  void (*DeviceConfigured)(void);
+  void (*DeviceSuspended)(void);
+  void (*DeviceResumed)(void);  
+  
+  void (*DeviceConnected)(void);  
+  void (*DeviceDisconnected)(void);    
+  
+}
+USBD_Usr_cb_TypeDef;
+
+typedef struct _DCD
+{
+  uint8_t        device_config;
+  uint8_t        device_state;
+  uint8_t        device_status;
+  uint8_t        device_address;
+  uint32_t       DevRemoteWakeup;
+  USB_OTG_EP     in_ep   [15];
+  USB_OTG_EP     out_ep  [15];
+  uint8_t        setup_packet [8*3];
+  USBD_Class_cb_TypeDef         *class_cb;
+  USBD_Usr_cb_TypeDef           *usr_cb;
+  USBD_DEVICE                   *usr_device;  
+  uint8_t        *pConfig_descriptor;
+ }
+DCD_DEV , *DCD_PDEV;
+
+
+typedef struct _HCD
+{
+  uint8_t                  Rx_Buffer [0xFF];  
+  volatile uint32_t            ConnSts;
+  volatile uint32_t            ErrCnt[15];
+  volatile uint32_t            XferCnt[15];
+  volatile HC_STATUS           HC_Status[15];  
+  volatile URB_STATE           URB_State[15];
+  USB_OTG_HC               hc [15];
+  uint16_t                 channel [15];
+  USB_OTG_hPort_TypeDef    *port_cb;  
+}
+HCD_DEV , *USB_OTG_USBH_PDEV;
+
+
+typedef struct _OTG
+{
+  uint8_t    OTG_State;
+  uint8_t    OTG_PrevState;  
+  uint8_t    OTG_Mode;    
+}
+OTG_DEV , *USB_OTG_USBO_PDEV;
+
+typedef struct USB_OTG_handle
+{
+  USB_OTG_CORE_CFGS    cfg;
+  USB_OTG_CORE_REGS    regs;
+  DCD_DEV     dev;
+}
+USB_OTG_CORE_HANDLE , *PUSB_OTG_CORE_HANDLE;
+
+
+
+  
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+USB_OTG_STS  USB_OTG_CoreInit        (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_SelectCore      (USB_OTG_CORE_HANDLE *pdev, 
+                                      USB_OTG_CORE_ID_TypeDef coreID);
+USB_OTG_STS  USB_OTG_EnableGlobalInt (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_DisableGlobalInt(USB_OTG_CORE_HANDLE *pdev);
+void*           USB_OTG_ReadPacket   (USB_OTG_CORE_HANDLE *pdev ,
+    uint8_t *dest,
+    uint16_t len);
+USB_OTG_STS  USB_OTG_WritePacket     (USB_OTG_CORE_HANDLE *pdev ,
+    uint8_t *src,
+    uint8_t ch_ep_num,
+    uint16_t len);
+USB_OTG_STS  USB_OTG_FlushTxFifo     (USB_OTG_CORE_HANDLE *pdev , uint32_t num);
+USB_OTG_STS  USB_OTG_FlushRxFifo     (USB_OTG_CORE_HANDLE *pdev);
+
+uint32_t     USB_OTG_ReadCoreItr     (USB_OTG_CORE_HANDLE *pdev);
+uint32_t     USB_OTG_ReadOtgItr      (USB_OTG_CORE_HANDLE *pdev);
+uint8_t      USB_OTG_IsHostMode      (USB_OTG_CORE_HANDLE *pdev);
+uint8_t      USB_OTG_IsDeviceMode    (USB_OTG_CORE_HANDLE *pdev);
+uint32_t     USB_OTG_GetMode         (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_PhyInit         (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_SetCurrentMode  (USB_OTG_CORE_HANDLE *pdev,
+    uint8_t mode);
+
+ 
+ 
+USB_OTG_STS  USB_OTG_CoreInitDev         (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_EnableDevInt        (USB_OTG_CORE_HANDLE *pdev);
+uint32_t     USB_OTG_ReadDevAllInEPItr           (USB_OTG_CORE_HANDLE *pdev);
+enum USB_OTG_SPEED USB_OTG_GetDeviceSpeed (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_EP0Activate (USB_OTG_CORE_HANDLE *pdev);
+USB_OTG_STS  USB_OTG_EPActivate  (USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep);
+USB_OTG_STS  USB_OTG_EPDeactivate(USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep);
+USB_OTG_STS  USB_OTG_EPStartXfer (USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep);
+USB_OTG_STS  USB_OTG_EP0StartXfer(USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep);
+USB_OTG_STS  USB_OTG_EPSetStall          (USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep);
+USB_OTG_STS  USB_OTG_EPClearStall        (USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep);
+uint32_t     USB_OTG_ReadDevAllOutEp_itr (USB_OTG_CORE_HANDLE *pdev);
+uint32_t     USB_OTG_ReadDevOutEP_itr    (USB_OTG_CORE_HANDLE *pdev , uint8_t epnum);
+uint32_t     USB_OTG_ReadDevAllInEPItr   (USB_OTG_CORE_HANDLE *pdev);
+void         USB_OTG_InitDevSpeed        (USB_OTG_CORE_HANDLE *pdev , uint8_t speed);
+uint8_t      USBH_IsEvenFrame (USB_OTG_CORE_HANDLE *pdev);
+void         USB_OTG_EP0_OutStart(USB_OTG_CORE_HANDLE *pdev);
+void         USB_OTG_ActiveRemoteWakeup(USB_OTG_CORE_HANDLE *pdev);
+void         USB_OTG_UngateClock(USB_OTG_CORE_HANDLE *pdev);
+void         USB_OTG_StopDevice(USB_OTG_CORE_HANDLE *pdev);
+void         USB_OTG_SetEPStatus (USB_OTG_CORE_HANDLE *pdev , USB_OTG_EP *ep , uint32_t Status);
+uint32_t     USB_OTG_GetEPStatus(USB_OTG_CORE_HANDLE *pdev ,USB_OTG_EP *ep);
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+ 
+
+
+
+
+
+ 
+
+
+
+
+  
+
+
+
+
+  
+
+ 
+
+
+
+  
+
+
+
+
+  
+
+
+ 
+typedef struct
+{
+  uint8_t  bLength;
+  uint8_t  bDescriptorType;
+  uint8_t  bEndpointAddress;
+  uint8_t  bmAttributes;
+  uint16_t wMaxPacketSize;
+  uint8_t  bInterval;
+}
+EP_DESCRIPTOR , *PEP_DESCRIPTOR;
+
+
+
+  
+
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+
+ 
+void       DCD_Init(USB_OTG_CORE_HANDLE *pdev ,
+                    USB_OTG_CORE_ID_TypeDef coreID);
+
+void        DCD_DevConnect (USB_OTG_CORE_HANDLE *pdev);
+void        DCD_DevDisconnect (USB_OTG_CORE_HANDLE *pdev);
+void        DCD_EP_SetAddress (USB_OTG_CORE_HANDLE *pdev,
+                               uint8_t address);
+uint32_t    DCD_EP_Open(USB_OTG_CORE_HANDLE *pdev , 
+                     uint8_t ep_addr,
+                     uint16_t ep_mps,
+                     uint8_t ep_type);
+
+uint32_t    DCD_EP_Close  (USB_OTG_CORE_HANDLE *pdev,
+                                uint8_t  ep_addr);
+
+
+uint32_t   DCD_EP_PrepareRx ( USB_OTG_CORE_HANDLE *pdev,
+                        uint8_t   ep_addr,                                  
+                        uint8_t *pbuf,                                  
+                        uint16_t  buf_len);
+  
+uint32_t    DCD_EP_Tx (USB_OTG_CORE_HANDLE *pdev,
+                               uint8_t  ep_addr,
+                               uint8_t  *pbuf,
+                               uint32_t   buf_len);
+uint32_t    DCD_EP_Stall (USB_OTG_CORE_HANDLE *pdev,
+                              uint8_t   epnum);
+uint32_t    DCD_EP_ClrStall (USB_OTG_CORE_HANDLE *pdev,
+                                  uint8_t epnum);
+uint32_t    DCD_EP_Flush (USB_OTG_CORE_HANDLE *pdev,
+                               uint8_t epnum);
+uint32_t    DCD_Handle_ISR(USB_OTG_CORE_HANDLE *pdev);
+
+uint32_t DCD_GetEPStatus(USB_OTG_CORE_HANDLE *pdev ,
+                         uint8_t epnum);
+
+void DCD_SetEPStatus (USB_OTG_CORE_HANDLE *pdev , 
+                      uint8_t epnum , 
+                      uint32_t Status);
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+ 
+
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+
+  
+
+typedef enum {
+  USBD_OK   = 0,
+  USBD_BUSY,
+  USBD_FAIL,
+}USBD_Status;
+
+
+  
+
+
+
+
+ 
+ 
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
+               USB_OTG_CORE_ID_TypeDef coreID, 
+               USBD_DEVICE *pDevice,                  
+               USBD_Class_cb_TypeDef *class_cb, 
+               USBD_Usr_cb_TypeDef *usr_cb);
+
+USBD_Status USBD_DeInit(USB_OTG_CORE_HANDLE *pdev);
+
+USBD_Status USBD_ClrCfg(USB_OTG_CORE_HANDLE  *pdev, uint8_t cfgidx);
+
+USBD_Status USBD_SetCfg(USB_OTG_CORE_HANDLE  *pdev, uint8_t cfgidx);
+
+
+
+  
+
+
+
+
+  
+
+
+
+  
+
+ 
+
+
+
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+
+ 
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+USBD_Status  USBD_CtlSendData (USB_OTG_CORE_HANDLE  *pdev, 
+                               uint8_t *buf,
+                               uint16_t len);
+
+USBD_Status  USBD_CtlContinueSendData (USB_OTG_CORE_HANDLE  *pdev, 
+                               uint8_t *pbuf,
+                               uint16_t len);
+
+USBD_Status USBD_CtlPrepareRx (USB_OTG_CORE_HANDLE  *pdev, 
+                               uint8_t *pbuf,                                 
+                               uint16_t len);
+
+USBD_Status  USBD_CtlContinueRx (USB_OTG_CORE_HANDLE  *pdev, 
+                              uint8_t *pbuf,                                          
+                              uint16_t len);
+
+USBD_Status  USBD_CtlSendStatus (USB_OTG_CORE_HANDLE  *pdev);
+
+USBD_Status  USBD_CtlReceiveStatus (USB_OTG_CORE_HANDLE  *pdev);
+
+uint16_t  USBD_GetRxCount (USB_OTG_CORE_HANDLE  *pdev , 
+                           uint8_t epnum);
+
+
+
+  
+
+
+
+
+  
+
+
+
+  
+ 
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+
+
+        
+
+ 
+ 
+ 
+
+ 
+ 
+ 
+
+
+
+  
+
+
+
+
+ 
+typedef struct _CDC_IF_PROP
+{
+  uint16_t (*pIf_Init)     (void);   
+  uint16_t (*pIf_DeInit)   (void);   
+  uint16_t (*pIf_Ctrl)     (uint32_t Cmd, uint8_t* Buf, uint32_t Len);
+  uint16_t (*pIf_DataTx)   (uint8_t* Buf, uint32_t Len);
+  uint16_t (*pIf_DataRx)   (uint8_t* Buf, uint32_t Len);
+}
+CDC_IF_Prop_TypeDef;
+
+
+  
+
+
+
+
+
+  
+  
+
+
+  
+
+
+
+  
+
+extern USBD_Class_cb_TypeDef  USBD_CDC_cb;
+
+
+  
+
+
+
+ 
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+ 
+typedef struct
+{
+  uint32_t bitrate;
+  uint8_t  format;
+  uint8_t  paritytype;
+  uint8_t  datatype;
+}LINE_CODING;
+
+ 
+
+ 
+
+
+
+
+
+ 
+ 
+
+
+void VCP_send_str(uint8_t* buf);
+void VCP_put_char(uint8_t buf);
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+  
+
+
+
+
+  
+
+extern  USBD_Usr_cb_TypeDef USR_cb;
+extern  USBD_Usr_cb_TypeDef USR_FS_cb;
+extern  USBD_Usr_cb_TypeDef USR_HS_cb;
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+  
+
+void     USBD_USR_Init(void);
+void     USBD_USR_DeviceReset (uint8_t speed);
+void     USBD_USR_DeviceConfigured (void);
+void     USBD_USR_DeviceSuspended(void);
+void     USBD_USR_DeviceResumed(void);
+
+void     USBD_USR_DeviceConnected(void);
+void     USBD_USR_DeviceDisconnected(void); 
+
+void     USBD_USR_FS_Init(void);
+void     USBD_USR_FS_DeviceReset (uint8_t speed);
+void     USBD_USR_FS_DeviceConfigured (void);
+void     USBD_USR_FS_DeviceSuspended(void);
+void     USBD_USR_FS_DeviceResumed(void);
+
+void     USBD_USR_FS_DeviceConnected(void);
+void     USBD_USR_FS_DeviceDisconnected(void);  
+
+void     USBD_USR_HS_Init(void);
+void     USBD_USR_HS_DeviceReset (uint8_t speed);
+void     USBD_USR_HS_DeviceConfigured (void);
+void     USBD_USR_HS_DeviceSuspended(void);
+void     USBD_USR_HS_DeviceResumed(void);
+
+void     USBD_USR_HS_DeviceConnected(void);
+void     USBD_USR_HS_DeviceDisconnected(void);  
+
+
+
+  
+
+
+
+  
+
+
+  
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+ 
+
+
+ 
+
+
+
+ 
+  
+
+
+
+  
+
+
+
+ 
+
+
+
+  
+
+
+
+
+ 
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+
+
+  
+extern  uint8_t USBD_DeviceDesc  [18];
+extern  uint8_t USBD_StrDesc[50];
+extern  uint8_t USBD_OtherSpeedCfgDesc[0x09]; 
+extern  uint8_t USBD_DeviceQualifierDesc[0x0A];
+extern  uint8_t USBD_LangIDDesc[4];
+extern  USBD_DEVICE USR_desc; 
+
+
+  
+
+
+
+  
+
+
+uint8_t *     USBD_USR_DeviceDescriptor( uint8_t speed , uint16_t *length);
+uint8_t *     USBD_USR_LangIDStrDescriptor( uint8_t speed , uint16_t *length);
+uint8_t *     USBD_USR_ManufacturerStrDescriptor ( uint8_t speed , uint16_t *length);
+uint8_t *     USBD_USR_ProductStrDescriptor ( uint8_t speed , uint16_t *length);
+uint8_t *     USBD_USR_SerialStrDescriptor( uint8_t speed , uint16_t *length);
+uint8_t *     USBD_USR_ConfigStrDescriptor( uint8_t speed , uint16_t *length);
+uint8_t *     USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length);
+
+  
+
+
+  
+
+
+
+
+  
+
+
+
+  
+ 
+
  
  
  
@@ -13966,11 +17105,35 @@ void Delay(volatile uint32_t nTime);
 
  
 
+ 
+ 
 
-void Oxygen_PM(void);
+
+
+
+
+
+ 
+
+void Oxygen_PM_Setup(void);
 int fputc(int ch, FILE *f);
+int GET_FiO2(void);
 
-unsigned char DataFromOPM[133];                                                 
+
+ 
+ 
+
+
+
+
+
+
+ 
+
+
+unsigned char DataFromOPM[133]; 
+
+uint8_t FiO2_Value;
 uint8_t tx_index = 0;
 uint8_t rx_index = 0;
 
@@ -13986,7 +17149,7 @@ void Oxygen_PM_Setup(void)
    
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x02), ((uint8_t)0x07));
    
-  GPIO_PinAFConfig( ((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x03), ((uint8_t)0x07));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x03), ((uint8_t)0x07));
 	
   
 
@@ -14001,7 +17164,7 @@ void Oxygen_PM_Setup(void)
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
   
    
-  USART_InitStruct.USART_BaudRate = 9600;
+  USART_InitStruct.USART_BaudRate = 4800;
   USART_InitStruct.USART_WordLength = ((uint16_t)0x0000);
   USART_InitStruct.USART_StopBits = ((uint16_t)0x0000);
   USART_InitStruct.USART_Parity = ((uint16_t)0x0000) ;
@@ -14011,10 +17174,11 @@ void Oxygen_PM_Setup(void)
   
    
    
+  
   NVIC_InitTypeDef NVIC_InitStruct;
   
   NVIC_InitStruct.NVIC_IRQChannel = USART2_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 5;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
@@ -14026,19 +17190,54 @@ void Oxygen_PM_Setup(void)
   USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727), DISABLE);
   
   
-  USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ENABLE);
+  USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), DISABLE);
+
+  
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+  
+  RCC_APB1PeriphResetCmd(((uint32_t)0x00000004), ENABLE);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+   
+  
+
+
+
+
+ 
+   
+  TIM_TimeBaseStructure.TIM_Period = 20;            
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;        
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = ((uint16_t)0x0000);
+  TIM_TimeBaseInit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), &TIM_TimeBaseStructure);
+   
+  TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ((uint16_t)0x0001), ENABLE);
+   
+  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), DISABLE);
 }
 
 
 void USART2_IRQHandler(void)
 {
-  
   if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0525)) != RESET)
   {
+    if (rx_index == 0)
+    {
+      
+      TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ENABLE);
+    }
     DataFromOPM[rx_index++] = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));
   
     if(rx_index >= (sizeof(DataFromOPM) - 1))
     {  
+      TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), DISABLE);
       rx_index = 0;
     }
   }
@@ -14049,14 +17248,161 @@ void USART2_IRQHandler(void)
 }
 
 
-
-int fputc(int ch, FILE *f)
+int GET_FiO2(void)
 {
-   
-   
-  USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), (uint8_t) ch);
-   
-  while (USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0040)) == RESET)
-  {}
-  return ch;
+  
+
+
+ 
+  char FiO2_string[3];
+  FiO2_Value = 0 ;
+  uint8_t i;
+  
+  if (DataFromOPM[0] == '+' && DataFromOPM[4] == 'P' && DataFromOPM[5] == 'V' && DataFromOPM[6] == 'I')
+  {
+    for (i = 0; i < 133; i++)
+    {
+       
+      rx_index = 0;
+      DataFromOPM[i] = '\0';
+    }
+    FiO2_Value = '\0';
+  }
+  else
+  {
+    for(i=0;i<3;i++)
+    {
+      FiO2_string[i] = DataFromOPM[37+i];
+    }
+    FiO2_Value = atio(FiO2_string);
+  }
+  
+  return FiO2_Value;
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+void TIM4_IRQHandler (void)
+{
+  if (TIM_GetITStatus(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ((uint16_t)0x0001)) != RESET)
+  {
+    uint8_t rx_index = 0;
+    TIM_ClearITPendingBit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ((uint16_t)0x0001));
+    
+    for (rx_index = 0; rx_index < 133; rx_index++)
+    {
+      DataFromOPM[rx_index] = '\0';
+    }
+    
+    TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), DISABLE);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

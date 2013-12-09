@@ -171,6 +171,8 @@
           <state>STM32F4XX_VG</state>
           <state>USE_STDPERIPH_DRIVER</state>
           <state>HSE=8000000</state>
+          <state>USE_STM32F4_DISCOVERY</state>
+          <state>USE_USB_OTG_FS</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -304,6 +306,9 @@
           <state>$PROJ_DIR$\STM32F4xx_StdPeriph_Driver\inc</state>
           <state>$PROJ_DIR$\Utilities\STM32F4-Discovery</state>
           <state>$PROJ_DIR$\Application</state>
+          <state>$PROJ_DIR$\STM32_USB_Device_Library\Class\cdc\inc</state>
+          <state>$PROJ_DIR$\STM32_USB_Device_Library\Core\inc</state>
+          <state>$PROJ_DIR$\STM32_USB_OTG_Driver\inc</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1937,6 +1942,33 @@
     </file>
   </group>
   <group>
+    <name>STM32_USB_Device_Library</name>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_Device_Library\Class\cdc\src\usbd_cdc_core.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_Device_Library\Core\src\usbd_core.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_Device_Library\Core\src\usbd_ioreq.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_Device_Library\Core\src\usbd_req.c</name>
+    </file>
+  </group>
+  <group>
+    <name>STM32_USB_OTG_Driver</name>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_OTG_Driver\src\usb_core.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_OTG_Driver\src\usb_dcd.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\STM32_USB_OTG_Driver\src\usb_dcd_int.c</name>
+    </file>
+  </group>
+  <group>
     <name>STM32F4 Discovery</name>
     <file>
       <name>$PROJ_DIR$\Utilities\STM32F4-Discovery\stm32f4_discovery.c</name>
@@ -1954,6 +1986,9 @@
   <group>
     <name>User</name>
     <file>
+      <name>$PROJ_DIR$\Application\Connect_GUI.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Application\DAC_LTC1661.c</name>
     </file>
     <file>
@@ -1970,6 +2005,18 @@
     </file>
     <file>
       <name>$PROJ_DIR$\stm32f4xx_it.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Application\usb_bsp.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Application\usbd_cdc_vcp.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Application\usbd_desc.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Application\usbd_usr.c</name>
     </file>
   </group>
 </project>

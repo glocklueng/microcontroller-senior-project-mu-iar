@@ -12624,6 +12624,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
 
 
+
  
   
 
@@ -12641,6 +12642,16 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
+ 
+
+ 
+
+ 
+
+ 
+
+  
+
 
 
 
@@ -12676,7 +12687,7 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
  
-
+ 
 
  
 
@@ -12699,11 +12710,6 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 
  
 
- 
-
-     
-
- 
 
 
 
@@ -14690,6 +14696,12 @@ typedef enum
    
 
 
+
+
+ 
+
+
+
   
 
 
@@ -14729,23 +14741,15 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
 
+  
 
-
+ 
 
 
 
 
   
 
-
-
-
-  
-
-
-
-
-  
 
 
   
@@ -15154,7 +15158,6 @@ uint16_t  USBD_GetRxCount (USB_OTG_CORE_HANDLE  *pdev ,
 
 
 
-
  
 
 
@@ -15197,17 +15200,11 @@ USBD_Usr_cb_TypeDef USR_cb =
   USBD_USR_DeviceConfigured,
   USBD_USR_DeviceSuspended,
   USBD_USR_DeviceResumed,
-  
-  USBD_USR_DeviceConnected,
-  USBD_USR_DeviceDisconnected,  
-  
-  
+
 };
 
 
 
-
-
  
 
 
@@ -15231,7 +15228,6 @@ USBD_Usr_cb_TypeDef USR_cb =
 
 
   
-
 
 
 
@@ -15239,16 +15235,12 @@ USBD_Usr_cb_TypeDef USR_cb =
 
  
 void USBD_USR_Init(void)
-{   
+{  
+   
   
- 
-  if (SysTick_Config(SystemCoreClock / 24))
-  { 
-      
-    while (1);
-  }
+  STM_EVAL_LEDInit(LED5);
+  
 }
-
 
 
 
@@ -15257,19 +15249,10 @@ void USBD_USR_Init(void)
  
 void USBD_USR_DeviceReset(uint8_t speed )
 {
- switch (speed)
- {
-   case 0: 
-     break;
 
-  case 1: 
-     break;
- default:
-     break;
-     
- }
+
+
 }
-
 
 
 
@@ -15279,30 +15262,10 @@ void USBD_USR_DeviceReset(uint8_t speed )
  
 void USBD_USR_DeviceConfigured (void)
 {
+   
+  
+  STM_EVAL_LEDOn(LED5);
 }
-
-
-
-
-
-
-
- 
-void USBD_USR_DeviceConnected (void)
-{
-}
-
-
-
-
-
-
-
- 
-void USBD_USR_DeviceDisconnected (void)
-{
-}
-
 
 
 
@@ -15312,8 +15275,10 @@ void USBD_USR_DeviceDisconnected (void)
 void USBD_USR_DeviceSuspended(void)
 {
    
+  
+  STM_EVAL_LEDOff(LED5);
+   
 }
-
 
 
 
@@ -15323,7 +15288,10 @@ void USBD_USR_DeviceSuspended(void)
  
 void USBD_USR_DeviceResumed(void)
 {
-   
+  
+  STM_EVAL_LEDOn(LED5);
+     
+     
 }
 
 
@@ -15335,33 +15303,3 @@ void USBD_USR_DeviceResumed(void)
   
 
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

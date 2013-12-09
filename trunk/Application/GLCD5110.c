@@ -17,20 +17,20 @@ File : GLCD5110.c
 #include "stm32f4xx_tim.h"
 #include "GLCD5110.h"
 //------------------------------------------------------------------------------
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
                                       Global Variables
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 static unsigned char  LcdCache [ LCD_CACHE_SIZE ];
 
 static int   LcdCacheIdx;
 static int   LoWaterMark;
 static int   HiWaterMark;
-static char  UpdateLcd;
+__IO static char  UpdateLcd;
 unsigned char glcd_ini=0;
 
-//------------------------------------------------------------------------------------------------//
-//---------------------------------- Function delay ----------------------------------------------//
-//------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
+//--------------------------- Function delay -----------------------------------
+//------------------------------------------------------------------------------
 void delay_ms(volatile unsigned long ms)  // delay 1 ms per count @ Crystal 8.0 MHz and PLL9x or SYSCLK = 72 MHz
 {
    volatile unsigned long i,j;
@@ -42,7 +42,6 @@ void port_init()
 {
   /*use SPI2 for Transfer data to PCD8544 (Nokia LCD)*/
   GPIO_InitTypeDef GPIO_InitStruct;
-  SPI_InitTypeDef SPI_InitStruct;
   
   /*
     PA8 = SPI1_NSS
@@ -50,10 +49,9 @@ void port_init()
     PA7 = SPI1_MOIS (Master out Slave in)
   Note : In the Master Mode and Tx Only , use MOSI and CLK 
   */
-	
-//  RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI2, ENABLE);
+  
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);  
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+  RCC_AHB1PeriphClockCmd(GLCD_CLK, ENABLE);
     
 //  /* set GPIO init structure parameters values */
 //  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_13 | GPIO_Pin_15;                                      //Set for SCK Pin
@@ -64,34 +62,34 @@ void port_init()
 //  GPIO_Init(GPIOB, &GPIO_InitStruct);
   
   //For NSS Pin
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_1 ;                                     
+  GPIO_InitStruct.GPIO_Pin  = GLCD_NSS_Pin ;                                     
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOD, &GPIO_InitStruct);
+  GPIO_Init(GLCD_Port, &GPIO_InitStruct);
   
   /*
   	set output for NSS, RESET, D/C(Data/Command)
-                (3)NSS           |      PD1
-		(4)RESET	 |	PD6
-		(5)D/C		 |	PD3
-                (6)LED           |      PD2
+                (3)NSS     |  PD1
+		            (4)RESET	 |	PD6
+		            (5)D/C		 |	PD3
+                (6)LED     |  PD2
   */
 
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_6;             //Set for RESET, D/C Pin
+  GPIO_InitStruct.GPIO_Pin  = GLCD_RES_Pin | GLCD_DC_Pin | GLCD_LED_Pin;        //Set for RESET, D/C Pin
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOD, &GPIO_InitStruct);
+  GPIO_Init(GLCD_Port, &GPIO_InitStruct);
   
 //  //Enable Altinate Function for SPI Protoca
 //  GPIO_PinAFConfig(GPIOB,GPIO_PinSource13 ,GPIO_AF_SPI2);
 //  GPIO_PinAFConfig(GPIOB,GPIO_PinSource15 ,GPIO_AF_SPI2);
   
-  GPIO_SetBits(GPIOD, GPIO_Pin_1);                                              // NSS Pin is High
+  GPIO_SetBits(GLCD_NSS_Port, GLCD_NSS_Pin);                                    // NSS Pin is High
 	
 //  //Config SPI
 //  //APB1 Prescale : 4, 168/4= 42MHz, So SPI BaudRate = 42/16 = 2.625 MHz
@@ -118,18 +116,18 @@ void port_init()
   //Reconfig
   
   //Set LED On
-  GPIO_SetBits(GPIOD, GPIO_Pin_2);
+  GPIO_SetBits(GLCD_LED_Port, GLCD_LED_Pin);
 }
 
 //------------------------------------------------------------------------------
-void lcdInit ( void )
+void lcdInit(void)
 {
    port_init();
    delay_ms(10); // Ensure delay for initial
-   GPIO_ResetBits(GPIOD, GPIO_Pin_6);						//PD6 is RESET Pin
-   GPIO_SetBits(GPIOD, GPIO_Pin_6);
+   GPIO_ResetBits(GLCD_RES_Port, GLCD_RES_Pin);					//PD6 is RESET Pin
+   GPIO_SetBits(GLCD_RES_Port, GLCD_RES_Pin);
    
-   GPIO_SetBits(GPIOD, GPIO_Pin_1);						//NSS Pin is High
+   GPIO_SetBits(GLCD_NSS_Port, GLCD_NSS_Pin);					//NSS Pin is High
    lcdSend( 0x21, LCD_CMD );  // LCD Extended Commands.
    lcdSend( 0xC8, LCD_CMD );  // Set LCD Vop (Contrast).
    lcdSend( 0x06, LCD_CMD );  // Set Temp coefficent.
@@ -144,7 +142,7 @@ void lcdInit ( void )
    lcdUpdate();
 }
 
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdClear
 
@@ -154,7 +152,7 @@ void lcdInit ( void )
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdClear ( void )
 {
     int i;
@@ -172,7 +170,7 @@ void lcdClear ( void )
 }
 
 
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdGotoXY
 
@@ -182,7 +180,7 @@ void lcdClear ( void )
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdGotoXY ( unsigned char x, unsigned char y )
 {
     configGlcd();
@@ -198,7 +196,7 @@ void configGlcd()
         lcdClear();
     }
 }
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdSend
 
@@ -213,7 +211,7 @@ void configGlcd()
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
 {
     /*
@@ -221,20 +219,26 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
         D/C Pin is High, Select Send Data
         D/C Pin is Low, Select Send Command
     */
+    if ((SPI2->CR1 & 0x0800) == 0x0800)
+    {
+      // if Datasize is equal 16bits, then reconfig to 8 bits
+      // Reconfig Size Data for GLCD5110
+      SPI_DataSizeConfig(SPI2, SPI_DataSize_8b);
+    }
   
     uint16_t i;
     if ( cd == LCD_DATA )
     {
       //Select sent to Data Register
-      GPIO_SetBits(GPIOD, GPIO_Pin_3);
+      GPIO_SetBits(GLCD_DC_Port, GLCD_DC_Pin);
     }
     else 
     {
       //Select sent command
-      GPIO_ResetBits(GPIOD, GPIO_Pin_3);
+      GPIO_ResetBits(GLCD_DC_Port, GLCD_DC_Pin);
     }
     
-    GPIO_ResetBits(GPIOD, GPIO_Pin_1);						// NSS Pin is Low
+    GPIO_ResetBits(GLCD_NSS_Port, GLCD_NSS_Pin);				// NSS Pin is Low
     
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == RESET)
     {
@@ -244,10 +248,10 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
       }
     }
     for(i=0;i<750;i++);
-    GPIO_SetBits(GPIOD, GPIO_Pin_1);						// NSS Pin is High
+    GPIO_SetBits(GLCD_NSS_Port, GLCD_NSS_Pin);					// NSS Pin is High
 }
 
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdChar	
 
@@ -258,7 +262,7 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+--------------------------------------------------------------------------------*/
 void lcdChar (char ch )
 {
     unsigned char i;
@@ -289,7 +293,7 @@ void lcdChar (char ch )
     LcdCache[LcdCacheIdx++] = 0x00;
 }
 
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdString
 
@@ -301,7 +305,7 @@ void lcdChar (char ch )
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdString (unsigned char _x,unsigned char _y,char *dataPtr)
 {
     configGlcd();
@@ -310,8 +314,9 @@ void lcdString (unsigned char _x,unsigned char _y,char *dataPtr)
     {
         lcdChar(*dataPtr++);
     }
+    lcdUpdate();
 }
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdPixel
 
@@ -322,7 +327,7 @@ void lcdString (unsigned char _x,unsigned char _y,char *dataPtr)
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdPixel(unsigned char x, unsigned char y, unsigned char mode)
 {
     unsigned int  index;
@@ -366,7 +371,7 @@ void lcdPixel(unsigned char x, unsigned char y, unsigned char mode)
     }
 }
 
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdLine
 
@@ -378,7 +383,7 @@ void lcdPixel(unsigned char x, unsigned char y, unsigned char mode)
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdLine ( unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2, unsigned char mode )
 {
     int dx, dy, stepx, stepy, fraction;
@@ -445,7 +450,7 @@ void lcdLine ( unsigned char x1, unsigned char y1, unsigned char x2, unsigned ch
     UpdateLcd = TRUE;
 }
 
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
   Name         :  lcdUpdate
 
@@ -455,7 +460,7 @@ void lcdLine ( unsigned char x1, unsigned char y1, unsigned char x2, unsigned ch
 
   Return value :  None.
 
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdUpdate ( void )
 {
     int i;
@@ -486,14 +491,14 @@ void lcdUpdate ( void )
 
     UpdateLcd = FALSE;
 }
-/*--------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 // Purpose:       Draw a rectangle on a graphic LCD
 // Inputs:        (x1, y1) - the start coordinate
 //                (x2, y2) - the end coordinate
 //                fill  - YES or NO
 //                color - ON or OFF
 // Dependencies:  glcd_pixel(), glcd_line()
---------------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 void lcdRect(	unsigned char x1, 
 				unsigned char y1, 
 				unsigned char x2, 
@@ -543,9 +548,9 @@ void lcdRect(	unsigned char x1,
       lcdLine(x2, y1, x2, y2, color);
    }
 }
-//------------------------------------------------------------------------------------------------//
-//---------------------------------- Function for draw Progress Bar ------------------------------//
-//------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
+//------------------------Function for draw Progress Bar -----------------------
+//------------------------------------------------------------------------------
 void lcdProgBar(    unsigned char _x, 
 				    unsigned char _y, 
 				    unsigned char width, 
@@ -561,10 +566,12 @@ void lcdBackLight(char set)
 {
   if(set == SET)
   {
-    GPIO_SetBits(GPIOD,GPIO_Pin_2);                                             // Control LED back light on
+    GPIO_SetBits(GLCD_LED_Port,GLCD_LED_Pin);                                   // Control LED back light on
   }
   else if (set ==  RESET)
   {
-    GPIO_ResetBits(GPIOD, GPIO_Pin_2);                                          // Control LED back light off
+    GPIO_ResetBits(GLCD_LED_Port, GLCD_LED_Pin);                                // Control LED back light off
   }
 }
+
+//--------------------------------- END of File --------------------------------
