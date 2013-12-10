@@ -17461,7 +17461,7 @@ void lcdInit(void)
    
    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));					
    lcdSend( 0x21, LCD_CMD );  
-   lcdSend( 0xC8, LCD_CMD );  
+   lcdSend( 0xD0, LCD_CMD );  
    lcdSend( 0x06, LCD_CMD );  
    lcdSend( 0x13, LCD_CMD );  
    lcdSend( 0x20, LCD_CMD );  

@@ -44,15 +44,7 @@ int main()
   
   while(1)
   {
-    
-      //lcdString(1,1,"Phattaradanai");
-//    DataFromGUI[rx_index_GUI] = USART_ReceiveData(GUI_USART);
-//    rx_index_GUI++;
-//  
-//    if(rx_index_GUI >= (sizeof(DataFromGUI) - 1))
-//    {  
-//      rx_index_GUI = 0;
-//    }
+
   }
 }
 	
