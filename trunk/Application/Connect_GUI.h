@@ -17,5 +17,8 @@ File : Connect_GUI.c
 //------------------------------------------------------------------------------
 // Function
 void USART_GUI_Connect (void);
+void CRC_CALCULATE_TX(void);
+unsigned int TX_CRC(unsigned int crc, unsigned int data);
+void connect_command(void);
 
 

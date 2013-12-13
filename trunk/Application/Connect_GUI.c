@@ -12,13 +12,44 @@ File : Connect_GUI.c
     package = 8-n-1
     
 */
+/*
+            Package of Data 
+         * Length 40 Bytes
+         * Byte 0 : Head of Bytes : "$"
+         * Byte 1 : Command : Connect (0x0A), Upload (0xA0)
+         * Byte 2 : SOH     : 0xFF
+         * Byte 3 - 36: Data (if don't have data replace with Padding Bytes (0x23) (Padding Bytes : 30 - Data))
+         *      1.) Oxygen Saturation and FiO2 Value 14 rule = 28 Bytes (Byte 3 - 31)
+         *      2.) Alarm Level 1 and Level 2 = 2 Bytes (Byte 32 - 33)
+         *      3.) Padding : 0x23 (32 - Data - Alarm = 3 Bytes (Byte 34 - 36))
+         *      
+         * Byte 37-38 : CRC - CCITT 16 (2 Bytes)
+         * Byte 39 : End of Package Bytes (0x03)
+              
+           
+    CRC - ModBus
+         
+*/
+//------------------------------------------------------------------------------
 #include "main.h"
 #include "Connect_GUI.h"
 #include "DefinePin.h"
 //-------------------------------------------------------------------------------
-unsigned char DataFromGUI[50];
+char Data_Package[40];
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
+
+//Define Variable for CRC ------------------------------------------------------
+uint16_t Crc;
+uint8_t CRC_Low, CRC_High;
+uint8_t Length_Data = 37;
+
+//------------------------------------------------------------------------------
+//Define Value for Data Packaging
+const uint8_t Padding = 0x23;                                                   //Pendding Bytes for dummy Bytes of Data (Value = 0x23)
+const uint8_t Connect_Command = 0xE8;                                           //0xE8 is Connect Command
+const uint8_t Upload_Command = 0xD5;                                            //0xD5 is Upload Profile data Command
+const uint8_t ETX = 0x33;                                                       //End of Package Transmittion
 
 //------------------------------------------------------------------------------
 void USART_GUI_Connect(void)
@@ -113,6 +144,57 @@ void USART_GUI_Connect(void)
 //  TIM_Cmd(TIM3, DISABLE);
 }
 
+void connect_command(void)
+{
+  //Connect command
+  Data_Package[0] = '$';
+  Data_Package[1] = Connect_Command;
+  for(uint8_t j = 3; j<37; j++)
+  {
+    Data_Package[j] = Padding;
+  }
+  CRC_CALCULATE_TX();
+  Data_Package[37] = CRC_High;
+  Data_Package[38] = CRC_Low;
+}
+
+// CRC Calculate ---------------------------------------------------------------
+void CRC_CALCULATE_TX(void)
+{  
+  uint8_t i;
+  Crc = 0xFFFF;
+  for (i = 0; i < Length_Data; i++) 
+  {
+    Crc = TX_CRC(Crc , Data_Package[i]);
+  }
+  CRC_Low = (Crc & 0x00FF);                                                     //Low byte calculation
+  CRC_High = (Crc & 0xFF00)/256;                                                //High byte calculation
+} 
+
+unsigned int TX_CRC(unsigned int crc, unsigned int data)
+{
+  const unsigned int Poly16 = 0xA001;
+  unsigned int LSB;
+  uint8_t i;
+  
+  crc = ((crc^data) | 0xFF00) & (crc | 0x00FF);
+  for (i=0; i<8; i++) 
+  {
+    LSB = (crc & 0x0001);
+    crc = crc/2;
+    
+    if (LSB)
+      crc=crc^Poly16;
+    
+    /*
+    if (LSB == 0x0001)
+    {
+      crc=crc^Poly16;
+    }
+    */
+  }
+return(crc);
+}
 //-------------------------------------------------------------------------------
 
 

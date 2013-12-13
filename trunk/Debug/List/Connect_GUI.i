@@ -26,6 +26,22 @@
 
 
 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -17160,6 +17176,9 @@ void Delay(volatile uint32_t nTime);
 
 
 void USART_GUI_Connect (void);
+void CRC_CALCULATE_TX(void);
+unsigned int TX_CRC(unsigned int crc, unsigned int data);
+void connect_command(void);
 
 
 
@@ -17200,9 +17219,21 @@ void USART_GUI_Connect (void);
 
 
 
-unsigned char DataFromGUI[50];
+char Data_Package[40];
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
+
+
+uint16_t Crc;
+uint8_t CRC_Low, CRC_High;
+uint8_t Length_Data = 37;
+
+
+
+const uint8_t Padding = 0x23;                                                   
+const uint8_t Connect_Command = 0xE8;                                           
+const uint8_t Upload_Command = 0xD5;                                            
+const uint8_t ETX = 0x33;                                                       
 
 
 void USART_GUI_Connect(void)
@@ -17295,6 +17326,58 @@ void USART_GUI_Connect(void)
 
 
 
+}
+
+void connect_command(void)
+{
+  
+  Data_Package[0] = '$';
+  Data_Package[1] = Connect_Command;
+  for(uint8_t j = 3; j<37; j++)
+  {
+    Data_Package[j] = Padding;
+  }
+  CRC_CALCULATE_TX();
+  Data_Package[37] = CRC_High;
+  Data_Package[38] = CRC_Low;
+}
+
+
+void CRC_CALCULATE_TX(void)
+{  
+  uint8_t i;
+  Crc = 0xFFFF;
+  for (i = 0; i < Length_Data; i++) 
+  {
+    Crc = TX_CRC(Crc , Data_Package[i]);
+  }
+  CRC_Low = (Crc & 0x00FF);                                                     
+  CRC_High = (Crc & 0xFF00)/256;                                                
+} 
+
+unsigned int TX_CRC(unsigned int crc, unsigned int data)
+{
+  const unsigned int Poly16 = 0xA001;
+  unsigned int LSB;
+  uint8_t i;
+  
+  crc = ((crc^data) | 0xFF00) & (crc | 0x00FF);
+  for (i=0; i<8; i++) 
+  {
+    LSB = (crc & 0x0001);
+    crc = crc/2;
+    
+    if (LSB)
+      crc=crc^Poly16;
+    
+    
+
+
+
+
+ 
+  }
+return(crc);
 }
 
 
