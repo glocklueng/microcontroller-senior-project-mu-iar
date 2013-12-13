@@ -17484,6 +17484,9 @@ static const unsigned char FontLookup [][5] =
 
 
 void USART_GUI_Connect (void);
+void CRC_CALCULATE_TX(void);
+unsigned int TX_CRC(unsigned int crc, unsigned int data);
+void connect_command(void);
 
 
 
@@ -17501,7 +17504,7 @@ uint32_t count;
 extern uint16_t time;
 extern unsigned char DataFromGUI[50];
 extern uint8_t rx_index_GUI;
-
+uint8_t DataFromGUI[50];
 
 
 int main()
@@ -17514,7 +17517,7 @@ int main()
   
   while(1)
   {
-
+    connect_command();
   }
 }
 	

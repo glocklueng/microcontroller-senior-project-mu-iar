@@ -31,7 +31,7 @@ uint32_t count;
 extern uint16_t time;
 extern unsigned char DataFromGUI[50];
 extern uint8_t rx_index_GUI;
-
+uint8_t DataFromGUI[50];
 
 // Main Function ---------------------------------------------------------------
 int main()
@@ -44,7 +44,7 @@ int main()
   
   while(1)
   {
-
+    connect_command();
   }
 }
 	
