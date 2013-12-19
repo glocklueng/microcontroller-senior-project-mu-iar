@@ -4,6 +4,46 @@
 		"selected_items":
 		[
 			[
+				"oxy",
+				"OxygenSat_string"
+			],
+			[
+				"Oxy",
+				"OxygenSat_Percent"
+			],
+			[
+				"Oxyge",
+				"OxygenSat_Percent"
+			],
+			[
+				"FiO2",
+				"FiO2_Value"
+			],
+			[
+				"Fi",
+				"FiO2_ADC"
+			],
+			[
+				"Con",
+				"Connect_Command"
+			],
+			[
+				"Upl",
+				"Upload_Command"
+			],
+			[
+				"Data",
+				"Data_GUI"
+			],
+			[
+				"wh",
+				"while"
+			],
+			[
+				"uint",
+				"uint8_t"
+			],
+			[
 				"TIM",
 				"TIM4"
 			],
@@ -88,10 +128,6 @@
 				"GLCD_Port"
 			],
 			[
-				"Oxyge",
-				"OxygenSensor_Pin"
-			],
-			[
 				"GPIO",
 				"GPIO_Pin_1"
 			],
@@ -116,24 +152,12 @@
 				"define"
 			],
 			[
-				"Fi",
-				"FiO2_Value"
-			],
-			[
-				"Data",
-				"DataFromOPM"
-			],
-			[
 				"lcd",
 				"lcdInit"
 			],
 			[
 				"NSS",
 				"SPI_NSSInternalSoft_Set"
-			],
-			[
-				"uint",
-				"uint32_t"
 			],
 			[
 				"GPIO_Pin_",
@@ -148,21 +172,10 @@
 	"buffers":
 	[
 		{
-			"contents": "/*\nProject : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation\nMicrocontroller : STM32F4 Discovery (STM32F407VG)\nFile : main.c\n*/\n//------------------------------------------------------------------------------\n#include \"main.h\"\n#include \"DAC_LTC1661.h\"\n#include \"Oxygen_Pulse_Meter.h\"\n#include \"Oxygen_sensor.h\"\n#include \"GLCD5110.h\"\n#include \"DefinePin.h\"\n#include \"Connect_GUI.h\"\n//------------------------------------------------------------------------------\n__ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;\n#ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED\n  #if defined ( __ICCARM__ ) /*!< IAR Compiler */\n    #pragma data_alignment=4\n  #endif\n#endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */\n\n//------------------------------------------------------------------------------\nvoid delay(void);\nvoid LCD_SetUp(void);\nvoid System_Init(void);\nvoid INTTIM_Config(void);\n// Variable --------------------------------------------------------------------\nunsigned char msg ;\nchar Character;\nuint32_t count;\nextern uint16_t time;\nextern unsigned char DataFromGUI[50];\nextern uint8_t rx_index_GUI;\n\n\n// Main Function ---------------------------------------------------------------\nint main()\n{  \n /* Set Up config System*/\n  System_Init();\n  lcdInit();\n  lcdString (1,1,\"Hello\");\n  lcdString(2,1, \"Phattaradanai\");\n  \n  while(1)\n  {\n\n  }\n}\n	\n// delay function --------------------------------------------------------------\nvoid delay(void)\n{\n  unsigned int i,j;\n  for(i=0;i<5000;i++)\n  {\n    for(j=0;j<500;j++);\n  }\n}\n\n//------------------------------------------------------------------------------\nvoid System_Init(void)\n{\n  SPI2_SetUp();\n  LTC1661_Setup();\n  OxygenSensor_Setup();\n  STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);\n  Timer6_SetUp();\n  USART_GUI_Connect();\n  //INTTIM_Config();\n  \n  // LED Set UP\n  STM_EVAL_LEDInit(LED3);\n  STM_EVAL_LEDInit(LED4);\n  STM_EVAL_LEDInit(LED5);\n  STM_EVAL_LEDInit(LED6);\n  STM_EVAL_LEDOn(LED3);\n  STM_EVAL_LEDOn(LED4);\n  STM_EVAL_LEDOn(LED5);\n  STM_EVAL_LEDOn(LED6);\n  \n  //LCD Set Up\n  lcdInit();\n  \n  /* Initialize USB available on STM32F4-Discovery board */\n  USBD_Init(&USB_OTG_dev,\n  #ifdef USE_USB_OTG_HS \n    USB_OTG_HS_CORE_ID,\n  #else            \n    USB_OTG_FS_CORE_ID,\n  #endif  \n    &USR_desc, \n    &USBD_CDC_cb,\n    &USR_cb);\n}\n\n\n//void INTTIM_Config(void)\n//{\n//  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;\n//  NVIC_InitTypeDef NVIC_InitStructure;\n//  /* Enable the TIM2 gloabal Interrupt */\n//  NVIC_InitStructure.NVIC_IRQChannel = TIM6_DAC_IRQn;\n//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;\n//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;\n//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;\n//  NVIC_Init(&NVIC_InitStructure);\n//   \n//  /* TIM2 clock enable */\n//  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);\n//  /* Time base configuration */\n//  TIM_TimeBaseStructure.TIM_Period = 2000; // 1 MHz down to 1 KHz (1 ms)\n//  TIM_TimeBaseStructure.TIM_Prescaler = 42000; // 24 MHz Clock down to 1 MHz (adjust per your clock)\n//  TIM_TimeBaseStructure.TIM_ClockDivision = 0;\n//  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;\n//  TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);\n//  /* TIM IT enable */\n//  TIM_ITConfig(TIM6, TIM_IT_Update, ENABLE);\n//  /* TIM2 enable counter */\n//  TIM_Cmd(TIM6, ENABLE);\n//  TIM_Cmd(TIM6, DISABLE);\n//}\n//void TIM6_DAC_IRQHandler(void)\n//{\n//  if (TIM_GetITStatus (TIM6, TIM_IT_Update) != RESET)\n//  {\n//    time = time + 1;\n//    STM_EVAL_LEDOff(LED5);\n//    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);\n//  }\n//}\n\n//------------------------------------------------------------------------------\nvoid USART6_IRQHandler (void)\n{\n  unsigned char Data_in;\n  if(USART_GetITStatus(USART6, USART_IT_RXNE) == SET)\n  {\n    Data_in = USART_ReceiveData(USART6);\n    USART_ClearITPendingBit(USART6, USART_IT_RXNE);\n    DataFromGUI[rx_index_GUI] = Data_in;\n    //DataFromGUI[rx_index_GUI] = USART_ReceiveData(GUI_USART);\n    rx_index_GUI++;\n  \n    if(rx_index_GUI >= (sizeof(DataFromGUI) - 1))\n    {  \n      rx_index_GUI = 0;\n    }\n  }\n  if(USART_GetITStatus(GUI_USART, USART_IT_TXE) != RESET)\n  {\n    USART_ITConfig(GUI_USART, USART_IT_TXE, DISABLE);\n    //USART_SendData(USART6, 'a');\n  }\n}\n\n//------------------------------------------------------------------------------\n//#ifdef USE_FULL_ASSERT\n///**\n//* @brief  assert_failed\n//*         Reports the name of the source file and the source line number\n//*         where the assert_param error has occurred.\n//* @param  File: pointer to the source file name\n//* @param  Line: assert_param error line source number\n//* @retval None\n//*/\n//void assert_failed(uint8_t* file, uint32_t line)\n//{\n//  /* User can add his own implementation to report the file name and line number,\n//  ex: printf(\"Wrong parameters value: file %s on line %d\\r\\n\", file, line) */\n// \n//  /* Infinite loop */\n//  while (1)\n//  {}\n//}\n//#endif\n// End of File -----------------------------------------------------------------",
 			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
-			"file_size": 5190,
-			"file_write_time": 130310662995559202,
 			"settings":
 			{
-				"buffer_size": 5014,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
-			"settings":
-			{
-				"buffer_size": 3324,
+				"buffer_size": 5797,
 				"line_ending": "Windows"
 			}
 		},
@@ -170,7 +183,7 @@
 			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
 			"settings":
 			{
-				"buffer_size": 7835,
+				"buffer_size": 8153,
 				"line_ending": "Windows"
 			}
 		},
@@ -178,39 +191,31 @@
 			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_sensor.c",
 			"settings":
 			{
-				"buffer_size": 6999,
+				"buffer_size": 7257,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/E/My document/Sonic scope Project/sonix/VCP & Media Player/Application/src/usbd_cdc_vcp.c",
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
 			"settings":
 			{
-				"buffer_size": 11707,
+				"buffer_size": 8501,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c",
 			"settings":
 			{
-				"buffer_size": 38692,
+				"buffer_size": 55098,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/system_stm32f4xx.c",
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/GLCD5110.c",
 			"settings":
 			{
-				"buffer_size": 22568,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Top Gun microcontroller/Application/setup_driver.c",
-			"settings":
-			{
-				"buffer_size": 7949,
+				"buffer_size": 15846,
 				"line_ending": "Windows"
 			}
 		}
@@ -243,6 +248,17 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/EXTI/EXTI_Example/main.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM3240_41_G_EVAL/stm324xg_eval_sdio_sd.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/SDIO/SDIO_uSDCard/main.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/USART/USART_HyperTerminal/stm32f4xx_it.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/USART/USART_HyperTerminal/main.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
+		"/E/My document/Sonic scope Project/sonix/VCP & Media Player/Application/src/usbd_cdc_vcp.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/system_stm32f4xx.c",
+		"/D/Top Gun microcontroller/Application/setup_driver.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Conncect_GUI.c",
 		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/MEMS/main.c",
@@ -343,7 +359,6 @@
 		"/D/USART2/system_setup.c",
 		"/E/STM32F4/STM32F4xx_Clock_Configuration/STM32F4xx_Clock_Configuration/system_stm32f4xx.c",
 		"/D/TGR_AC.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/system_stm32f4xx.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/stm32f4xx_conf.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/system_setup.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu/main.c",
@@ -360,17 +375,7 @@
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/usbd_conf.h",
 		"/E/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.0.1/Project/Peripheral_Examples/ADC3_DMA/main.c",
 		"/E/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.0.1/Project/Peripheral_Examples/ADC_Interleaved_DMAmode2/main.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/stm32f4xx.h",
-		"/E/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.0.1/Utilities/STM32F4-Discovery/stm32f4_discovery_lis302dl.c",
-		"/C/Users/Phattaradanai/AppData/Local/Temp/Serial_SPI_accel.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/IAR/stm32f4xx.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/IAR/main.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/IAR/system_stm32f4xx.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu/STM32F4xx/Include/system_stm32f4xx.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/IAR/CMSIS/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c",
-		"/E/My document/IAR WorkSpace/Sonix/system_stm32f4xx.c",
-		"/E/My document/Sonic scope Project/Sonix/system_stm32f4xx.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/IAR/CMSIS/ST/STM32F4xx/Include/system_stm32f4xx.h"
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/stm32f4xx.h"
 	],
 	"find":
 	{
@@ -388,6 +393,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"FiO2_Value",
+			"DataFromGUI",
 			"TIM3",
 			"OMP",
 			"ADC1",
@@ -429,7 +436,7 @@
 	"groups":
 	[
 		{
-			"selected": 7,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -437,15 +444,15 @@
 					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 					"settings":
 					{
-						"buffer_size": 5014,
+						"buffer_size": 5797,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4221,
-								4221
+								911,
+								911
 							]
 						],
 						"settings":
@@ -455,51 +462,53 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2447.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
 					"settings":
 					{
-						"buffer_size": 3324,
+						"buffer_size": 8153,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								809,
+								809
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2622.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_sensor.c",
 					"settings":
 					{
-						"buffer_size": 7835,
+						"buffer_size": 7257,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								6991,
+								6991
 							]
 						],
 						"settings":
@@ -509,25 +518,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 3420.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_sensor.c",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
 					"settings":
 					{
-						"buffer_size": 6999,
+						"buffer_size": 8501,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6911,
-								6911
+								0,
+								0
 							]
 						],
 						"settings":
@@ -537,25 +546,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1197.0,
+						"translation.y": 2109.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "/E/My document/Sonic scope Project/sonix/VCP & Media Player/Application/src/usbd_cdc_vcp.c",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c",
 					"settings":
 					{
-						"buffer_size": 11707,
+						"buffer_size": 55098,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2011,
-								2011
+								48334,
+								48334
 							]
 						],
 						"settings":
@@ -565,25 +574,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6612.0,
+						"translation.y": 23780.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/GLCD5110.c",
 					"settings":
 					{
-						"buffer_size": 38692,
+						"buffer_size": 15846,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								5725,
+								5725
 							]
 						],
 						"settings":
@@ -593,63 +602,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 513.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/system_stm32f4xx.c",
-					"settings":
-					{
-						"buffer_size": 22568,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1311.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "/D/Top Gun microcontroller/Application/setup_driver.c",
-					"settings":
-					{
-						"buffer_size": 7949,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 513.0,
+						"translation.y": 3249.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

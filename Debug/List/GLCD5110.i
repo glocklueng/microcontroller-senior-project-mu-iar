@@ -17499,6 +17499,7 @@ void lcdClear ( void )
     HiWaterMark = ((84 * 48) / 8) - 1;
 
     UpdateLcd = 1;
+    lcdUpdate();
 }
 
 
@@ -17579,7 +17580,7 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
         SPI_I2S_SendData(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), Data_Send);
       }
     }
-    for(i=0;i<750;i++);
+    for(i=0;i<625;i++);
     GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));					
 }
 

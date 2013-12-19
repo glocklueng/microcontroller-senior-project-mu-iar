@@ -6,6 +6,7 @@ File : Oxygen_sensor.c
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "Oxygen_sensor.h"
+#include "GLCD5110.h"
 #include "DAC_LTC1661.h"
 //------------------------------------------------------------------------------
 // Define Variable -------------------------------------------------------------
@@ -15,6 +16,7 @@ uint16_t ADC_Voltage;
 double ADC_fValue;
 float FiO2_PureOxygen[60], FiO2_PureAir[60];
 float FiO2_Upper, FiO2_Lower;
+uint8_t FiO2_Percent;
 // Function --------------------------------------------------------------------
 
 void OxygenSensor_Setup(void)
@@ -130,6 +132,15 @@ float Oxygen_convert(void)
 //------------------------------------------------------------------------------
 void Calibrate_OxygenSensor(void)
 {
+  //Updata LCD
+  lcdClear();
+  lcdString(3,1,"Waitting....");
+  lcdString(3,3,"Set  Up...");
+  lcdString(1,4,"Oxygen Sensor");
+
+  //LED 6 is off
+  STM_EVAL_LEDOff(LED6);
+  
   // Calibrate Oxygen Concentration (Pure Oxygen)
   SentData_DAC(0x03FF, 1);
   SentData_DAC(0x0000, 2);
@@ -147,6 +158,8 @@ void Calibrate_OxygenSensor(void)
     }
   }
   TIM_Cmd(TIM6, DISABLE);
+  
+  //Average PureAir Voltage Data
   FiO2_Upper = (FiO2_PureOxygen[55] + FiO2_PureOxygen[56] +FiO2_PureOxygen[57] +FiO2_PureOxygen[58] +FiO2_PureOxygen[59])/5;
   
   //Calibrate Oxygen Concentration (Pure Air)
@@ -167,10 +180,16 @@ void Calibrate_OxygenSensor(void)
   TIM_Cmd(TIM6, DISABLE);
   time = 0;
   
+  //Average PureAir Voltage Data
   FiO2_Lower = (FiO2_PureAir[55] + FiO2_PureAir[56] +FiO2_PureAir[57] +FiO2_PureAir[58] +FiO2_PureAir[59])/5;
   
   //Close Air and Oxygen Valve
   SentData_DAC(0x0000, 3);
+  
+  //LED 6 is off
+  STM_EVAL_LEDOn(LED6);
+  lcdClear();
+  lcdUpdate();
 }
 
 //------------------------------------------------------------------------------
@@ -178,21 +197,11 @@ void Calibrate_OxygenSensor(void)
 void EXTI0_IRQHandler(void)
 {
   Calibrate_OxygenSensor();
+  
   // Clear Flag Interrupt
   EXTI_ClearITPendingBit(EXTI_Line0);
 }
-
-//void TIM2_IRQHandler(void)
-//{
-//  if (TIM_GetITStatus (TIM2, TIM_IT_Update) != RESET)
-//  {
-//    FiO2_PureOxygen[time] = Oxygen_convert();
-//    time = time + 1;
-//    STM_EVAL_LEDOff(LED5);
-//    TIM_ClearITPendingBit (TIM2, TIM_IT_Update);
-//  }
-//}
-//
+//------------------------------------------------------------------------------
 
 void TIM6_DAC_IRQHandler(void)
 {
@@ -205,3 +214,9 @@ void TIM6_DAC_IRQHandler(void)
 }
 
 //------------------------------------------------------------------------------
+uint8_t Convert_FiO2 (float FiO2_ADC)
+{
+  FiO2_Percent = (FiO2_ADC);
+  
+
+}

@@ -79,7 +79,7 @@ File : DefinePin.h
 #define  GUI_Port				GPIOD
 #define  GUI_Port_CLK				RCC_AHB1Periph_GPIOD
 #define  GUI_IRQn				USART3_IRQn
-#define  GUI_IRQHandler				USART3_IRQHandler
+#define  GUI_IRQHandler				USART6_IRQHandler
 
 #define  GUI_TX_Pin				GPIO_Pin_8
 #define  GUI_TX_GPIO_Port			GPIOD

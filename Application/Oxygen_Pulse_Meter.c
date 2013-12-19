@@ -12,7 +12,7 @@ Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SaO2)
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
 unsigned char DataFromOPM[133]; 
 //------------------------------------------------------------------------------
-uint8_t FiO2_Value;
+uint8_t OxygenSat_Percent;
 uint8_t tx_index = 0;
 uint8_t rx_index = 0;
 
@@ -127,14 +127,14 @@ void OPM_IRQHandler(void)
 }
 //--------------------------------------------------------------------------------------
 
-int GET_FiO2(void)
+int Get_OxygenSat(void)
 {
   /* 
-    This Function is use for getting FiO2 Value from Oxygen Pulse Meter via RS-232
-    FiO2 Address = number 37 to 39 (start 0) (SpO2=099%)
+    This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter via RS-232
+    Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
   */
-  char FiO2_string[3];
-  FiO2_Value = 0 ;
+  char OxygenSat_string[3];
+  OxygenSat_Percent = 0 ;
   uint8_t i;
   //check this command is getting SaO2 or Headding Command
   if (DataFromOPM[0] == '+' && DataFromOPM[4] == 'P' && DataFromOPM[5] == 'V' && DataFromOPM[6] == 'I')
@@ -145,113 +145,113 @@ int GET_FiO2(void)
       rx_index = 0;
       DataFromOPM[i] = '\0';
     }
-    FiO2_Value = '\0';
+    OxygenSat_Percent = '\0';
   }
   else
   {
     for(i=0;i<3;i++)
     {
-      FiO2_string[i] = DataFromOPM[37+i];
+      OxygenSat_string[i] = DataFromOPM[37+i];
     }
-    FiO2_Value = atio(FiO2_string);
+    OxygenSat_Percent = atio(OxygenSat_string);
   }
   
-  return FiO2_Value;
+  return OxygenSat_Percent;
   
 //  if(DataFromOPM[37] == '1')
 //  {
-//    FiO2_Value = 100;
+//    OxygenSat_Percent = 100;
 //  }
 //  else if(DataFromOPM[37] == '0')
 //  {
 //    switch DataFromOPM[38]
 //    {
 //      case '1':
-//      FiO2_Value = 10;
+//      OxygenSat_Percent = 10;
 //      break;
 //
 //      case '2':
-//      FiO2_Value = 20;
+//      OxygenSat_Percent = 20;
 //      break;
 //
 //      case '3':
-//      FiO2_Value = 30;
+//      OxygenSat_Percent = 30;
 //      break;
 //
 //      case '4':
-//      FiO2_Value = 40;
+//      OxygenSat_Percent = 40;
 //      break;
 //
 //      case '5':
-//      FiO2_Value = 50;
+//      OxygenSat_Percent = 50;
 //      break;
 //
 //      case '6':
-//      FiO2_Value = 60;
+//      OxygenSat_Percent = 60;
 //      break
 //
 //      case '7':
-//      FiO2_Value = 70;
+//      OxygenSat_Percent = 70;
 //      break;
 //
 //      case '8':
-//      FiO2_Value = 80;
+//      OxygenSat_Percent = 80;
 //      break;
 //
 //      case '9':
-//      FiO2_Value = 90;
+//      OxygenSat_Percent = 90;
 //      break;
 //
 //      case '0':
-//      FiO2_Value = 0;
+//      OxygenSat_Percent = 0;
 //      break;
 //    }
 //
 //    switch DataFromOPM[39]
 //    {
 //      case '1':
-//      FiO2_Value = FiO2_Value + 1;
+//      OxygenSat_Percent = OxygenSat_Percent + 1;
 //      break;
 //
 //      case '2':
-//      FiO2_Value = FiO2_Value + 2;
+//      OxygenSat_Percent = OxygenSat_Percent + 2;
 //      break;
 //
 //      case '3':
-//      FiO2_Value = FiO2_Value + 3;
+//      OxygenSat_Percent = OxygenSat_Percent + 3;
 //      break;
 //
 //      case '4':
-//      FiO2_Value = FiO2_Value + 4;
+//      OxygenSat_Percent = OxygenSat_Percent + 4;
 //      break;
 //
 //      case '5':
-//      FiO2_Value = FiO2_Value + 5;
+//      OxygenSat_Percent = OxygenSat_Percent + 5;
 //      break;
 //
 //      case '6':
-//      FiO2_Value = FiO2_Value + 6;
+//      OxygenSat_Percent = OxygenSat_Percent + 6;
 //      break
 //
 //      case '7':
-//      FiO2_Value = FiO2_Value + 7;
+//      OxygenSat_Percent = OxygenSat_Percent + 7;
 //      break;
 //
 //      case '8':
-//      FiO2_Value = FiO2_Value + 8;
+//      OxygenSat_Percent = OxygenSat_Percent + 8;
 //      break;
 //
 //      case '9':
-//      FiO2_Value = FiO2_Value + 9;
+//      OxygenSat_Percent = OxygenSat_Percent + 9;
 //      break;
 //
 //      case '0':
-//      FiO2_Value = FiO2_Value + 0;
+//      OxygenSat_Percent = OxygenSat_Percent + 0;
 //      break;
 //    }
 //  }
 //
-//  return FiO2_Value; 
+//  return OxygenSat_Percent; 
 }
 
 //------------------------------------------------------------------------------------

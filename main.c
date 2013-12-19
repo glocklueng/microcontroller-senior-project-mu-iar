@@ -21,18 +21,17 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 
 //------------------------------------------------------------------------------
 void delay(void);
-void LCD_SetUp(void);
 void System_Init(void);
 void INTTIM_Config(void);
+void EXTILine0_Config(void);
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
 char Character;
 uint32_t count;
 extern uint16_t time;
-extern unsigned char DataFromGUI[50];
 extern uint8_t rx_index_GUI;
-uint8_t DataFromGUI[50];
-
+uint8_t Data_GUI[40];
+uint8_t Oxygen_Sat[14], FiO2[14];
 // Main Function ---------------------------------------------------------------
 int main()
 {  
@@ -44,7 +43,7 @@ int main()
   
   while(1)
   {
-    connect_command();
+    delay();
   }
 }
 	
@@ -131,47 +130,66 @@ void System_Init(void)
 //}
 
 //------------------------------------------------------------------------------
-void USART6_IRQHandler (void)
+/**
+  * @brief  Configures EXTI Line0 (connected to PA0 pin) in interrupt mode
+  * @param  None
+  * @retval None
+  */
+static void EXTILine0_Config(void)
 {
-  unsigned char Data_in;
-  if(USART_GetITStatus(USART6, USART_IT_RXNE) == SET)
-  {
-    Data_in = USART_ReceiveData(USART6);
-    USART_ClearITPendingBit(USART6, USART_IT_RXNE);
-    DataFromGUI[rx_index_GUI] = Data_in;
-    //DataFromGUI[rx_index_GUI] = USART_ReceiveData(GUI_USART);
-    rx_index_GUI++;
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
+
+  /* Enable GPIOA clock */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+  /* Enable SYSCFG clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
   
-    if(rx_index_GUI >= (sizeof(DataFromGUI) - 1))
-    {  
-      rx_index_GUI = 0;
-    }
-  }
-  if(USART_GetITStatus(GUI_USART, USART_IT_TXE) != RESET)
-  {
-    //USART_ITConfig(GUI_USART, USART_IT_TXE, DISABLE);
-    USART_SendData(USART3, 'a');
-  }
+  /* Configure PA0 pin as input floating */
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  /* Connect EXTI Line0 to PA0 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+
+  /* Configure EXTI Line0 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line0;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 }
 
+
+
 //------------------------------------------------------------------------------
-//#ifdef USE_FULL_ASSERT
-///**
-//* @brief  assert_failed
-//*         Reports the name of the source file and the source line number
-//*         where the assert_param error has occurred.
-//* @param  File: pointer to the source file name
-//* @param  Line: assert_param error line source number
-//* @retval None
-//*/
-//void assert_failed(uint8_t* file, uint32_t line)
-//{
-//  /* User can add his own implementation to report the file name and line number,
-//  ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-// 
-//  /* Infinite loop */
-//  while (1)
-//  {}
-//}
-//#endif
+#ifdef USE_FULL_ASSERT
+/**
+* @brief  assert_failed
+*         Reports the name of the source file and the source line number
+*         where the assert_param error has occurred.
+* @param  File: pointer to the source file name
+* @param  Line: assert_param error line source number
+* @retval None
+*/
+void assert_failed(uint8_t* file, uint32_t line)
+{
+  /* User can add his own implementation to report the file name and line number,
+  ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+ 
+  /* Infinite loop */
+  while (1)
+  {}
+}
+#endif
 // End of File -----------------------------------------------------------------

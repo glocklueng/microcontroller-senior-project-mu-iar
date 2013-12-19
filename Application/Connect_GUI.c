@@ -6,8 +6,8 @@ File : Connect_GUI.c
 //------------------------------------------------------------------------------
 /*
     Connect to GUI USE USART3 via RS-232 Protocol
-    USART3 - Tx -> Port D Pin PD8
-    USART3 - Rx -> Port D Pin PD9
+    USART6 - Tx -> Port C Pin PC6
+    USART6 - Rx -> Port C Pin PC7
     Baud Rate = 115200
     package = 8-n-1
     
@@ -16,28 +16,30 @@ File : Connect_GUI.c
             Package of Data 
          * Length 40 Bytes
          * Byte 0 : Head of Bytes : "$"
-         * Byte 1 : Command : Connect (0x0A), Upload (0xA0)
+         * Byte 1 : Command : Connect (0x00xE8A), Upload (0xD5)
          * Byte 2 : SOH     : 0xFF
          * Byte 3 - 36: Data (if don't have data replace with Padding Bytes (0x23) (Padding Bytes : 30 - Data))
          *      1.) Oxygen Saturation and FiO2 Value 14 rule = 28 Bytes (Byte 3 - 31)
          *      2.) Alarm Level 1 and Level 2 = 2 Bytes (Byte 32 - 33)
          *      3.) Padding : 0x23 (32 - Data - Alarm = 3 Bytes (Byte 34 - 36))
          *      
-         * Byte 37-38 : CRC - CCITT 16 (2 Bytes)
+         * Byte 37-38 : CRC 16 - ModBus (2 Bytes)
          * Byte 39 : End of Package Bytes (0x03)
-              
-           
-    CRC - ModBus
          
 */
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "Connect_GUI.h"
 #include "DefinePin.h"
-//-------------------------------------------------------------------------------
-char Data_Package[40];
+//------------------------------------------------------------------------------
+#define ERROR   0x65                                                            //Data Error = 'e' (0x65)
+#define ACK     0x41                                                            //Data Correct = 'A' (0x41)
+
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
+
+extern uint8_t Data_GUI [40];
+extern uint8_t Oxygen_Sat[14], FiO2[14];
 
 //Define Variable for CRC ------------------------------------------------------
 uint16_t Crc;
@@ -46,7 +48,7 @@ uint8_t Length_Data = 37;
 
 //------------------------------------------------------------------------------
 //Define Value for Data Packaging
-const uint8_t Padding = 0x23;                                                   //Pendding Bytes for dummy Bytes of Data (Value = 0x23)
+const uint8_t Padding = 0x23;                                                   //Padding Bytes for dummy Bytes of Data (Value = 0x23)
 const uint8_t Connect_Command = 0xE8;                                           //0xE8 is Connect Command
 const uint8_t Upload_Command = 0xD5;                                            //0xD5 is Upload Profile data Command
 const uint8_t ETX = 0x33;                                                       //End of Package Transmittion
@@ -134,7 +136,7 @@ void USART_GUI_Connect(void)
 //  */
 //  /* Time base configuration */
 //  TIM_TimeBaseStructure.TIM_Period = 20;            
-//  TIM_TimeBaseStructure.TIM_Prescaler = 42000;        // 42 MHz Clock down to 1 kHz (adjust per your clock)
+//  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                // 42 MHz Clock down to 1 kHz (adjust per your clock)
 //  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
 //  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 //  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
@@ -144,28 +146,34 @@ void USART_GUI_Connect(void)
 //  TIM_Cmd(TIM3, DISABLE);
 }
 
-void connect_command(void)
-{
-  //Connect command
-  Data_Package[0] = '$';
-  Data_Package[1] = Connect_Command;
-  for(uint8_t j = 3; j<37; j++)
-  {
-    Data_Package[j] = Padding;
-  }
-  CRC_CALCULATE_TX();
-  Data_Package[37] = CRC_High;
-  Data_Package[38] = CRC_Low;
-}
+// Connect Command -------------------------------------------------------------
+//void connect_command(void)
+//{
+//  //Connect command
+//  Data_Package[0] = '$';
+//  Data_Package[1] = Connect_Command;
+//  for(uint8_t j = 3; j<37; j++)
+//  {
+//    Data_Package[j] = Padding;
+//  }
+//  CRC_CALCULATE_TX();
+//  Data_Package[37] = CRC_High;
+//  Data_Package[38] = CRC_Low;
+//}
 
 // CRC Calculate ---------------------------------------------------------------
+/*
+    CRC 16 - ModBus 
+    Length : 16 bits (2 Bytes - CRC_High, CRC_Low)
+    Polynomial : 0xA001
+*/
 void CRC_CALCULATE_TX(void)
 {  
   uint8_t i;
   Crc = 0xFFFF;
   for (i = 0; i < Length_Data; i++) 
   {
-    Crc = TX_CRC(Crc , Data_Package[i]);
+    Crc = TX_CRC(Crc , Data_GUI[i]);
   }
   CRC_Low = (Crc & 0x00FF);                                                     //Low byte calculation
   CRC_High = (Crc & 0xFF00)/256;                                                //High byte calculation
@@ -193,8 +201,71 @@ unsigned int TX_CRC(unsigned int crc, unsigned int data)
     }
     */
   }
-return(crc);
+  return(crc);
 }
-//-------------------------------------------------------------------------------
 
+// GUI Interrupt Service Routine -----------------------------------------------
+void GUI_IRQHandler (void)
+{
+  uint8_t Data_in;
 
+  if(USART_GetITStatus(USART6, USART_IT_RXNE) == SET)
+  {
+    Data_in = USART_ReceiveData(USART6);
+    USART_ClearITPendingBit(USART6, USART_IT_RXNE);
+    Data_GUI[rx_index_GUI] = Data_in;
+    //Data_GUI[rx_index_GUI] = USART_ReceiveData(GUI_USART);
+    rx_index_GUI++;
+  
+    if(rx_index_GUI >= (sizeof(Data_GUI) - 1))
+    {  
+      rx_index_GUI = 0;
+
+      //Check CRC16 - ModBus
+      CRC_CALCULATE_TX();
+      if (Data_GUI[37] == CRC_High & Data_GUI[38] == CRC_Low)
+      {
+        //CRC is Correct
+        USART_SendData(USART6, ACK);                                            //Send Acknowlege to GUI
+        while(USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
+        
+        if (Data_GUI[1] == Upload_Command)
+        {
+          //Update Rule
+          
+        }
+        else if (Data_GUI[1] == Connect_Command)
+        {
+          //Clear Data out from Buffer
+          for (uint8_t i = 0; i < 40; i++)
+          {
+            Data_GUI[i] = 0;
+          }
+        }
+
+      }
+      else
+      {
+        //CRC is ERROR, Send ERROR ACK to GUI (ERROR ACK = 0xEA)
+        USART_SendData(USART6, ERROR);
+        while(USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
+      }
+    }
+  }
+  
+  if(USART_GetITStatus(USART6, USART_IT_TXE) != RESET)
+  {
+    USART_ITConfig(USART6, USART_IT_TXE, DISABLE);
+  }
+}
+
+// Update Rule -----------------------------------------------------------------
+void Update_Rule(void)
+{
+  uint8_t i;
+  for(i = 0; i<14 ; i++)
+  {
+    
+  }
+  
+}
