@@ -17179,6 +17179,7 @@ void USART_GUI_Connect (void);
 void CRC_CALCULATE_TX(void);
 unsigned int TX_CRC(unsigned int crc, unsigned int data);
 void connect_command(void);
+void Updata_Rule(void);
 
 
 
@@ -17219,9 +17220,12 @@ void connect_command(void);
 
 
 
-char Data_Package[40];
+
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
+
+extern uint8_t Data_GUI [40];
+extern uint8_t Oxygen_Sat[14], FiO2[14];
 
 
 uint16_t Crc;
@@ -17328,28 +17332,34 @@ void USART_GUI_Connect(void)
 
 }
 
-void connect_command(void)
-{
-  
-  Data_Package[0] = '$';
-  Data_Package[1] = Connect_Command;
-  for(uint8_t j = 3; j<37; j++)
-  {
-    Data_Package[j] = Padding;
-  }
-  CRC_CALCULATE_TX();
-  Data_Package[37] = CRC_High;
-  Data_Package[38] = CRC_Low;
-}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 void CRC_CALCULATE_TX(void)
 {  
   uint8_t i;
   Crc = 0xFFFF;
   for (i = 0; i < Length_Data; i++) 
   {
-    Crc = TX_CRC(Crc , Data_Package[i]);
+    Crc = TX_CRC(Crc , Data_GUI[i]);
   }
   CRC_Low = (Crc & 0x00FF);                                                     
   CRC_High = (Crc & 0xFF00)/256;                                                
@@ -17377,9 +17387,71 @@ unsigned int TX_CRC(unsigned int crc, unsigned int data)
 
  
   }
-return(crc);
+  return(crc);
 }
 
 
+void USART6_IRQHandler (void)
+{
+  uint8_t Data_in;
+
+  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525)) == SET)
+  {
+    Data_in = USART_ReceiveData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)));
+    USART_ClearITPendingBit(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525));
+    Data_GUI[rx_index_GUI] = Data_in;
+    
+    rx_index_GUI++;
+  
+    if(rx_index_GUI >= (sizeof(Data_GUI) - 1))
+    {  
+      rx_index_GUI = 0;
+
+      
+      CRC_CALCULATE_TX();
+      if (Data_GUI[37] == CRC_High & Data_GUI[38] == CRC_Low)
+      {
+        
+        USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), 0x41);                                            
+        while(USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0040)) == RESET);
+        
+        if (Data_GUI[1] == Upload_Command)
+        {
+          
+          
+        }
+        else if (Data_GUI[1] == Connect_Command)
+        {
+          
+          for (uint8_t i = 0; i < 40; i++)
+          {
+            Data_GUI[i] = 0;
+          }
+        }
+
+      }
+      else
+      {
+        
+        USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), 0x65);
+        while(USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0040)) == RESET);
+      }
+    }
+  }
+  
+  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727)) != RESET)
+  {
+    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727), DISABLE);
+  }
+}
 
 
+void Update_Rule(void)
+{
+  uint8_t i;
+  for(i = 0; i<14 ; i++)
+  {
+    
+  }
+  
+}

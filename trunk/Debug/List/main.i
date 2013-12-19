@@ -17487,6 +17487,7 @@ void USART_GUI_Connect (void);
 void CRC_CALCULATE_TX(void);
 unsigned int TX_CRC(unsigned int crc, unsigned int data);
 void connect_command(void);
+void Updata_Rule(void);
 
 
 
@@ -17494,18 +17495,17 @@ void connect_command(void);
 
 
 void delay(void);
-void LCD_SetUp(void);
 void System_Init(void);
 void INTTIM_Config(void);
+void EXTILine0_Config(void);
 
 unsigned char msg ;
 char Character;
 uint32_t count;
 extern uint16_t time;
-extern unsigned char DataFromGUI[50];
 extern uint8_t rx_index_GUI;
-uint8_t DataFromGUI[50];
-
+uint8_t Data_GUI[40];
+uint8_t Oxygen_Sat[14], FiO2[14];
 
 int main()
 {  
@@ -17517,7 +17517,7 @@ int main()
   
   while(1)
   {
-    connect_command();
+    delay();
   }
 }
 	
@@ -17600,45 +17600,45 @@ void System_Init(void)
 
 
 
-void USART6_IRQHandler (void)
+
+
+
+
+ 
+static void EXTILine0_Config(void)
 {
-  unsigned char Data_in;
-  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525)) == SET)
-  {
-    Data_in = USART_ReceiveData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)));
-    USART_ClearITPendingBit(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525));
-    DataFromGUI[rx_index_GUI] = Data_in;
-    
-    rx_index_GUI++;
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
+
+   
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE);
+   
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00004000), ENABLE);
   
-    if(rx_index_GUI >= (sizeof(DataFromGUI) - 1))
-    {  
-      rx_index_GUI = 0;
-    }
-  }
-  if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0727)) != RESET)
-  {
-    
-    USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), 'a');
-  }
+   
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0001);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStructure);
+
+   
+  SYSCFG_EXTILineConfig(((uint8_t)0x00), ((uint8_t)0x00));
+
+   
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00001);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -71,10 +71,10 @@ void port_init()
   
   /*
   	set output for NSS, RESET, D/C(Data/Command)
-                (3)NSS     |  PD1
-		            (4)RESET	 |	PD6
-		            (5)D/C		 |	PD3
-                (6)LED     |  PD2
+                (3)NSS           |      PD1
+		(4)RESET	 |	PD6
+		(5)D/C		 |	PD3
+                (6)LED           |      PD2
   */
 
   /* set GPIO init structure parameters values */
@@ -167,6 +167,7 @@ void lcdClear ( void )
     HiWaterMark = LCD_CACHE_SIZE - 1;
 
     UpdateLcd = TRUE;
+    lcdUpdate();
 }
 
 
@@ -247,7 +248,7 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
         SPI_I2S_SendData(SPI2, Data_Send);
       }
     }
-    for(i=0;i<750;i++);
+    for(i=0;i<625;i++);
     GPIO_SetBits(GLCD_NSS_Port, GLCD_NSS_Pin);					// NSS Pin is High
 }
 
