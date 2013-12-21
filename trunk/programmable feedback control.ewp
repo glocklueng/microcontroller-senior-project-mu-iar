@@ -1973,6 +1973,9 @@
     <file>
       <name>$PROJ_DIR$\Utilities\STM32F4-Discovery\stm32f4_discovery.c</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\Utilities\STM32F4-Discovery\stm32f4_discovery_sdio_sd.c</name>
+    </file>
   </group>
   <group>
     <name>System_conf</name>
