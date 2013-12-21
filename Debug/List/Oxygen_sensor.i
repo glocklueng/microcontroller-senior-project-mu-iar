@@ -12953,6 +12953,24 @@ typedef enum
 
 
   
+
+
+
+  
+
+
+ 
+   
+
+
+ 
+
+
+ 
+
+ 
+
+
   
 
 
@@ -14244,6 +14262,341 @@ void WavePlayerStart(void);
 void WavePlayer_CallBack(void);
 uint32_t ReadUnit(uint8_t *buffer, uint8_t idx, uint8_t NbrOfBytes, Endianness BytesFormat);
 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+ 
+
+
+
+ 
+  
+
+
+  
+
+
+
+ 
+  
+
+
+   
+
+
+
+  
+typedef enum
+{
+
+
+    
+  SD_CMD_CRC_FAIL                    = (1),  
+  SD_DATA_CRC_FAIL                   = (2),  
+  SD_CMD_RSP_TIMEOUT                 = (3),  
+  SD_DATA_TIMEOUT                    = (4),  
+  SD_TX_UNDERRUN                     = (5),  
+  SD_RX_OVERRUN                      = (6),  
+  SD_START_BIT_ERR                   = (7),  
+  SD_CMD_OUT_OF_RANGE                = (8),  
+  SD_ADDR_MISALIGNED                 = (9),  
+  SD_BLOCK_LEN_ERR                   = (10),  
+  SD_ERASE_SEQ_ERR                   = (11),  
+  SD_BAD_ERASE_PARAM                 = (12),  
+  SD_WRITE_PROT_VIOLATION            = (13),  
+  SD_LOCK_UNLOCK_FAILED              = (14),  
+  SD_COM_CRC_FAILED                  = (15),  
+  SD_ILLEGAL_CMD                     = (16),  
+  SD_CARD_ECC_FAILED                 = (17),  
+  SD_CC_ERROR                        = (18),  
+  SD_GENERAL_UNKNOWN_ERROR           = (19),  
+  SD_STREAM_READ_UNDERRUN            = (20),  
+  SD_STREAM_WRITE_OVERRUN            = (21),  
+  SD_CID_CSD_OVERWRITE               = (22),  
+  SD_WP_ERASE_SKIP                   = (23),  
+  SD_CARD_ECC_DISABLED               = (24),  
+  SD_ERASE_RESET                     = (25),  
+  SD_AKE_SEQ_ERROR                   = (26),  
+  SD_INVALID_VOLTRANGE               = (27),
+  SD_ADDR_OUT_OF_RANGE               = (28),
+  SD_SWITCH_ERROR                    = (29),
+  SD_SDIO_DISABLED                   = (30),
+  SD_SDIO_FUNCTION_BUSY              = (31),
+  SD_SDIO_FUNCTION_FAILED            = (32),
+  SD_SDIO_UNKNOWN_FUNCTION           = (33),
+
+
+
+  
+  SD_INTERNAL_ERROR, 
+  SD_NOT_CONFIGURED,
+  SD_REQUEST_PENDING, 
+  SD_REQUEST_NOT_APPLICABLE, 
+  SD_INVALID_PARAMETER,  
+  SD_UNSUPPORTED_FEATURE,  
+  SD_UNSUPPORTED_HW,  
+  SD_ERROR,  
+  SD_OK = 0 
+} SD_Error;
+
+
+
+    
+typedef enum
+{
+  SD_TRANSFER_OK  = 0,
+  SD_TRANSFER_BUSY = 1,
+  SD_TRANSFER_ERROR
+} SDTransferState;
+
+
+
+    
+typedef enum
+{
+  SD_CARD_READY                  = ((uint32_t)0x00000001),
+  SD_CARD_IDENTIFICATION         = ((uint32_t)0x00000002),
+  SD_CARD_STANDBY                = ((uint32_t)0x00000003),
+  SD_CARD_TRANSFER               = ((uint32_t)0x00000004),
+  SD_CARD_SENDING                = ((uint32_t)0x00000005),
+  SD_CARD_RECEIVING              = ((uint32_t)0x00000006),
+  SD_CARD_PROGRAMMING            = ((uint32_t)0x00000007),
+  SD_CARD_DISCONNECTED           = ((uint32_t)0x00000008),
+  SD_CARD_ERROR                  = ((uint32_t)0x000000FF)
+}SDCardState;
+
+
+
+
+  
+typedef struct
+{
+  volatile uint8_t  CSDStruct;             
+  volatile uint8_t  SysSpecVersion;        
+  volatile uint8_t  Reserved1;             
+  volatile uint8_t  TAAC;                  
+  volatile uint8_t  NSAC;                  
+  volatile uint8_t  MaxBusClkFrec;         
+  volatile uint16_t CardComdClasses;       
+  volatile uint8_t  RdBlockLen;            
+  volatile uint8_t  PartBlockRead;         
+  volatile uint8_t  WrBlockMisalign;       
+  volatile uint8_t  RdBlockMisalign;       
+  volatile uint8_t  DSRImpl;               
+  volatile uint8_t  Reserved2;             
+  volatile uint32_t DeviceSize;            
+  volatile uint8_t  MaxRdCurrentVDDMin;    
+  volatile uint8_t  MaxRdCurrentVDDMax;    
+  volatile uint8_t  MaxWrCurrentVDDMin;    
+  volatile uint8_t  MaxWrCurrentVDDMax;    
+  volatile uint8_t  DeviceSizeMul;         
+  volatile uint8_t  EraseGrSize;           
+  volatile uint8_t  EraseGrMul;            
+  volatile uint8_t  WrProtectGrSize;       
+  volatile uint8_t  WrProtectGrEnable;     
+  volatile uint8_t  ManDeflECC;            
+  volatile uint8_t  WrSpeedFact;           
+  volatile uint8_t  MaxWrBlockLen;         
+  volatile uint8_t  WriteBlockPaPartial;   
+  volatile uint8_t  Reserved3;             
+  volatile uint8_t  ContentProtectAppli;   
+  volatile uint8_t  FileFormatGrouop;      
+  volatile uint8_t  CopyFlag;              
+  volatile uint8_t  PermWrProtect;         
+  volatile uint8_t  TempWrProtect;         
+  volatile uint8_t  FileFormat;            
+  volatile uint8_t  ECC;                   
+  volatile uint8_t  CSD_CRC;               
+  volatile uint8_t  Reserved4;             
+} SD_CSD;
+
+
+
+ 
+typedef struct
+{
+  volatile uint8_t  ManufacturerID;        
+  volatile uint16_t OEM_AppliID;           
+  volatile uint32_t ProdName1;             
+  volatile uint8_t  ProdName2;             
+  volatile uint8_t  ProdRev;               
+  volatile uint32_t ProdSN;                
+  volatile uint8_t  Reserved1;             
+  volatile uint16_t ManufactDate;          
+  volatile uint8_t  CID_CRC;               
+  volatile uint8_t  Reserved2;             
+} SD_CID;
+
+
+
+ 
+typedef struct
+{
+  volatile uint8_t DAT_BUS_WIDTH;
+  volatile uint8_t SECURED_MODE;
+  volatile uint16_t SD_CARD_TYPE;
+  volatile uint32_t SIZE_OF_PROTECTED_AREA;
+  volatile uint8_t SPEED_CLASS;
+  volatile uint8_t PERFORMANCE_MOVE;
+  volatile uint8_t AU_SIZE;
+  volatile uint16_t ERASE_SIZE;
+  volatile uint8_t ERASE_TIMEOUT;
+  volatile uint8_t ERASE_OFFSET;
+} SD_CardStatus;
+
+
+
+
+ 
+typedef struct
+{
+  SD_CSD SD_csd;
+  SD_CID SD_cid;
+  uint32_t CardCapacity;   
+  uint32_t CardBlockSize;  
+  uint16_t RCA;
+  uint8_t CardType;
+} SD_CardInfo;
+
+
+
+ 
+  
+
+
+  
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+  
+   
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+  
+  
+
+
+  
+
+
+  
+
+
+
+  
+void SD_DeInit(void);
+SD_Error SD_Init(void);
+SDTransferState SD_GetStatus(void);
+SDCardState SD_GetState(void);
+uint8_t SD_Detect(void);
+SD_Error SD_PowerON(void);
+SD_Error SD_PowerOFF(void);
+SD_Error SD_InitializeCards(void);
+SD_Error SD_GetCardInfo(SD_CardInfo *cardinfo);
+SD_Error SD_GetCardStatus(SD_CardStatus *cardstatus);
+SD_Error SD_EnableWideBusOperation(uint32_t WideMode);
+SD_Error SD_SelectDeselect(uint32_t addr);
+SD_Error SD_ReadBlock(uint8_t *readbuff, uint32_t ReadAddr, uint16_t BlockSize);
+SD_Error SD_ReadMultiBlocks(uint8_t *readbuff, uint32_t ReadAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
+SD_Error SD_WriteBlock(uint8_t *writebuff, uint32_t WriteAddr, uint16_t BlockSize);
+SD_Error SD_WriteMultiBlocks(uint8_t *writebuff, uint32_t WriteAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
+SDTransferState SD_GetTransferState(void);
+SD_Error SD_StopTransfer(void);
+SD_Error SD_Erase(uint32_t startaddr, uint32_t endaddr);
+SD_Error SD_SendStatus(uint32_t *pcardstatus);
+SD_Error SD_SendSDStatus(uint32_t *psdstatus);
+SD_Error SD_ProcessIRQSrc(void);
+void SD_ProcessDMAIRQ(void);
+SD_Error SD_WaitReadOperation(void);
+SD_Error SD_WaitWriteOperation(void);
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+  
+
+
+
+  
 
  
 
@@ -17436,7 +17789,7 @@ uint16_t ADC_Voltage;
 double ADC_fValue;
 float FiO2_PureOxygen[60], FiO2_PureAir[60];
 float FiO2_Upper, FiO2_Lower;
-
+uint8_t FiO2_Percent;
 
 
 void OxygenSensor_Setup(void)
@@ -17634,9 +17987,9 @@ void TIM6_DAC_IRQHandler(void)
 }
 
 
+uint8_t Convert_FiO2 (float FiO2_ADC)
+{
+  FiO2_Percent = (FiO2_ADC);
+  
 
-
-
-
-
-
+}

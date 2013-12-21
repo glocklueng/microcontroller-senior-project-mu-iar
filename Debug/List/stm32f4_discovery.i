@@ -12590,6 +12590,24 @@ typedef enum
 
 
   
+
+
+
+  
+
+
+ 
+   
+
+
+ 
+
+
+ 
+
+ 
+
+
   
 
 
@@ -12861,5 +12879,181 @@ uint32_t STM_EVAL_PBGetState(Button_TypeDef Button)
 
 
   
+
+
+
+
+
+ 
+void SD_LowLevel_DeInit(void)
+{
+  GPIO_InitTypeDef  GPIO_InitStructure;
+  
+   
+  SDIO_ClockCmd(DISABLE);
+  
+   
+  SDIO_SetPowerState(((uint32_t)0x00000000));
+
+   
+  SDIO_DeInit();
+  
+   
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00000800), DISABLE);
+
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x08), ((uint8_t)0x00));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x09), ((uint8_t)0x00));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x0A), ((uint8_t)0x00));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x0B), ((uint8_t)0x00));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x0C), ((uint8_t)0x00));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint8_t)0x02), ((uint8_t)0x00));
+
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0100) | ((uint16_t)0x0200) | ((uint16_t)0x0400) | ((uint16_t)0x0800);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStructure);
+
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0004);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStructure);
+
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x1000);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStructure);
+}
+
+
+
+
+
+
+ 
+void SD_LowLevel_Init(void)
+{
+  GPIO_InitTypeDef  GPIO_InitStructure;
+
+   
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000004) | ((uint32_t)0x00000008) | ((uint32_t)0x00000002), ENABLE);
+
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x08), ((uint8_t)0xC));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x09), ((uint8_t)0xC));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x0A), ((uint8_t)0xC));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x0B), ((uint8_t)0xC));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x0C), ((uint8_t)0xC));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint8_t)0x02), ((uint8_t)0xC));
+
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0100) | ((uint16_t)0x0200) | ((uint16_t)0x0400) | ((uint16_t)0x0800);
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStructure);
+
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0004);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStructure);
+
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x1000);
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStructure);
+  
+   
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x8000);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
+
+   
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00000800), ENABLE);
+
+   
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00400000), ENABLE);
+}
+
+
+
+
+
+
+ 
+void SD_LowLevel_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize)
+{
+  DMA_InitTypeDef SDDMA_InitStructure;
+
+  DMA_ClearFlag(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ((uint32_t)0x10400000) | ((uint32_t)0x11000000) | ((uint32_t)0x12000000) | ((uint32_t)0x14000000) | ((uint32_t)0x18000000));
+
+   
+  DMA_Cmd(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), DISABLE);
+
+   
+  DMA_DeInit(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)));
+
+  SDDMA_InitStructure.DMA_Channel = ((uint32_t)0x08000000);
+  SDDMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)((uint32_t)0x40012C80);
+  SDDMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)BufferSRC;
+  SDDMA_InitStructure.DMA_DIR = ((uint32_t)0x00000040);
+  SDDMA_InitStructure.DMA_BufferSize = 0;
+  SDDMA_InitStructure.DMA_PeripheralInc = ((uint32_t)0x00000000);
+  SDDMA_InitStructure.DMA_MemoryInc = ((uint32_t)0x00000400);
+  SDDMA_InitStructure.DMA_PeripheralDataSize = ((uint32_t)0x00001000);
+  SDDMA_InitStructure.DMA_MemoryDataSize = ((uint32_t)0x00004000);
+  SDDMA_InitStructure.DMA_Mode = ((uint32_t)0x00000000);
+  SDDMA_InitStructure.DMA_Priority = ((uint32_t)0x00030000);
+  SDDMA_InitStructure.DMA_FIFOMode = ((uint32_t)0x00000004);
+  SDDMA_InitStructure.DMA_FIFOThreshold = ((uint32_t)0x00000003);
+  SDDMA_InitStructure.DMA_MemoryBurst = ((uint32_t)0x00800000);
+  SDDMA_InitStructure.DMA_PeripheralBurst = ((uint32_t)0x00200000);
+  DMA_Init(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), &SDDMA_InitStructure);
+  DMA_ITConfig(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ((uint32_t)0x00000010), ENABLE);
+  DMA_FlowControllerConfig(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ((uint32_t)0x00000020));
+
+   
+  DMA_Cmd(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ENABLE);
     
+}
+
+
+
+
+
+
+ 
+void SD_LowLevel_DMA_RxConfig(uint32_t *BufferDST, uint32_t BufferSize)
+{
+  DMA_InitTypeDef SDDMA_InitStructure;
+
+  DMA_ClearFlag(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ((uint32_t)0x10400000) | ((uint32_t)0x11000000) | ((uint32_t)0x12000000) | ((uint32_t)0x14000000) | ((uint32_t)0x18000000));
+
+   
+  DMA_Cmd(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), DISABLE);
+
+   
+  DMA_DeInit(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)));
+
+  SDDMA_InitStructure.DMA_Channel = ((uint32_t)0x08000000);
+  SDDMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)((uint32_t)0x40012C80);
+  SDDMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)BufferDST;
+  SDDMA_InitStructure.DMA_DIR = ((uint32_t)0x00000000);
+  SDDMA_InitStructure.DMA_BufferSize = 0;
+  SDDMA_InitStructure.DMA_PeripheralInc = ((uint32_t)0x00000000);
+  SDDMA_InitStructure.DMA_MemoryInc = ((uint32_t)0x00000400);
+  SDDMA_InitStructure.DMA_PeripheralDataSize = ((uint32_t)0x00001000);
+  SDDMA_InitStructure.DMA_MemoryDataSize = ((uint32_t)0x00004000);
+  SDDMA_InitStructure.DMA_Mode = ((uint32_t)0x00000000);
+  SDDMA_InitStructure.DMA_Priority = ((uint32_t)0x00030000);
+  SDDMA_InitStructure.DMA_FIFOMode = ((uint32_t)0x00000004);
+  SDDMA_InitStructure.DMA_FIFOThreshold = ((uint32_t)0x00000003);
+  SDDMA_InitStructure.DMA_MemoryBurst = ((uint32_t)0x00800000);
+  SDDMA_InitStructure.DMA_PeripheralBurst = ((uint32_t)0x00200000);
+  DMA_Init(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), &SDDMA_InitStructure);
+  DMA_ITConfig(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ((uint32_t)0x00000010), ENABLE);
+  DMA_FlowControllerConfig(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ((uint32_t)0x00000020));
+
+   
+  DMA_Cmd(((DMA_Stream_TypeDef *) (((((uint32_t)0x40000000) + 0x00020000) + 0x6400) + 0x058)), ENABLE);
+    
+}
  
