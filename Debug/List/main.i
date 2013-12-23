@@ -17892,6 +17892,7 @@ extern uint8_t rx_index_GUI;
 uint8_t Data_GUI[40];
 uint8_t Oxygen_Sat[14], FiO2[14];
 
+
 int main()
 {  
   
@@ -17899,11 +17900,13 @@ int main()
   lcdInit();
   lcdString (1,1,"Hello");
   lcdString(2,1, "Phattaradanai");
-   SentData_DAC ( 0x300, 2);
-   SentData_DAC ( 0x3FF, 1);
+   SentData_DAC ( 0x128, 2);
+   SentData_DAC ( 0x128, 1);
   
   while(1)
   {
+    SentData_DAC ( 0x128, 1);
+    delay();
   }
 }
 	
@@ -17927,6 +17930,8 @@ void System_Init(void)
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   Timer6_SetUp();
   USART_GUI_Connect();
+  
+  
 
   
   
@@ -18049,6 +18054,7 @@ void SD_Card_Setup(void)
  
 
    
+  
   NVIC_Configuration();
 
    
@@ -18083,6 +18089,7 @@ void SD_Card_Setup(void)
       }              
     }
   }
+  SD_PowerON();
 }
 
 

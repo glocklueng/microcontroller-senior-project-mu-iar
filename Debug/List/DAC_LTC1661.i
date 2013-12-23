@@ -17510,19 +17510,28 @@ void SPI2_SetUp(void)
   
   RCC_APB1PeriphClockCmd(((uint32_t)0x00004000), ENABLE);
   RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000004), ENABLE);
     
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x2000) | ((uint16_t)0x8000) ;                       
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0400);                    
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)) , &GPIO_InitStruct);
+  
+   
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0008);                    
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)) , &GPIO_InitStruct);
 
   
   
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint8_t)0x0D)  ,((uint8_t)0x05));
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)),((uint8_t)0x0F) ,((uint8_t)0x05));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint8_t)0x0A)  ,((uint8_t)0x05));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)) ,((uint8_t)0x03) ,((uint8_t)0x05));
 
   
   SPI_InitStruct.SPI_Direction = ((uint16_t)0xC000);      
@@ -17531,7 +17540,7 @@ void SPI2_SetUp(void)
   SPI_InitStruct.SPI_CPOL = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_CPHA = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_NSS = ((uint16_t)0x0200);
-  SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0028);
+  SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0020);
   SPI_InitStruct.SPI_FirstBit = ((uint16_t)0x0000);
   SPI_Init(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), &SPI_InitStruct);
   

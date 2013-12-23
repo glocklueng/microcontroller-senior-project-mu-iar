@@ -17763,7 +17763,7 @@ void port_init()
  
 
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0040) | ((uint16_t)0x0008) | ((uint16_t)0x0004);        
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0040) | ((uint16_t)0x0004) | ((uint16_t)0x0020);        
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -17801,7 +17801,7 @@ void port_init()
   
   
   
-  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0004));
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0020));
 }
 
 
@@ -17916,12 +17916,12 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
     if ( cd == LCD_DATA )
     {
       
-      GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0008));
+      GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0004));
     }
     else 
     {
       
-      GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0008));
+      GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0004));
     }
     
     GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));				
@@ -18252,11 +18252,11 @@ void lcdBackLight(char set)
 {
   if(set == SET)
   {
-    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)),((uint16_t)0x0004));                                   
+    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)),((uint16_t)0x0020));                                   
   }
   else if (set ==  RESET)
   {
-    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0004));                                
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0020));                                
   }
 }
 
