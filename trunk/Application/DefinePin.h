@@ -32,14 +32,14 @@ File : DefinePin.h
 #define  SPI2_Port 				GPIOB
 #define  SPI2_Port_CLK				RCC_AHB1Periph_GPIOB
 
-#define  SPI2_CLK_Pin				GPIO_Pin_13
+#define  SPI2_CLK_Pin				GPIO_Pin_10
 #define  SPI2_CLK_Port				GPIOB
-#define  SPI2_CLK_Source			GPIO_PinSource13
+#define  SPI2_CLK_Source			GPIO_PinSource10
 #define  SPI2_CLK_AF				GPIO_AF_SPI2	
 
-#define  SPI2_MOSI_Pin				GPIO_Pin_15
-#define  SPI2_MOSI_Port				GPIOB	
-#define  SPI2_MOSI_Source			GPIO_PinSource15
+#define  SPI2_MOSI_Pin				GPIO_Pin_3
+#define  SPI2_MOSI_Port				GPIOC	
+#define  SPI2_MOSI_Source			GPIO_PinSource3
 #define  SPI2_MOSI_AF				GPIO_AF_SPI2
 
 //-------------------------------------------------------------------------------			
@@ -58,10 +58,10 @@ File : DefinePin.h
 #define  GLCD_RES_Pin				GPIO_Pin_6
 #define  GLCD_RES_Port				GPIOD
 
-#define  GLCD_DC_Pin				GPIO_Pin_3
+#define  GLCD_DC_Pin				GPIO_Pin_2
 #define  GLCD_DC_Port				GPIOD
 
-#define  GLCD_LED_Pin				GPIO_Pin_2
+#define  GLCD_LED_Pin				GPIO_Pin_5
 #define  GLCD_LED_Port				GPIOD
 //--------------------------------------------------------------------------------
 //Define Oxygen Sensor (ADC)

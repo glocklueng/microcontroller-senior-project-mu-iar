@@ -224,6 +224,14 @@
 			}
 		},
 		{
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.c",
+			"settings":
+			{
+				"buffer_size": 59626,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
 			"settings":
 			{
@@ -260,6 +268,9 @@
 	},
 	"file_history":
 	[
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.h",
+		"/D/SDIO/STM32F4xx_SDIO_Example/Utilities/STM32F4-Discovery/stm32f4_discovery_debug.h",
+		"/D/SDIO/STM32F4xx_SDIO_Example/Utilities/STM32F4-Discovery/stm32f4_discovery_debug.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_sensor.c",
@@ -384,10 +395,7 @@
 		"/E/STM32F4/STM32F4xx_Clock_Configuration/STM32F4xx_Clock_Configuration/system_stm32f4xx.c",
 		"/D/TGR_AC.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/stm32f4xx_conf.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/system_setup.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu/main.c",
-		"/E/My document/Microcontroller OR Embedded System/FreeRTOS/New folder/FreeRTOSV7.3.0/FreeRTOS/Source/tasks.c",
-		"/E/My document/TESA Top Gun/top-gun2013/Top Gun microcontroller/stm32f4xx.h"
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/system_setup.c"
 	],
 	"find":
 	{
@@ -449,7 +457,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 7,
 			"sheets":
 			[
 				{
@@ -622,6 +630,34 @@
 				},
 				{
 					"buffer": 6,
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.c",
+					"settings":
+					{
+						"buffer_size": 59626,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 22458.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
 					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
 					"settings":
 					{
