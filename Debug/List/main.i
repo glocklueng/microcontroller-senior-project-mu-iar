@@ -12997,6 +12997,14 @@ void STM_EVAL_PBInit(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode);
 uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
+void SD_LowLevel_DeInit(void);
+void SD_LowLevel_Init(void);
+void SD_LowLevel_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize);
+void SD_LowLevel_DMA_RxConfig(uint32_t *BufferDST, uint32_t BufferSize);
+
+
+
+
  
   
 
@@ -14158,6 +14166,8 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
+
+
 
 
 
@@ -17449,6 +17459,8 @@ uint8_t *     USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
 void TimingDelay_Decrement(void);
 void Delay(volatile uint32_t nTime);
 
+void EXTILine0_Config(void);
+
 
  
 
@@ -17846,6 +17858,400 @@ void Updata_Rule(void);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+ 
+ 
+
+
+
+ 
+typedef int				INT;
+typedef unsigned int	UINT;
+
+ 
+typedef char			CHAR;
+typedef unsigned char	UCHAR;
+typedef unsigned char	BYTE;
+
+ 
+typedef short			SHORT;
+typedef unsigned short	USHORT;
+typedef unsigned short	WORD;
+typedef unsigned short	WCHAR;
+
+ 
+typedef long			LONG;
+typedef unsigned long	ULONG;
+typedef unsigned long	DWORD;
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+typedef char TCHAR;
+
+
+
+
+ 
+
+typedef struct {
+	BYTE	fs_type;		 
+	BYTE	drv;			 
+	BYTE	csize;			 
+	BYTE	n_fats;			 
+	BYTE	wflag;			 
+	BYTE	fsi_flag;		 
+	WORD	id;				 
+	WORD	n_rootdir;		 
+	DWORD	last_clust;		 
+	DWORD	free_clust;		 
+	DWORD	fsi_sector;		 
+	DWORD	n_fatent;		 
+	DWORD	fsize;			 
+	DWORD	fatbase;		 
+	DWORD	dirbase;		 
+	DWORD	database;		 
+	DWORD	winsect;		 
+	BYTE	win[512];	 
+} FATFS;
+
+
+
+ 
+
+typedef struct {
+	FATFS*	fs;				 
+	WORD	id;				 
+	BYTE	flag;			 
+	BYTE	pad1;
+	DWORD	fptr;			 
+	DWORD	fsize;			 
+	DWORD	org_clust;		 
+	DWORD	curr_clust;		 
+	DWORD	dsect;			 
+	DWORD	dir_sect;		 
+	BYTE*	dir_ptr;		 
+	BYTE	buf[512];	 
+} FIL;
+
+
+
+ 
+
+typedef struct {
+	FATFS*	fs;				 
+	WORD	id;				 
+	WORD	index;			 
+	DWORD	sclust;			 
+	DWORD	clust;			 
+	DWORD	sect;			 
+	BYTE*	dir;			 
+	BYTE*	fn;				 
+} DIR;
+
+
+
+ 
+
+typedef struct {
+	DWORD	fsize;			 
+	WORD	fdate;			 
+	WORD	ftime;			 
+	BYTE	fattrib;		 
+	TCHAR	fname[13];		 
+} FILINFO;
+
+
+
+ 
+
+typedef enum {
+	FR_OK = 0,				 
+	FR_DISK_ERR,			 
+	FR_INT_ERR,				 
+	FR_NOT_READY,			 
+	FR_NO_FILE,				 
+	FR_NO_PATH,				 
+	FR_INVALID_NAME,		 
+	FR_DENIED,				 
+	FR_EXIST,				 
+	FR_INVALID_OBJECT,		 
+	FR_WRITE_PROTECTED,		 
+	FR_INVALID_DRIVE,		 
+	FR_NOT_ENABLED,			 
+	FR_NO_FILESYSTEM,		 
+	FR_MKFS_ABORTED,		 
+	FR_TIMEOUT,				 
+	FR_LOCKED,				 
+	FR_NOT_ENOUGH_CORE,		 
+	FR_TOO_MANY_OPEN_FILES	 
+} FRESULT;
+
+
+
+ 
+ 
+
+FRESULT f_mount (BYTE, FATFS*);						 
+FRESULT f_open (FIL*, const TCHAR*, BYTE);			 
+FRESULT f_read (FIL*, void*, UINT, UINT*);			 
+FRESULT f_lseek (FIL*, DWORD);						 
+FRESULT f_close (FIL*);								 
+FRESULT f_opendir (DIR*, const TCHAR*);				 
+FRESULT f_readdir (DIR*, FILINFO*);					 
+FRESULT f_stat (const TCHAR*, FILINFO*);			 
+
+FRESULT f_write (FIL*, const void*, UINT, UINT*);	 
+FRESULT f_getfree (const TCHAR*, DWORD*, FATFS**);	 
+FRESULT f_truncate (FIL*);							 
+FRESULT f_sync (FIL*);								 
+FRESULT f_unlink (const TCHAR*);					 
+FRESULT	f_mkdir (const TCHAR*);						 
+FRESULT f_chmod (const TCHAR*, BYTE, BYTE);			 
+FRESULT f_utime (const TCHAR*, const FILINFO*);		 
+FRESULT f_rename (const TCHAR*, const TCHAR*);		 
+
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+DWORD get_fattime (void);
+
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+
+
+
+
  USB_OTG_CORE_HANDLE    USB_OTG_dev ;
 
 void delay(void);
@@ -17858,30 +18264,26 @@ void EXTILine0_Config(void);
  
 
  
-typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
-
- 
-
-
-
- 
- 
-uint8_t Buffer_Block_Tx[512], Buffer_Block_Rx[512];
-uint8_t Buffer_MultiBlock_Tx[(512 * 100)], Buffer_MultiBlock_Rx[(512 * 100)];
-volatile TestStatus EraseStatus = FAILED, TransferStatus1 = FAILED, TransferStatus2 = FAILED;
 SD_Error Status = SD_OK;
-volatile uint32_t SDCardOperation = 0;
+
+FATFS filesystem;		 
+
+FRESULT ret;			   
+
+FIL file;				     
+
+DIR dir;				     
+
+FILINFO fno;			   
+
+UINT bw, br;
+
+uint8_t buff[128];
 
  
-void NVIC_Configuration(void);
-void SD_EraseTest(void);
-void SD_SingleBlockTest(void);
-void SD_MultiBlockTest(void);
-void Fill_Buffer(uint8_t *pBuffer, uint32_t BufferLength, uint32_t Offset);
-TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength);
-TestStatus eBuffercmp(uint8_t* pBuffer, uint32_t BufferLength);
+static void Delay(volatile uint32_t nCount);
+static void fault_err (FRESULT rc);
 
-void SD_Card_Setup(void);
 
 
 unsigned char msg ;
@@ -17899,13 +18301,37 @@ int main()
   System_Init();
   lcdInit();
   lcdString (1,1,"Hello");
-  lcdString(2,1, "Phattaradanai");
-   SentData_DAC ( 0x128, 2);
-   SentData_DAC ( 0x128, 1);
+  lcdString (2,1, "Phattaradanai");
+  SentData_DAC ( 0x1EB, 1);
+  SentData_DAC ( 0x3AD, 2);
+  
+  if (f_mount(0, &filesystem) != FR_OK) 
+  {
+    printf("could not open filesystem \n\r");
+  }
+  
+  ret = f_open(&file, "HELLO.TXT", 0x02 | 0x08);
+  if (ret) {
+    
+    fault_err(ret);
+  } else {
+    printf("Write a text data. (hello.txt)\n\r");
+    ret = f_write(&file, "Hello world!", 14, &bw);
+    if (ret) {
+      printf("Write a text data to file error\n\r");
+    } else {
+      printf("%u bytes written\n\r", bw);
+    }
+    Delay(50);
+    printf("Close the file\n\r");
+    ret = f_close(&file);
+    if (ret) {
+      printf("Close the hello.txt file error\n\r");			
+    }
+  }
   
   while(1)
   {
-    SentData_DAC ( 0x128, 1);
     delay();
   }
 }
@@ -17930,8 +18356,6 @@ void System_Init(void)
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   Timer6_SetUp();
   USART_GUI_Connect();
-  
-  
 
   
   
@@ -17949,7 +18373,7 @@ void System_Init(void)
   lcdInit();
 
   
-  SD_Card_Setup();
+  SD_Init();
   
    
   USBD_Init(&USB_OTG_dev,
@@ -18001,7 +18425,7 @@ void System_Init(void)
 
 
  
-static void EXTILine0_Config(void)
+void EXTILine0_Config(void)
 {
   EXTI_InitTypeDef   EXTI_InitStructure;
   GPIO_InitTypeDef   GPIO_InitStructure;
@@ -18036,60 +18460,21 @@ static void EXTILine0_Config(void)
   NVIC_Init(&NVIC_InitStructure);
 }
 
-
- 
-
-
-
-
-
- 
-void SD_Card_Setup(void)
+static void fault_err (FRESULT rc)
 {
-  
+  const char *str =
+                    "OK\0" "DISK_ERR\0" "INT_ERR\0" "NOT_READY\0" "NO_FILE\0" "NO_PATH\0"
+                    "INVALID_NAME\0" "DENIED\0" "EXIST\0" "INVALID_OBJECT\0" "WRITE_PROTECTED\0"
+                    "INVALID_DRIVE\0" "NOT_ENABLED\0" "NO_FILE_SYSTEM\0" "MKFS_ABORTED\0" "TIMEOUT\0"
+                    "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
+  FRESULT i;
 
-
-
-
- 
-
-   
-  
-  NVIC_Configuration();
-
-   
-  if ((Status = SD_Init()) != SD_OK) {
-    STM_EVAL_LEDOn(LED6); 
+  for (i = (FRESULT)0; i != rc && *str; i++) {
+    while (*str++) ;
   }
-        
-  while((Status == SD_OK) && (SDCardOperation != 3) && (SD_Detect()== ((uint8_t)0x01)))
-  {
-    switch(SDCardOperation)
-    {
-       
-      case (0):
-      {
-        SD_EraseTest();
-        SDCardOperation = 1;
-        break;
-      }
-       
-      case (1):
-      {
-        SD_SingleBlockTest();
-        SDCardOperation = 2;
-        break;
-      }       
-       
-      case (2):
-      {
-        SD_MultiBlockTest();
-        SDCardOperation = 3;
-        break;
-      }              
-    }
-  }
-  SD_PowerON();
+  printf("rc=%u FR_%s\n\r", (UINT)rc, str);
+  STM_EVAL_LEDOn(LED6);
+  while(1);
 }
 
 
@@ -18097,198 +18482,10 @@ void SD_Card_Setup(void)
 
 
  
-void NVIC_Configuration(void)
+static void Delay(volatile uint32_t nCount)
 {
-  NVIC_InitTypeDef NVIC_InitStructure;
-
-   
-  NVIC_PriorityGroupConfig(((uint32_t)0x600));
-
-  NVIC_InitStructure.NVIC_IRQChannel = SDIO_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_Init(&NVIC_InitStructure);  
-}
-
-
-
-
-
- 
-void SD_EraseTest(void)
-{
-   
-  if (Status == SD_OK) {
-     
-    Status = SD_Erase(0x00, (512 * 100));
-  }
-
-  if (Status == SD_OK) {
-    Status = SD_ReadMultiBlocks(Buffer_MultiBlock_Rx, 0x00, 512, 100);
-
-     
-    Status = SD_WaitReadOperation();
-
-     
-    while(SD_GetStatus() != SD_TRANSFER_OK);
-  }
-
-   
-  if (Status == SD_OK) {
-    EraseStatus = eBuffercmp(Buffer_MultiBlock_Rx, (512 * 100));
-  }
-  
-  if (EraseStatus == PASSED) {
-    STM_EVAL_LEDOn(LED3);
-  } else {
-    STM_EVAL_LEDOff(LED3);
-    STM_EVAL_LEDOn(LED6);    
-  }
-}
-
-
-
-
-
- 
-void SD_SingleBlockTest(void)
-{
-   
-   
-  Fill_Buffer(Buffer_Block_Tx, 512, 0x320F);
-
-  if (Status == SD_OK) {
-     
-    Status = SD_WriteBlock(Buffer_Block_Tx, 0x00, 512);
-     
-    Status = SD_WaitWriteOperation();
-    while(SD_GetStatus() != SD_TRANSFER_OK);
-  }
-
-  if (Status == SD_OK) {
-     
-    Status = SD_ReadBlock(Buffer_Block_Rx, 0x00, 512);
-     
-    Status = SD_WaitReadOperation();
-    while(SD_GetStatus() != SD_TRANSFER_OK);
-  }
-
-   
-  if (Status == SD_OK) {
-    TransferStatus1 = Buffercmp(Buffer_Block_Tx, Buffer_Block_Rx, 512);
-  }
-  
-  if (TransferStatus1 == PASSED) {
-    STM_EVAL_LEDOn(LED4);
-  } else {
-    STM_EVAL_LEDOff(LED4);
-    STM_EVAL_LEDOn(LED6);    
-  }
-}
-
-
-
-
-
- 
-void SD_MultiBlockTest(void)
-{
-   
-   
-  Fill_Buffer(Buffer_MultiBlock_Tx, (512 * 100), 0x0);
-
-  if (Status == SD_OK) {
-     
-    Status = SD_WriteMultiBlocks(Buffer_MultiBlock_Tx, 0x00, 512, 100);
-     
-    Status = SD_WaitWriteOperation();
-    while(SD_GetStatus() != SD_TRANSFER_OK);
-  }
-
-  if (Status == SD_OK) {
-     
-    Status = SD_ReadMultiBlocks(Buffer_MultiBlock_Rx, 0x00, 512, 100);
-     
-    Status = SD_WaitReadOperation();
-    while(SD_GetStatus() != SD_TRANSFER_OK);
-  }
-
-   
-  if (Status == SD_OK) {
-    TransferStatus2 = Buffercmp(Buffer_MultiBlock_Tx, Buffer_MultiBlock_Rx, (512 * 100));
-  }
-  
-  if(TransferStatus2 == PASSED) {
-    STM_EVAL_LEDOn(LED5);
-  } else {
-    STM_EVAL_LEDOff(LED5);
-    STM_EVAL_LEDOn(LED6);    
-  }
-}
-
-
-
-
-
-
-
- 
-TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength)
-{
-  while (BufferLength--)
-  {
-    if (*pBuffer1 != *pBuffer2) {
-      return FAILED;
-    }
-
-    pBuffer1++;
-    pBuffer2++;
-  }
-
-  return PASSED;
-}
-
-
-
-
-
-
-
- 
-void Fill_Buffer(uint8_t *pBuffer, uint32_t BufferLength, uint32_t Offset)
-{
-  uint16_t index = 0;
-
-   
-  for (index = 0; index < BufferLength; index++) {
-    pBuffer[index] = index + Offset;
-  }
-}
-
-
-
-
-
-
-
- 
-TestStatus eBuffercmp(uint8_t* pBuffer, uint32_t BufferLength)
-{
-  while (BufferLength--)
-  {
-     
-    if ((*pBuffer != 0xFF) && (*pBuffer != 0x00)) {
-      return FAILED;
-    }
-
-    pBuffer++;
-  }
-
-  return PASSED;
+  volatile uint32_t index = 0; 
+  for (index = (100000 * nCount); index != 0; index--);
 }
 
 

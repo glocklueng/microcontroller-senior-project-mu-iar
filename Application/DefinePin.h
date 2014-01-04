@@ -7,30 +7,32 @@ File : DefinePin.h
 #include "main.h"
 //------------------------------------------------------------------------------
 //Define RS-232 for Oxygen Pulse Meter
-#define  OPM_USART				USART2
+#define  OPM_USART					USART2
 #define  OPM_USART_CLK				RCC_APB1Periph_USART2
 #define  OPM_UART_CLK_INIT			RCC_APB1PeriphClockCmd
-#define  OPM_IRQn				USART2_IRQn
+#define  OPM_IRQn					USART2_IRQn
 #define  OPM_IRQHandler				USART2_IRQHandler
-#define  OPM_Port				GPIOA
+#define  OPM_Port					GPIOA
 #define  OPM_Port_CLK				RCC_AHB1Periph_GPIOA
 
-#define  OPM_TX_Pin				GPIO_Pin_2
+#define  OPM_TX_Pin					GPIO_Pin_2
 #define  OPM_TX_GPIO_Port			GPIOA
 #define  OPM_TX_GPIO_CLK			RCC_AHB1Periph_GPIOA
 #define  OPM_TX_Souce				GPIO_PinSource2
-#define  OPM_TX_AF				GPIO_AF_USART2
+#define  OPM_TX_AF					GPIO_AF_USART2
 
-#define  OPM_RX_Pin				GPIO_Pin_3
+#define  OPM_RX_Pin					GPIO_Pin_3
 #define  OPM_RX_GPIO_Port			GPIOA
 #define  OPM_RX_GPIO_CLK			RCC_AHB1Periph_GPIOA
 #define  OPM_RX_Souce				GPIO_PinSource3
-#define  OPM_RX_AF				GPIO_AF_USART2
+#define  OPM_RX_AF					GPIO_AF_USART2
 
 //------------------------------------------------------------------------------
 //Define SPI2
-#define  SPI2_Port 				GPIOB
-#define  SPI2_Port_CLK				RCC_AHB1Periph_GPIOB
+#define  SPI2_PortB 				GPIOB
+#define  SPI2_PortC 				GPIOC
+#define  SPI2_PortB_CLK				RCC_AHB1Periph_GPIOB
+#define  SPI2_PortC_CLK				RCC_AHB1Periph_GPIOC
 
 #define  SPI2_CLK_Pin				GPIO_Pin_10
 #define  SPI2_CLK_Port				GPIOB
@@ -49,8 +51,8 @@ File : DefinePin.h
 
 //-------------------------------------------------------------------------------
 //Define GLCD5110
-#define  GLCD_CLK				RCC_AHB1Periph_GPIOD
-#define  GLCD_Port 				GPIOD
+#define  GLCD_CLK					RCC_AHB1Periph_GPIOD
+#define  GLCD_Port 					GPIOD
 
 #define  GLCD_NSS_Pin				GPIO_Pin_1
 #define  GLCD_NSS_Port				GPIOD

@@ -306,6 +306,7 @@
           <state>$PROJ_DIR$\STM32F4xx_StdPeriph_Driver\inc</state>
           <state>$PROJ_DIR$\Utilities\STM32F4-Discovery</state>
           <state>$PROJ_DIR$\Application</state>
+          <state>$PROJ_DIR$\Utilities\FatFs_vR0.08a</state>
           <state>$PROJ_DIR$\STM32_USB_Device_Library\Class\cdc\inc</state>
           <state>$PROJ_DIR$\STM32_USB_Device_Library\Core\inc</state>
           <state>$PROJ_DIR$\STM32_USB_OTG_Driver\inc</state>
@@ -1845,6 +1846,15 @@
       <data/>
     </settings>
   </configuration>
+  <group>
+    <name>FAT_FS</name>
+    <file>
+      <name>$PROJ_DIR$\Utilities\FatFs_vR0.08a\diskio.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Utilities\FatFs_vR0.08a\ff.c</name>
+    </file>
+  </group>
   <group>
     <name>STD_PERIPH_DRIVER</name>
     <file>

@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"SPI",
+				"SPI2_PortB_CLK"
+			],
+			[
+				"GPI",
+				"GPIOC"
+			],
+			[
+				"SP",
+				"SPI2_PortB"
+			],
+			[
 				"in",
 				"include"
 			],
@@ -80,10 +92,6 @@
 				"FiO2_Value"
 			],
 			[
-				"SPI",
-				"SPI2"
-			],
-			[
 				"DAC",
 				"DAC_NSS_Pin"
 			],
@@ -144,10 +152,6 @@
 				"GPIOB"
 			],
 			[
-				"GPI",
-				"GPIO_PinSource3"
-			],
-			[
 				"GPIO_",
 				"GPIO_Pin_13"
 			],
@@ -176,66 +180,13 @@
 	"buffers":
 	[
 		{
-			"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
+			"contents": "#include <stdio.h>\n\nint main(int argc, char const *argv[])\n{\n	int number_year;\n\n	number_year = 0x7DE;	//0x7DE is Hexadecimal\n	printf(\"Happy New Year %d \\n\", &number_year);\n\n	while(1);\n\n	return 0;\n}",
+			"file": "/C/Users/Phattaradanai/Desktop/newyear.c",
+			"file_size": 0,
+			"file_write_time": 130329769374755318,
 			"settings":
 			{
-				"buffer_size": 37948,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Phattaradanai/Downloads/FATFS-DBG_Keil/FATFS-DBG/stm32f4_discovery_sdio_sd.h",
-			"settings":
-			{
-				"buffer_size": 18232,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval.c",
-			"settings":
-			{
-				"buffer_size": 25678,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval.h",
-			"settings":
-			{
-				"buffer_size": 11424,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval_sdio_sd.c",
-			"settings":
-			{
-				"buffer_size": 90079,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/SDIO/STM32F4xx_SDIO_Example/Project/uSDCard/src/main.c",
-			"settings":
-			{
-				"buffer_size": 11892,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.c",
-			"settings":
-			{
-				"buffer_size": 59626,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
-			"settings":
-			{
-				"buffer_size": 38692,
+				"buffer_size": 197,
 				"line_ending": "Windows"
 			}
 		}
@@ -268,17 +219,34 @@
 	},
 	"file_history":
 	[
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DAC_LTC1661.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f2-f4_demobuild/STM32F2-F4_Demonstration_Builder_V1.3.0/Project/Modules/Serial/mod_serial.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f2-f4_demobuild/STM32F2-F4_Demonstration_Builder_V1.3.0/Project/Modules/USBD/mod_usbd.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f2-f4_demobuild/STM32F2-F4_Demonstration_Builder_V1.3.0/Project/Modules/USBD/app_usbd.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval.h",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.c",
+		"/D/SDIO/STM32F4xx_SDIO_Example/Project/uSDCard/src/main.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
+		"/C/Users/Phattaradanai/Downloads/FATFS-DBG_Keil/FATFS-DBG/stm32f4_discovery_sdio_sd.h",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval_sdio_sd.c",
+		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/USART/USART_HyperTerminal/main.c",
+		"/C/Users/Phattaradanai/Downloads/05_VS_Rotate/vs_rotate.c",
+		"/C/Users/Phattaradanai/Downloads/01_HelloWorld/hello_world.c",
+		"/C/Users/Phattaradanai/Downloads/PIC_Base_C_1/BC_L1-Flash_LED-20p-CCS.c",
+		"/C/Users/Phattaradanai/Desktop/LCD/GLCD5110.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.h",
 		"/D/SDIO/STM32F4xx_SDIO_Example/Utilities/STM32F4-Discovery/stm32f4_discovery_debug.h",
 		"/D/SDIO/STM32F4xx_SDIO_Example/Utilities/STM32F4-Discovery/stm32f4_discovery_debug.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_sensor.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/GLCD5110.c",
 		"/C/Users/Phattaradanai/Downloads/FATFS-DBG_Keil/FATFS-DBG/stm32f4_discovery.h",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval_sdio_sd.h",
-		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval_sdio_sd.c",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/Third_Party/fat_fs/src/ff.c",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/SDIO/SDIO_uSDCard/main.h",
 		"/C/Users/Phattaradanai/Downloads/FATFS-DBG_Keil/FATFS-DBG/stm32f4_discovery_sdio_sd.c",
@@ -294,10 +262,7 @@
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/EXTI/EXTI_Example/main.c",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM3240_41_G_EVAL/stm324xg_eval_sdio_sd.c",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/USART/USART_HyperTerminal/stm32f4xx_it.c",
-		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/USART/USART_HyperTerminal/main.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
 		"/E/My document/Sonic scope Project/sonix/VCP & Media Player/Application/src/usbd_cdc_vcp.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/system_stm32f4xx.c",
 		"/D/Top Gun microcontroller/Application/setup_driver.c",
@@ -323,7 +288,6 @@
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/sx1App.c",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/sx1App.h",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/board/tesaDemoBoard.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DAC_LTC1661.c",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main_abEvalTest.c",
 		"/C/Users/Phattaradanai/Downloads/Core407i_5110-Sample1/5110/5110.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/GLCD5110.h",
@@ -334,7 +298,6 @@
 		"/C/Users/Phattaradanai/Downloads/glcd-0.5/glcd-0.5/text_tiny.c",
 		"/C/Users/Phattaradanai/Downloads/glcd-0.5/glcd-0.5/glcd_text.h",
 		"/C/Users/Phattaradanai/Downloads/glcd-0.5/glcd-0.5/controllers/PCD8544.c",
-		"/C/Users/Phattaradanai/Desktop/LCD/GLCD5110.c",
 		"/C/Users/Phattaradanai/Desktop/LCD/GLCD5110.H",
 		"/C/Users/Phattaradanai/Downloads/Core407i_5110-Sample1/5110/5110.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_spi.c",
@@ -383,19 +346,7 @@
 		"/C/Users/Phattaradanai/Desktop/main.h",
 		"/E/My document/TESA Top Gun/top-gun2013/Top Gun microcontroller/Application/oled_app/selftest.c",
 		"/C/Users/Phattaradanai/Desktop/letters.h",
-		"/E/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.0.1/Project/Peripheral_Examples/TIM_TimeBase/main.c",
-		"/E/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.0.1/Project/Peripheral_Examples/TIM_ComplementarySignals/main.c",
-		"/C/Users/Phattaradanai/Desktop/New folder/main.h",
-		"/C/Users/Phattaradanai/Desktop/main.c",
-		"/E/Audio_duplex/audio_duplex.cpp",
-		"/D/USART2/main.c",
-		"/D/main.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/function.c",
-		"/D/USART2/system_setup.c",
-		"/E/STM32F4/STM32F4xx_Clock_Configuration/STM32F4xx_Clock_Configuration/system_stm32f4xx.c",
-		"/D/TGR_AC.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/stm32f4xx_conf.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/system_setup.c"
+		"/E/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.0.1/Project/Peripheral_Examples/TIM_TimeBase/main.c"
 	],
 	"find":
 	{
@@ -413,6 +364,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"sentdata_Dac",
 			"SD_Init",
 			"FiO2_Value",
 			"DataFromGUI",
@@ -457,229 +409,31 @@
 	"groups":
 	[
 		{
-			"selected": 7,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
+					"file": "/C/Users/Phattaradanai/Desktop/newyear.c",
 					"settings":
 					{
-						"buffer_size": 37948,
+						"buffer_size": 197,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1060,
-								1060
+								114,
+								114
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 13053.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/Users/Phattaradanai/Downloads/FATFS-DBG_Keil/FATFS-DBG/stm32f4_discovery_sdio_sd.h",
-					"settings":
-					{
-						"buffer_size": 18232,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 6213.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval.c",
-					"settings":
-					{
-						"buffer_size": 25678,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								11478,
-								18303
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 285.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval.h",
-					"settings":
-					{
-						"buffer_size": 11424,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5853,
-								7708
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 357.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Utilities/STM32_EVAL/STM324x7I_EVAL/stm324x7i_eval_sdio_sd.c",
-					"settings":
-					{
-						"buffer_size": 90079,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 6954.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/D/SDIO/STM32F4xx_SDIO_Example/Project/uSDCard/src/main.c",
-					"settings":
-					{
-						"buffer_size": 11892,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 912.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/STM32F4-Discovery/stm32f4_discovery_audio_codec.c",
-					"settings":
-					{
-						"buffer_size": 59626,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 22458.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c",
-					"settings":
-					{
-						"buffer_size": 38692,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 13182.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
