@@ -12556,6 +12556,8 @@ void SysTick_Handler(void);
 
 
 
+
+
  
 
 
@@ -12695,28 +12697,6 @@ void SysTick_Handler(void)
   
 
 
-
-
-
-
- 
-void SDIO_IRQHandler(void)
-{
-   
-  SD_ProcessIRQSrc();
-}
-
-
-
-
-
-
- 
-void SD_SDIO_DMA_IRQHANDLER(void)
-{
-   
-  SD_ProcessDMAIRQ();
-}
 
 
  

@@ -29,7 +29,7 @@
 #endif
                                               
 /* Includes ------------------------------------------------------------------*/
- #include "stm32f4xx.h"
+#include "stm32f4xx.h"
    
 /** @addtogroup Utilities
   * @{
@@ -188,6 +188,14 @@ void STM_EVAL_LEDOff(Led_TypeDef Led);
 void STM_EVAL_LEDToggle(Led_TypeDef Led);
 void STM_EVAL_PBInit(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode);
 uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
+
+//SD Card Library
+void SD_LowLevel_DeInit(void);
+void SD_LowLevel_Init(void);
+void SD_LowLevel_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize);
+void SD_LowLevel_DMA_RxConfig(uint32_t *BufferDST, uint32_t BufferSize);
+
+
 /**
   * @}
   */

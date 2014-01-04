@@ -22,6 +22,7 @@
   
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4_discovery.h"
+#include "main.h"
 
 /** @addtogroup Utilities
   * @{
@@ -330,7 +331,7 @@ void SD_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
   
-  /*!< Configure SD_SPI_DETECT_PIN pin: SD Card detect pin */
+  /*!< Configure SD_SPI_DETECT_PIN pin: SD Card detect pin (Detect SD Card PB15) */
   GPIO_InitStructure.GPIO_Pin = SD_DETECT_PIN;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;

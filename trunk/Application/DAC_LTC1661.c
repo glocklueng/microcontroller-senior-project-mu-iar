@@ -44,18 +44,18 @@ void SPI2_SetUp(void)
   
   /*
     PB12 = SPI2_NSS
-    PB13 = SPI2_CLK
+    PB10 = SPI2_CLK
     PB14 = SPI2_MISO (Master in Slave out)
-    PB15 = SPI2_MOIS (Master out Slave in)
+    PC3  = SPI2_MOIS (Master out Slave in)
   Note : In the Master Mode and Tx Only , use MOSI and CLK 
   */
   
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-  RCC_AHB1PeriphClockCmd(SPI2_Port_CLK, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+  RCC_AHB1PeriphClockCmd(SPI2_PortB_CLK, ENABLE);
+  RCC_AHB1PeriphClockCmd(SPI2_PortC_CLK, ENABLE);
     
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_10;                    //Set for SCK and MOSI Pin
+  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_10;                    //Set for SCK Pin
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -63,15 +63,14 @@ void SPI2_SetUp(void)
   GPIO_Init(GPIOB , &GPIO_InitStruct);
   
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_3;                    //Set for SCK and MOSI Pin
+  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_3;                    //Set for MOSI Pin
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOC , &GPIO_InitStruct);
 
-  //Enable Altinate Function for SPI Protocal (PB12,PB13,PB14,PB15)
-  //GPIO_PinAFConfig(GPIOB,GPIO_PinSource12 ,GPIO_AF_SPI2);
+  //Enable Altinate Function for SPI Protocal (PB10, PC3)
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource10  ,GPIO_AF_SPI2);
   GPIO_PinAFConfig(GPIOC ,GPIO_PinSource3 ,GPIO_AF_SPI2);
 
@@ -82,7 +81,7 @@ void SPI2_SetUp(void)
   SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
   SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
   SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-  SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
+  SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
   SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
   SPI_Init(SPI2, &SPI_InitStruct);
   
@@ -108,7 +107,7 @@ void LTC1661_Setup(void)
   */
 	
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-  RCC_AHB1PeriphClockCmd(SPI2_Port_CLK, ENABLE);
+  RCC_AHB1PeriphClockCmd(SPI2_PortB_CLK, ENABLE);
   
   /* set GPIO init structure parameters values (NSS Pin is PB12) */ 
   GPIO_InitStruct.GPIO_Pin  = DAC_NSS_Pin;                                      //Set for NSS Pin

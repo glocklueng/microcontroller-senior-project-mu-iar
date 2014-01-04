@@ -13000,6 +13000,14 @@ void STM_EVAL_PBInit(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode);
 uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 
 
+void SD_LowLevel_DeInit(void);
+void SD_LowLevel_Init(void);
+void SD_LowLevel_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize);
+void SD_LowLevel_DMA_RxConfig(uint32_t *BufferDST, uint32_t BufferSize);
+
+
+
+
  
   
 
@@ -14161,6 +14169,8 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
+
+
 
 
 
@@ -17452,6 +17462,8 @@ uint8_t *     USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
 void TimingDelay_Decrement(void);
 void Delay(volatile uint32_t nTime);
 
+void EXTILine0_Config(void);
+
 
  
  
@@ -17529,7 +17541,6 @@ void SPI2_SetUp(void)
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)) , &GPIO_InitStruct);
 
   
-  
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint8_t)0x0A)  ,((uint8_t)0x05));
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)) ,((uint8_t)0x03) ,((uint8_t)0x05));
 
@@ -17540,7 +17551,7 @@ void SPI2_SetUp(void)
   SPI_InitStruct.SPI_CPOL = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_CPHA = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_NSS = ((uint16_t)0x0200);
-  SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0020);
+  SPI_InitStruct.SPI_BaudRatePrescaler = ((uint16_t)0x0028);
   SPI_InitStruct.SPI_FirstBit = ((uint16_t)0x0000);
   SPI_Init(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), &SPI_InitStruct);
   

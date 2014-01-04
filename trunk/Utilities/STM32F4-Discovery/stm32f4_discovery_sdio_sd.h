@@ -51,6 +51,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4_discovery.h"
+#include "main.h"
 
 /** @addtogroup Utilities
   * @{
