@@ -33,15 +33,15 @@ void EXTILine0_Config(void);
 /* Private typedef -----------------------------------------------------------*/
 SD_Error Status = SD_OK;
 
-FATFS filesystem;		/* volume lable */
+FATFS filesystem;		                                                /* volume lable */
 
-FRESULT ret;			  /* Result code */
+FRESULT ret;			                                                /* Result code */
 
-FIL file;				    /* File object */
+FIL file;				                                        /* File object */
 
-DIR dir;				    /* Directory object */
+DIR dir;				                                        /* Directory object */
 
-FILINFO fno;			  /* File information object */
+FILINFO fno;			                                                /* File information object */
 
 UINT bw, br;
 
@@ -50,6 +50,7 @@ uint8_t buff[128];
 /* Private function prototypes -----------------------------------------------*/
 static void Delay(__IO uint32_t nCount);
 static void fault_err (FRESULT rc);
+void ConvertInttoData(uint8_t DataInt[]);
 
 
 // Variable --------------------------------------------------------------------
@@ -60,6 +61,8 @@ extern uint16_t time;
 extern uint8_t rx_index_GUI;
 uint8_t Data_GUI[40];
 uint8_t Oxygen_Sat[14], FiO2[14];
+uint8_t SD_Test[50];
+char SD_String[200];
 
 // Main Function ---------------------------------------------------------------
 int main()
@@ -72,35 +75,72 @@ int main()
   SentData_DAC ( 0x1EB, 1);
   SentData_DAC ( 0x3AD, 2);
   
-  if (f_mount(0, &filesystem) != FR_OK) 
+  if (f_mount(0, &filesystem) != FR_OK)
   {
     printf("could not open filesystem \n\r");
   }
   
-  ret = f_open(&file, "HELLO.TXT", FA_WRITE | FA_CREATE_ALWAYS);
-  if (ret) {
-    //printf("Create a new file error\n\r");
+  ret = f_open(&file, "OXY.TXT", FA_WRITE | FA_CREATE_ALWAYS);
+  if (ret) 
+  {
     fault_err(ret);
-  } else {
-    printf("Write a text data. (hello.txt)\n\r");
-    ret = f_write(&file, "Hello world!", 14, &bw);
-    if (ret) {
-      printf("Write a text data to file error\n\r");
-    } else {
+  } 
+  else 
+  {
+    ret = f_write(&file, "phattaradanai\n kiratiwudhikul", 30, &bw);
+    if (ret) 
+    {
+      printf("Write a text1 data to file error\n\r");
+    } 
+    else 
+    {
       printf("%u bytes written\n\r", bw);
     }
     Delay(50);
     printf("Close the file\n\r");
     ret = f_close(&file);
-    if (ret) {
+    if (ret)
+    {
       printf("Close the hello.txt file error\n\r");			
     }
+  }  
+  
+  //Test Transfer Data to SD Card
+  uint8_t count;
+  for(count = 0; count < 50; count++)
+  {
+    SD_Test[count] = count;
   }
+  ConvertInttoData(SD_Test);
+  ret = f_open(&file, "OXY.TXT", FA_WRITE);
+  if (ret) 
+  {
+    fault_err(ret);
+  } 
+  else 
+  {
+    ret = f_write(&file, SD_String, 200, &bw);
+    if (ret) 
+    {
+      printf("Write a text1 data to file error\n\r");
+    } 
+    else 
+    {
+      printf("%u bytes written\n\r", bw);
+    }
+    printf("Close the file\n\r");
+    ret = f_close(&file);
+    if (ret)
+    {
+      printf("Close the hello.txt file error\n\r");			
+    }
+  }  
   
   while(1)
   {
     delay();
   }
+  
 }
 	
 // delay function --------------------------------------------------------------
@@ -138,9 +178,6 @@ void System_Init(void)
   
   //LCD Set Up
   lcdInit();
-
-  //SD Card Setup
-  SD_Init();
   
   /* Initialize USB available on STM32F4-Discovery board */
   USBD_Init(&USB_OTG_dev,
@@ -154,6 +191,20 @@ void System_Init(void)
     &USR_cb);
 }
 
+//------------------------------------------------------------------------------
+void ConvertInttoData(uint8_t DataInt[])
+{
+  uint8_t i;
+  for(i = 0; i < 200; i+4)
+  {
+    SD_String[i] = '0' + (DataInt[i]/100);
+    SD_String[i+1] = '0' + ((DataInt[i]%100)/10);
+    SD_String[i+2] = '0' + ((DataInt[i]%10)/1);
+    SD_String[i+3] = '\n';
+  }
+  
+}
+//------------------------------------------------------------------------------
 
 //void INTTIM_Config(void)
 //{
@@ -240,7 +291,8 @@ static void fault_err (FRESULT rc)
                     "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
   FRESULT i;
 
-  for (i = (FRESULT)0; i != rc && *str; i++) {
+  for (i = (FRESULT)0; i != rc && *str; i++) 
+  {
     while (*str++) ;
   }
   printf("rc=%u FR_%s\n\r", (UINT)rc, str);

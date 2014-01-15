@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-1508256592
+Checksum=1658127565
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -46,6 +46,8 @@ ActionState=1
 [Trace1]
 Enabled=0
 ShowSource=1
+[array_types]
+Fmt0=uint8_t[50]	3	0
 [watch_formats]
 Fmt0={W}42:ADC_Value	3	0
 Fmt1={W}42:DAC_data	4	4
@@ -98,7 +100,11 @@ Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.154.1" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.141.5" 0 0 1 "" 0 "" 0
+Bp2=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.114.3" 0 0 1 "" 0 "" 0
+Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.115.3" 0 0 1 "" 0 "" 0
+Count=4
 [Aliases]
 Count=0
 SuppressDialog=0

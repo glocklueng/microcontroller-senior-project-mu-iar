@@ -60,7 +60,7 @@ File : DefinePin.h
 #define  GLCD_RES_Pin				GPIO_Pin_6
 #define  GLCD_RES_Port				GPIOD
 
-#define  GLCD_DC_Pin				GPIO_Pin_2
+#define  GLCD_DC_Pin				GPIO_Pin_4
 #define  GLCD_DC_Port				GPIOD
 
 #define  GLCD_LED_Pin				GPIO_Pin_5

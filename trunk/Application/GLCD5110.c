@@ -43,24 +43,9 @@ void port_init()
   /*use SPI2 for Transfer data to PCD8544 (Nokia LCD)*/
   GPIO_InitTypeDef GPIO_InitStruct;
   
-  /*
-    PA8 = SPI1_NSS
-    PA5 = SPI1_CLK
-    PA7 = SPI1_MOIS (Master out Slave in)
-  Note : In the Master Mode and Tx Only , use MOSI and CLK 
-  */
-  
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);  
   RCC_AHB1PeriphClockCmd(GLCD_CLK, ENABLE);
-    
-//  /* set GPIO init structure parameters values */
-//  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_13 | GPIO_Pin_15;                                      //Set for SCK Pin
-//  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-//  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-//  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-//  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-//  GPIO_Init(GPIOB, &GPIO_InitStruct);
-  
+
   //For NSS Pin
   GPIO_InitStruct.GPIO_Pin  = GLCD_NSS_Pin ;                                     
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
@@ -73,8 +58,8 @@ void port_init()
   	set output for NSS, RESET, D/C(Data/Command)
                 (3)NSS           |      PD1
 		(4)RESET	 |	PD6
-		(5)D/C		 |	PD3
-                (6)LED           |      PD2
+		(5)D/C		 |	PD4
+                (6)LED           |      PD5
   */
 
   /* set GPIO init structure parameters values */
@@ -85,35 +70,10 @@ void port_init()
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GLCD_Port, &GPIO_InitStruct);
   
-//  //Enable Altinate Function for SPI Protoca
-//  GPIO_PinAFConfig(GPIOB,GPIO_PinSource13 ,GPIO_AF_SPI2);
-//  GPIO_PinAFConfig(GPIOB,GPIO_PinSource15 ,GPIO_AF_SPI2);
-  
   GPIO_SetBits(GLCD_NSS_Port, GLCD_NSS_Pin);                                    // NSS Pin is High
 	
-//  //Config SPI
-//  //APB1 Prescale : 4, 168/4= 42MHz, So SPI BaudRate = 42/16 = 2.625 MHz
-//  SPI_InitStruct.SPI_Direction = SPI_Direction_1Line_Tx;			// Tx Only
-//  SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
-//  SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;				//Data size is 8 bits
-//  SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
-//  SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
-//  SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set;
-//  SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;              
-//  SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
-//  SPI_Init(SPI2, &SPI_InitStruct);
-//  
-//  SPI_NSSInternalSoftwareConfig(SPI2, SPI_NSSInternalSoft_Set);
-//  
-//  //Enable select output
-//  SPI_SSOutputCmd(SPI2, ENABLE);
-//  
-//  //Enable SPI2
-//  SPI_Cmd(SPI2, ENABLE);
-  
   // Reconfig Size Data
   SPI_DataSizeConfig(SPI2, SPI_DataSize_8b);
-  //Reconfig
   
   //Set LED On
   GPIO_SetBits(GLCD_LED_Port, GLCD_LED_Pin);

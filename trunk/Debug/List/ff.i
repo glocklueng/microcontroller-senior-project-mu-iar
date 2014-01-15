@@ -390,25 +390,25 @@ typedef struct {
  
 
 typedef enum {
-	FR_OK = 0,				 
-	FR_DISK_ERR,			 
-	FR_INT_ERR,				 
-	FR_NOT_READY,			 
-	FR_NO_FILE,				 
-	FR_NO_PATH,				 
-	FR_INVALID_NAME,		 
-	FR_DENIED,				 
-	FR_EXIST,				 
-	FR_INVALID_OBJECT,		 
-	FR_WRITE_PROTECTED,		 
-	FR_INVALID_DRIVE,		 
-	FR_NOT_ENABLED,			 
-	FR_NO_FILESYSTEM,		 
-	FR_MKFS_ABORTED,		 
-	FR_TIMEOUT,				 
-	FR_LOCKED,				 
-	FR_NOT_ENOUGH_CORE,		 
-	FR_TOO_MANY_OPEN_FILES	 
+	FR_OK = 0,				                                 
+	FR_DISK_ERR,			                                         
+	FR_INT_ERR,				                                 
+	FR_NOT_READY,			                                         
+	FR_NO_FILE,				                                 
+	FR_NO_PATH,				                                 
+	FR_INVALID_NAME,		                                         
+	FR_DENIED,				                                 
+	FR_EXIST,				                                 
+	FR_INVALID_OBJECT,		                                         
+	FR_WRITE_PROTECTED,		                                         
+	FR_INVALID_DRIVE,		                                         
+	FR_NOT_ENABLED,			                                         
+	FR_NO_FILESYSTEM,		                                         
+	FR_MKFS_ABORTED,		                                         
+	FR_TIMEOUT,				                                 
+	FR_LOCKED,				                                 
+	FR_NOT_ENOUGH_CORE,		                                         
+	FR_TOO_MANY_OPEN_FILES	                                                 
 } FRESULT;
 
 
@@ -632,10 +632,10 @@ int mem_cmp (const void* dst, const void* src, UINT cnt) {
 }
 
  
-static
-int chk_chr (const char* str, int chr) {
-	while (*str && *str != chr) str++;
-	return *str;
+static int chk_chr (const char* str, int chr) 
+{
+  while (*str && *str != chr) str++;
+  return *str;
 }
 
 
@@ -646,8 +646,10 @@ int chk_chr (const char* str, int chr) {
 
 
 
- 
- 
+
+
+
+
  
 
 
@@ -656,30 +658,38 @@ int chk_chr (const char* str, int chr) {
  
  
 
-static
-FRESULT move_window (
-	FATFS *fs,		 
-	DWORD sector	 
-)					 
+ 
+
+
+static FRESULT move_window (FATFS *fs,DWORD sector)					
 {
 	DWORD wsect;
 
 
 	wsect = fs->winsect;
-	if (wsect != sector) {	 
-		if (fs->wflag) {	 
-			if (disk_write(fs->drv, fs->win, wsect, 1) != RES_OK)
-				return FR_DISK_ERR;
-			fs->wflag = 0;
-			if (wsect < (fs->fatbase + fs->fsize)) {	 
+         
+	if (wsect != sector) 
+        {	
+           
+		if (fs->wflag) 
+                {	
+                    if (disk_write(fs->drv, fs->win, wsect, 1) != RES_OK)
+                    return FR_DISK_ERR;
+                    fs->wflag = 0;
+			if (wsect < (fs->fatbase + fs->fsize))
+                        {	
+                                 
 				BYTE nf;
-				for (nf = fs->n_fats; nf > 1; nf--) {	 
+                                 
+				for (nf = fs->n_fats; nf > 1; nf--) 
+                                {	
 					wsect += fs->fsize;
 					disk_write(fs->drv, fs->win, wsect, 1);
 				}
 			}
 		}
-		if (sector) {
+		if (sector) 
+                {
 			if (disk_read(fs->drv, fs->win, sector, 1) != RES_OK)
 				return FR_DISK_ERR;
 			fs->winsect = sector;
@@ -695,18 +705,19 @@ FRESULT move_window (
  
  
  
-static
-FRESULT sync (	 
-	FATFS *fs	 
-)
+ 
+
+static FRESULT sync (FATFS *fs)
 {
 	FRESULT res;
 
 
 	res = move_window(fs, 0);
-	if (res == FR_OK) {
+	if (res == FR_OK) 
+        {
 		 
-		if (fs->fs_type == 3 && fs->fsi_flag) {
+		if (fs->fs_type == 3 && fs->fsi_flag) 
+                {
 			fs->winsect = 0;
 			mem_set(fs->win, 0, 512);
 			*(BYTE*)(fs->win+510)=(BYTE)(0xAA55); *(BYTE*)((fs->win+510)+1)=(BYTE)((WORD)(0xAA55)>>8);
@@ -732,14 +743,13 @@ FRESULT sync (
  
  
 
+ 
 
-DWORD clust2sect (	 
-	FATFS *fs,		 
-	DWORD clst		 
-)
+
+DWORD clust2sect (FATFS *fs,DWORD clst)
 {
 	clst -= 2;
-	if (clst >= (fs->n_fatent - 2)) return 0;		 
+	if (clst >= (fs->n_fatent - 2)) return 0;		                 
 	return clst * fs->csize + fs->database;
 }
 
@@ -750,20 +760,20 @@ DWORD clust2sect (
  
  
 
+ 
 
-DWORD get_fat (	 
-	FATFS *fs,	 
-	DWORD clst	 
-)
+
+DWORD get_fat (FATFS *fs,DWORD clst)
 {
 	UINT wc, bc;
 	BYTE *p;
 
 
-	if (clst < 2 || clst >= fs->n_fatent)	 
+	if (clst < 2 || clst >= fs->n_fatent)	                                 
 		return 1;
 
-	switch (fs->fs_type) {
+	switch (fs->fs_type) 
+        {
 	case 1 :
 		bc = (UINT)clst; bc += bc / 2;
 		if (move_window(fs, fs->fatbase + (bc / 512U))) break;
@@ -891,56 +901,65 @@ FRESULT remove_chain (
  
  
  
-static
-DWORD create_chain (	 
-	FATFS *fs,			 
-	DWORD clst			 
-)
+ 
+
+
+
+static DWORD create_chain (FATFS *fs, DWORD clst)
 {
 	DWORD cs, ncl, scl;
 	FRESULT res;
 
-
-	if (clst == 0) {		 
-		scl = fs->last_clust;			 
+         
+	if (clst == 0) 
+        {		
+		scl = fs->last_clust;			                         
 		if (!scl || scl >= fs->n_fatent) scl = 1;
 	}
-	else {					 
-		cs = get_fat(fs, clst);			 
-		if (cs < 2) return 1;			 
-		if (cs < fs->n_fatent) return cs;	 
+	else 
+        {					                                 
+		cs = get_fat(fs, clst);			                         
+		if (cs < 2) return 1;			                         
+		if (cs < fs->n_fatent) return cs;	                         
 		scl = clst;
 	}
 
-	ncl = scl;				 
-	for (;;) {
-		ncl++;							 
-		if (ncl >= fs->n_fatent) {		 
+	ncl = scl;				                                 
+	for (;;) 
+        {
+		ncl++;							         
+		if (ncl >= fs->n_fatent)                                         
+                {		                        
 			ncl = 2;
-			if (ncl > scl) return 0;	 
+			if (ncl > scl) return 0;	                         
 		}
-		cs = get_fat(fs, ncl);			 
-		if (cs == 0) break;				 
-		if (cs == 0xFFFFFFFF || cs == 1) 
+		cs = get_fat(fs, ncl);			                         
+		if (cs == 0) break;				                 
+		if (cs == 0xFFFFFFFF || cs == 1)                                 
 			return cs;
-		if (ncl == scl) return 0;		 
+		if (ncl == scl) return 0;		                         
 	}
 
-	res = put_fat(fs, ncl, 0x0FFFFFFF);	 
-	if (res == FR_OK && clst != 0) {
-		res = put_fat(fs, clst, ncl);	 
+	res = put_fat(fs, ncl, 0x0FFFFFFF);	                                 
+	if (res == FR_OK && clst != 0) 
+        {
+		res = put_fat(fs, clst, ncl);	                                 
 	}
-	if (res == FR_OK) {
-		fs->last_clust = ncl;			 
-		if (fs->free_clust != 0xFFFFFFFF) {
+	if (res == FR_OK) 
+        {
+		fs->last_clust = ncl;			                         
+		if (fs->free_clust != 0xFFFFFFFF) 
+                {
 			fs->free_clust--;
 			fs->fsi_flag = 1;
 		}
-	} else {
-		ncl = (res == FR_DISK_ERR) ? 0xFFFFFFFF : 1;
+	} 
+        else 
+        {
+          ncl = (res == FR_DISK_ERR) ? 0xFFFFFFFF : 1;
 	}
 
-	return ncl;		 
+	return ncl;		                                                 
 }
 
 
@@ -950,11 +969,10 @@ DWORD create_chain (
  
  
 
-static
-FRESULT dir_sdi (
-	DIR *dj,		 
-	WORD idx		 
-)
+
+
+
+static FRESULT dir_sdi (DIR *dj,WORD idx)
 {
 	DWORD clst;
 	WORD ic;
@@ -962,23 +980,26 @@ FRESULT dir_sdi (
 
 	dj->index = idx;
 	clst = dj->sclust;
-	if (clst == 1 || clst >= dj->fs->n_fatent)	 
+	if (clst == 1 || clst >= dj->fs->n_fatent)	                         
 		return FR_INT_ERR;
-	if (!clst && dj->fs->fs_type == 3)	 
+	if (!clst && dj->fs->fs_type == 3)	                         
 		clst = dj->fs->dirbase;
 
-	if (clst == 0) {	 
+	if (clst == 0)                                                           
+        {	
 		dj->clust = clst;
-		if (idx >= dj->fs->n_rootdir)		 
+		if (idx >= dj->fs->n_rootdir)		                         
 			return FR_INT_ERR;
-		dj->sect = dj->fs->dirbase + idx / (512U / 32);	 
+		dj->sect = dj->fs->dirbase + idx / (512U / 32);	         
 	}
-	else {				 
-		ic = 512U / 32 * dj->fs->csize;	 
-		while (idx >= ic) {	 
+	else                                                                     
+        {				
+		ic = 512U / 32 * dj->fs->csize;	                         
+		while (idx >= ic) 
+                {	 
 			clst = get_fat(dj->fs, clst);				 
-			if (clst == 0xFFFFFFFF) return FR_DISK_ERR;	 
-			if (clst < 2 || clst >= dj->fs->n_fatent)	 
+			if (clst == 0xFFFFFFFF) return FR_DISK_ERR;	         
+			if (clst < 2 || clst >= dj->fs->n_fatent)	         
 				return FR_INT_ERR;
 			idx -= ic;
 		}
@@ -986,7 +1007,7 @@ FRESULT dir_sdi (
 		dj->sect = clust2sect(dj->fs, clst) + idx / (512U / 32);	 
 	}
 
-	dj->dir = dj->fs->win + (idx % (512U / 32)) * 32;	 
+	dj->dir = dj->fs->win + (idx % (512U / 32)) * 32;	                 
 
 	return FR_OK;	 
 }
@@ -1608,11 +1629,12 @@ FRESULT f_mount (
  
  
 
-FRESULT f_open (
-	FIL *fp,			 
-	const TCHAR *path,	 
-	BYTE mode			 
-)
+
+
+
+ 
+
+FRESULT f_open (FIL *fp, const TCHAR *path, BYTE mode)
 {
 	FRESULT res;
 	DIR dj;
@@ -1703,16 +1725,17 @@ FRESULT f_open (
 
 
 
- 
- 
+
+
  
 
-FRESULT f_read (
-	FIL *fp, 		 
-	void *buff,		 
-	UINT btr,		 
-	UINT *br		 
-)
+
+
+
+
+ 
+
+FRESULT f_read (FIL *fp, void *buff, UINT btr, UINT *br)
 {
 	FRESULT res;
 	DWORD clst, sect, remain;
@@ -1720,56 +1743,66 @@ FRESULT f_read (
 	BYTE csect, *rbuff = buff;
 
 
-	*br = 0;	 
+	*br = 0;	                                                         
 
-	res = validate(fp->fs, fp->id);					 
+	res = validate(fp->fs, fp->id);					         
 	if (res != FR_OK) return res;
 	if (fp->flag & 0x80)						 
 		return FR_INT_ERR;
 	if (!(fp->flag & 0x01)) 						 
 		return FR_DENIED;
 	remain = fp->fsize - fp->fptr;
-	if (btr > remain) btr = (UINT)remain;			 
+	if (btr > remain) btr = (UINT)remain;			                 
 
-	for ( ;  btr;									 
+	for ( ;  btr;                                                            
 		rbuff += rcnt, fp->fptr += rcnt, *br += rcnt, btr -= rcnt) {
-		if ((fp->fptr % 512U) == 0) {			 
-			csect = (BYTE)(fp->fptr / 512U & (fp->fs->csize - 1));	 
-			if (!csect) {							 
-				clst = (fp->fptr == 0) ?			 
+		 
+                if ((fp->fptr % 512U) == 0) 
+                {			
+                  csect = (BYTE)(fp->fptr / 512U & (fp->fs->csize - 1));	 
+                   
+                  if (!csect) 
+                  {                                     
+                    clst = (fp->fptr == 0) ?                                     
 					fp->org_clust : get_fat(fp->fs, fp->curr_clust);
 				if (clst <= 1) { fp->flag |= 0x80; return FR_INT_ERR; };
 				if (clst == 0xFFFFFFFF) { fp->flag |= 0x80; return FR_DISK_ERR; };
-				fp->curr_clust = clst;				 
+				fp->curr_clust = clst;                           
 			}
-			sect = clust2sect(fp->fs, fp->curr_clust);	 
+			sect = clust2sect(fp->fs, fp->curr_clust);               
 			if (!sect) { fp->flag |= 0x80; return FR_INT_ERR; };
 			sect += csect;
-			cc = btr / 512U;					 
-			if (cc) {								 
-				if (csect + cc > fp->fs->csize)		 
+			cc = btr / 512U;                                   
+			 
+			if (cc) 
+			{								
+				if (csect + cc > fp->fs->csize)                  
 					cc = fp->fs->csize - csect;
 				if (disk_read(fp->fs->drv, rbuff, sect, (BYTE)cc) != RES_OK)
 					{ fp->flag |= 0x80; return FR_DISK_ERR; };
 				if ((fp->flag & 0x40) && fp->dsect - sect < cc)
 					mem_cpy(rbuff + ((fp->dsect - sect) * 512U), fp->buf, 512U);
-				rcnt = 512U * cc;				 
+				rcnt = 512U * cc;                          
 				continue;
 			}
-			if (fp->flag & 0x40) {				 
+			 
+			if (fp->flag & 0x40) 
+			{				
 				if (disk_write(fp->fs->drv, fp->buf, fp->dsect, 1) != RES_OK)
 					{ fp->flag |= 0x80; return FR_DISK_ERR; };
 				fp->flag &= ~0x40;
 			}
-			if (fp->dsect != sect) {				 
+			 
+			if (fp->dsect != sect) 
+			{				
 				if (disk_read(fp->fs->drv, fp->buf, sect, 1) != RES_OK)
 					{ fp->flag |= 0x80; return FR_DISK_ERR; };
 			}
 			fp->dsect = sect;
 		}
-		rcnt = 512U - (fp->fptr % 512U);	 
+		rcnt = 512U - (fp->fptr % 512U);                     
 		if (rcnt > btr) rcnt = btr;
-		mem_cpy(rbuff, &fp->buf[fp->fptr % 512U], rcnt);	 
+		mem_cpy(rbuff, &fp->buf[fp->fptr % 512U], rcnt);           
 	}
 
 	return FR_OK;
@@ -1782,83 +1815,103 @@ FRESULT f_read (
  
  
 
-FRESULT f_write (
-	FIL *fp,			 
-	const void *buff,	 
-	UINT btw,			 
-	UINT *bw			 
-)
+
+
+
+
+ 
+
+FRESULT f_write (FIL *fp, const void *buff, UINT btw, UINT *bw)
 {
-	FRESULT res;
-	DWORD clst, sect;
-	UINT wcnt, cc;
-	const BYTE *wbuff = buff;
-	BYTE csect;
+  FRESULT res;
+  DWORD clst, sect;
+  UINT wcnt, cc;
+  const BYTE *wbuff = buff;
+  BYTE csect;
 
 
-	*bw = 0;	 
+  *bw = 0;								         
 
-	res = validate(fp->fs, fp->id);					 
-	if (res != FR_OK) return res;
-	if (fp->flag & 0x80)						 
-		return FR_INT_ERR;
-	if (!(fp->flag & 0x02))						 
-		return FR_DENIED;
-	if (fp->fsize + btw < fp->fsize) btw = 0;		 
+  res = validate(fp->fs, fp->id);						 
+  if (res != FR_OK) return res;
+  if (fp->flag & 0x80)						         
+    return FR_INT_ERR;	
+  if (!(fp->flag & 0x02))                                                    
+    return FR_DENIED;
+  if (fp->fsize + btw < fp->fsize) btw = 0;                                      
 
-	for ( ;  btw;									 
-		wbuff += wcnt, fp->fptr += wcnt, *bw += wcnt, btw -= wcnt) {
-		if ((fp->fptr % 512U) == 0) {			 
-			csect = (BYTE)(fp->fptr / 512U & (fp->fs->csize - 1));	 
-			if (!csect) {							 
-				if (fp->fptr == 0) {				 
-					clst = fp->org_clust;			 
-					if (clst == 0)					 
-						fp->org_clust = clst = create_chain(fp->fs, 0);	 
-				} else {							 
-					clst = create_chain(fp->fs, fp->curr_clust);			 
-				}
-				if (clst == 0) break;				 
-				if (clst == 1) { fp->flag |= 0x80; return FR_INT_ERR; };
-				if (clst == 0xFFFFFFFF) { fp->flag |= 0x80; return FR_DISK_ERR; };
-				fp->curr_clust = clst;				 
-			}
-			if (fp->flag & 0x40) {		 
-				if (disk_write(fp->fs->drv, fp->buf, fp->dsect, 1) != RES_OK)
-					{ fp->flag |= 0x80; return FR_DISK_ERR; };
-				fp->flag &= ~0x40;
-			}
-			sect = clust2sect(fp->fs, fp->curr_clust);	 
-			if (!sect) { fp->flag |= 0x80; return FR_INT_ERR; };
-			sect += csect;
-			cc = btw / 512U;					 
-			if (cc) {								 
-				if (csect + cc > fp->fs->csize)		 
-					cc = fp->fs->csize - csect;
-				if (disk_write(fp->fs->drv, wbuff, sect, (BYTE)cc) != RES_OK)
-					{ fp->flag |= 0x80; return FR_DISK_ERR; };
-				if (fp->dsect - sect < cc) {		 
-					mem_cpy(fp->buf, wbuff + ((fp->dsect - sect) * 512U), 512U);
-					fp->flag &= ~0x40;
-				}
-				wcnt = 512U * cc;				 
-				continue;
-			}
-			if (fp->dsect != sect) {				 
-				if (fp->fptr < fp->fsize &&
-					disk_read(fp->fs->drv, fp->buf, sect, 1) != RES_OK)
-						{ fp->flag |= 0x80; return FR_DISK_ERR; };
-			}
-			fp->dsect = sect;
-		}
-		wcnt = 512U - (fp->fptr % 512U); 
+  for ( ;  btw;                                                                  
+        wbuff += wcnt, fp->fptr += wcnt, *bw += wcnt, btw -= wcnt) 
+  {
+     
+    if ((fp->fptr % 512U) == 0) 
+    {									
+      csect = (BYTE)(fp->fptr / 512U & (fp->fs->csize - 1));	         
+       
+      if (!csect) 
+      {		
+         					
+        if (fp->fptr == 0) 
+        {				
+          clst = fp->org_clust;                                                  
+          if (clst == 0)   
+          {                                                                      
+            fp->org_clust = clst = create_chain(fp->fs, 0);			 
+          }	
+        } 
+        else                                                                     
+        {							
+          clst = create_chain(fp->fs, fp->curr_clust);				 
+        }
+        if (clst == 0) break;                                                    
+        if (clst == 1) { fp->flag |= 0x80; return FR_INT_ERR; };
+        if (clst == 0xFFFFFFFF) { fp->flag |= 0x80; return FR_DISK_ERR; };
+            fp->curr_clust = clst;                                               
+      }
+       
+      if (fp->flag & 0x40) 
+      {		
+          if (disk_write(fp->fs->drv, fp->buf, fp->dsect, 1) != RES_OK)
+              { fp->flag |= 0x80; return FR_DISK_ERR; };
+                fp->flag &= ~0x40;
+      }
+      sect = clust2sect(fp->fs, fp->curr_clust);                                 
+      if (!sect) { fp->flag |= 0x80; return FR_INT_ERR; };
+      sect += csect;
+      cc = btw / 512U;                                                     
+       
+      if (cc) 
+      {								
+        if (csect + cc > fp->fs->csize)                                          
+        cc = fp->fs->csize - csect;
+        if (disk_write(fp->fs->drv, wbuff, sect, (BYTE)cc) != RES_OK)
+            { fp->flag |= 0x80; return FR_DISK_ERR; };
+         
+        if (fp->dsect - sect < cc) 
+        {		
+            mem_cpy(fp->buf, wbuff + ((fp->dsect - sect) * 512U), 512U);
+            fp->flag &= ~0x40;
+        }
+        wcnt = 512U * cc;                                                  
+        continue;
+      }
+       
+      if (fp->dsect != sect) 
+      {				
+        if (fp->fptr < fp->fsize &&
+          disk_read(fp->fs->drv, fp->buf, sect, 1) != RES_OK)
+            { fp->flag |= 0x80; return FR_DISK_ERR; };
+      }
+      fp->dsect = sect;
+    }
+		wcnt = 512U - (fp->fptr % 512U);                     
 		if (wcnt > btw) wcnt = btw;
-		mem_cpy(&fp->buf[fp->fptr % 512U], wbuff, wcnt);	 
+		mem_cpy(&fp->buf[fp->fptr % 512U], wbuff, wcnt);           
 		fp->flag |= 0x40;
 	}
 
-	if (fp->fptr > fp->fsize) fp->fsize = fp->fptr;	 
-	fp->flag |= 0x20;						 
+	if (fp->fptr > fp->fsize) fp->fsize = fp->fptr;                          
+	fp->flag |= 0x20;                                                 
 
 	return FR_OK;
 }
@@ -1870,31 +1923,34 @@ FRESULT f_write (
  
  
 
-FRESULT f_sync (
-	FIL *fp		 
-)
+FRESULT f_sync (FIL *fp)
 {
 	FRESULT res;
 	DWORD tim;
 	BYTE *dir;
 
 
-	res = validate(fp->fs, fp->id);		 
-	if (res == FR_OK) {
-		if (fp->flag & 0x20) {	 
-			if (fp->flag & 0x40) {
+	res = validate(fp->fs, fp->id);                                          
+	if (res == FR_OK) 
+	{
+		 
+		if (fp->flag & 0x20) 
+		{	
+			if (fp->flag & 0x40) 
+			{
 				if (disk_write(fp->fs->drv, fp->buf, fp->dsect, 1) != RES_OK)
 					return FR_DISK_ERR;
 				fp->flag &= ~0x40;
 			}
 			 
 			res = move_window(fp->fs, fp->dir_sect);
-			if (res == FR_OK) {
+			if (res == FR_OK) 
+                        {
 				dir = fp->dir_ptr;
-				dir[11] |= 0x20;					 
-				*(BYTE*)(dir+28)=(BYTE)(fp->fsize); *(BYTE*)((dir+28)+1)=(BYTE)((WORD)(fp->fsize)>>8); *(BYTE*)((dir+28)+2)=(BYTE)((DWORD)(fp->fsize)>>16); *(BYTE*)((dir+28)+3)=(BYTE)((DWORD)(fp->fsize)>>24);		 
-				{*(BYTE*)(dir+26)=(BYTE)(fp->org_clust); *(BYTE*)((dir+26)+1)=(BYTE)((WORD)(fp->org_clust)>>8); *(BYTE*)(dir+20)=(BYTE)((DWORD)fp->org_clust>>16); *(BYTE*)((dir+20)+1)=(BYTE)((WORD)((DWORD)fp->org_clust>>16)>>8);};				 
-				tim = get_fattime();						 
+				dir[11] |= 0x20;                         
+				*(BYTE*)(dir+28)=(BYTE)(fp->fsize); *(BYTE*)((dir+28)+1)=(BYTE)((WORD)(fp->fsize)>>8); *(BYTE*)((dir+28)+2)=(BYTE)((DWORD)(fp->fsize)>>16); *(BYTE*)((dir+28)+3)=(BYTE)((DWORD)(fp->fsize)>>24);           
+				{*(BYTE*)(dir+26)=(BYTE)(fp->org_clust); *(BYTE*)((dir+26)+1)=(BYTE)((WORD)(fp->org_clust)>>8); *(BYTE*)(dir+20)=(BYTE)((DWORD)fp->org_clust>>16); *(BYTE*)((dir+20)+1)=(BYTE)((WORD)((DWORD)fp->org_clust>>16)>>8);};                    
+				tim = get_fattime();                             
 				*(BYTE*)(dir+22)=(BYTE)(tim); *(BYTE*)((dir+22)+1)=(BYTE)((WORD)(tim)>>8); *(BYTE*)((dir+22)+2)=(BYTE)((DWORD)(tim)>>16); *(BYTE*)((dir+22)+3)=(BYTE)((DWORD)(tim)>>24);
 				fp->flag &= ~0x20;
 				fp->fs->wflag = 1;
@@ -1914,14 +1970,13 @@ FRESULT f_sync (
  
  
 
-FRESULT f_close (
-	FIL *fp		 
-)
+
+FRESULT f_close (FIL *fp)
 {
 	FRESULT res;
 
-	res = f_sync(fp);		 
-	if (res == FR_OK) fp->fs = 0;	 
+	res = f_sync(fp);                                                        
+	if (res == FR_OK) fp->fs = 0;                                            
 	return res;
 }
 
@@ -1931,6 +1986,7 @@ FRESULT f_close (
  
  
  
+
 
 
 
@@ -1970,9 +2026,12 @@ FRESULT f_lseek (
 				fp->fptr = (ifptr - 1) & ~(bcs - 1);	 
 				ofs -= fp->fptr;
 				clst = fp->curr_clust;
-			} else {									 
-				clst = fp->org_clust;					 
-				if (clst == 0) {						 
+			} 
+                        else 
+                        {                                                        
+				clst = fp->org_clust;                            
+				if (clst == 0) 
+                                {                                                
 					clst = create_chain(fp->fs, 0);
 					if (clst == 1) { fp->flag |= 0x80; return FR_INT_ERR; };
 					if (clst == 0xFFFFFFFF) { fp->flag |= 0x80; return FR_DISK_ERR; };
