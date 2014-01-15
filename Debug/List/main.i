@@ -18160,25 +18160,25 @@ typedef struct {
  
 
 typedef enum {
-	FR_OK = 0,				 
-	FR_DISK_ERR,			 
-	FR_INT_ERR,				 
-	FR_NOT_READY,			 
-	FR_NO_FILE,				 
-	FR_NO_PATH,				 
-	FR_INVALID_NAME,		 
-	FR_DENIED,				 
-	FR_EXIST,				 
-	FR_INVALID_OBJECT,		 
-	FR_WRITE_PROTECTED,		 
-	FR_INVALID_DRIVE,		 
-	FR_NOT_ENABLED,			 
-	FR_NO_FILESYSTEM,		 
-	FR_MKFS_ABORTED,		 
-	FR_TIMEOUT,				 
-	FR_LOCKED,				 
-	FR_NOT_ENOUGH_CORE,		 
-	FR_TOO_MANY_OPEN_FILES	 
+	FR_OK = 0,				                                 
+	FR_DISK_ERR,			                                         
+	FR_INT_ERR,				                                 
+	FR_NOT_READY,			                                         
+	FR_NO_FILE,				                                 
+	FR_NO_PATH,				                                 
+	FR_INVALID_NAME,		                                         
+	FR_DENIED,				                                 
+	FR_EXIST,				                                 
+	FR_INVALID_OBJECT,		                                         
+	FR_WRITE_PROTECTED,		                                         
+	FR_INVALID_DRIVE,		                                         
+	FR_NOT_ENABLED,			                                         
+	FR_NO_FILESYSTEM,		                                         
+	FR_MKFS_ABORTED,		                                         
+	FR_TIMEOUT,				                                 
+	FR_LOCKED,				                                 
+	FR_NOT_ENOUGH_CORE,		                                         
+	FR_TOO_MANY_OPEN_FILES	                                                 
 } FRESULT;
 
 
@@ -18266,15 +18266,15 @@ void EXTILine0_Config(void);
  
 SD_Error Status = SD_OK;
 
-FATFS filesystem;		 
+FATFS filesystem;		                                                 
 
-FRESULT ret;			   
+FRESULT ret;			                                                 
 
-FIL file;				     
+FIL file;				                                         
 
-DIR dir;				     
+DIR dir;				                                         
 
-FILINFO fno;			   
+FILINFO fno;			                                                 
 
 UINT bw, br;
 
@@ -18283,6 +18283,7 @@ uint8_t buff[128];
  
 static void Delay(volatile uint32_t nCount);
 static void fault_err (FRESULT rc);
+void ConvertInttoData(uint8_t DataInt[]);
 
 
 
@@ -18293,6 +18294,8 @@ extern uint16_t time;
 extern uint8_t rx_index_GUI;
 uint8_t Data_GUI[40];
 uint8_t Oxygen_Sat[14], FiO2[14];
+uint8_t SD_Test[50];
+char SD_String[200];
 
 
 int main()
@@ -18305,35 +18308,72 @@ int main()
   SentData_DAC ( 0x1EB, 1);
   SentData_DAC ( 0x3AD, 2);
   
-  if (f_mount(0, &filesystem) != FR_OK) 
+  if (f_mount(0, &filesystem) != FR_OK)
   {
     printf("could not open filesystem \n\r");
   }
   
-  ret = f_open(&file, "HELLO.TXT", 0x02 | 0x08);
-  if (ret) {
-    
+  ret = f_open(&file, "OXY.TXT", 0x02 | 0x08);
+  if (ret) 
+  {
     fault_err(ret);
-  } else {
-    printf("Write a text data. (hello.txt)\n\r");
-    ret = f_write(&file, "Hello world!", 14, &bw);
-    if (ret) {
-      printf("Write a text data to file error\n\r");
-    } else {
+  } 
+  else 
+  {
+    ret = f_write(&file, "phattaradanai\n kiratiwudhikul", 30, &bw);
+    if (ret) 
+    {
+      printf("Write a text1 data to file error\n\r");
+    } 
+    else 
+    {
       printf("%u bytes written\n\r", bw);
     }
     Delay(50);
     printf("Close the file\n\r");
     ret = f_close(&file);
-    if (ret) {
+    if (ret)
+    {
       printf("Close the hello.txt file error\n\r");			
     }
+  }  
+  
+  
+  uint8_t count;
+  for(count = 0; count < 50; count++)
+  {
+    SD_Test[count] = count;
   }
+  ConvertInttoData(SD_Test);
+  ret = f_open(&file, "OXY.TXT", 0x02);
+  if (ret) 
+  {
+    fault_err(ret);
+  } 
+  else 
+  {
+    ret = f_write(&file, SD_String, 200, &bw);
+    if (ret) 
+    {
+      printf("Write a text1 data to file error\n\r");
+    } 
+    else 
+    {
+      printf("%u bytes written\n\r", bw);
+    }
+    printf("Close the file\n\r");
+    ret = f_close(&file);
+    if (ret)
+    {
+      printf("Close the hello.txt file error\n\r");			
+    }
+  }  
   
   while(1)
   {
     delay();
   }
+  
 }
 	
 
@@ -18371,9 +18411,6 @@ void System_Init(void)
   
   
   lcdInit();
-
-  
-  SD_Init();
   
    
   USBD_Init(&USB_OTG_dev,
@@ -18381,6 +18418,20 @@ void System_Init(void)
     &USR_desc, 
     &USBD_CDC_cb,
     &USR_cb);
+}
+
+
+void ConvertInttoData(uint8_t DataInt[])
+{
+  uint8_t i;
+  for(i = 0; i < 200; i+4)
+  {
+    SD_String[i] = '0' + (DataInt[i]/100);
+    SD_String[i+1] = '0' + ((DataInt[i]%100)/10);
+    SD_String[i+2] = '0' + ((DataInt[i]%10)/1);
+    SD_String[i+3] = '\n';
+  }
+  
 }
 
 
@@ -18469,7 +18520,8 @@ static void fault_err (FRESULT rc)
                     "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
   FRESULT i;
 
-  for (i = (FRESULT)0; i != rc && *str; i++) {
+  for (i = (FRESULT)0; i != rc && *str; i++) 
+  {
     while (*str++) ;
   }
   printf("rc=%u FR_%s\n\r", (UINT)rc, str);
