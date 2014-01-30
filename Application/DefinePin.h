@@ -7,25 +7,25 @@ File : DefinePin.h
 #include "main.h"
 //------------------------------------------------------------------------------
 //Define RS-232 for Oxygen Pulse Meter
-#define  OPM_USART					USART2
-#define  OPM_USART_CLK				RCC_APB1Periph_USART2
-#define  OPM_UART_CLK_INIT			RCC_APB1PeriphClockCmd
-#define  OPM_IRQn					USART2_IRQn
-#define  OPM_IRQHandler				USART2_IRQHandler
-#define  OPM_Port					GPIOA
-#define  OPM_Port_CLK				RCC_AHB1Periph_GPIOA
+#define  OPM_USART				USART6
+#define  OPM_USART_CLK				RCC_APB2Periph_USART6
+#define  OPM_UART_CLK_INIT			RCC_APB2PeriphClockCmd
+#define  OPM_IRQn				USART6_IRQn
+#define  OPM_IRQHandler				USART6_IRQHandler
+#define  OPM_Port				GPIOC
+#define  OPM_Port_CLK				RCC_AHB1Periph_GPIOC
 
-#define  OPM_TX_Pin					GPIO_Pin_2
-#define  OPM_TX_GPIO_Port			GPIOA
-#define  OPM_TX_GPIO_CLK			RCC_AHB1Periph_GPIOA
-#define  OPM_TX_Souce				GPIO_PinSource2
-#define  OPM_TX_AF					GPIO_AF_USART2
+#define  OPM_TX_Pin				GPIO_Pin_6
+#define  OPM_TX_GPIO_Port			GPIOC
+#define  OPM_TX_GPIO_CLK			RCC_AHB1Periph_GPIOC
+#define  OPM_TX_Souce				GPIO_PinSource6
+#define  OPM_TX_AF				GPIO_AF_USART6
 
-#define  OPM_RX_Pin					GPIO_Pin_3
-#define  OPM_RX_GPIO_Port			GPIOA
-#define  OPM_RX_GPIO_CLK			RCC_AHB1Periph_GPIOA
-#define  OPM_RX_Souce				GPIO_PinSource3
-#define  OPM_RX_AF					GPIO_AF_USART2
+#define  OPM_RX_Pin				GPIO_Pin_7
+#define  OPM_RX_GPIO_Port			GPIOC
+#define  OPM_RX_GPIO_CLK			RCC_AHB1Periph_GPIOC
+#define  OPM_RX_Souce				GPIO_PinSource7
+#define  OPM_RX_AF				GPIO_AF_USART6
 
 //------------------------------------------------------------------------------
 //Define SPI2
@@ -76,24 +76,24 @@ File : DefinePin.h
 
 //---------------------------------------------------------------------------------
 //Define Connect GUI (Tx-PD8, Rx-PD9)
-#define  GUI_USART				USART3
-#define  GUI_USART_CLK				RCC_APB1Periph_USART3
-#define  GUI_Port				GPIOD
-#define  GUI_Port_CLK				RCC_AHB1Periph_GPIOD
-#define  GUI_IRQn				USART3_IRQn
-#define  GUI_IRQHandler				USART6_IRQHandler
+#define  GUI_USART				USART1
+#define  GUI_USART_CLK				RCC_APB1Periph_USART1
+#define  GUI_Port				GPIOB
+#define  GUI_Port_CLK				RCC_AHB1Periph_GPIOB
+#define  GUI_IRQn				USART1_IRQn
+#define  GUI_IRQHandler				USART1_IRQHandler
 
-#define  GUI_TX_Pin				GPIO_Pin_8
-#define  GUI_TX_GPIO_Port			GPIOD
-#define  GUI_TX_GPIO_CLK			RCC_AHB1Periph_GPIOD
-#define  GUI_TX_Souce				GPIO_PinSource8
-#define  GUI_TX_AF				GPIO_AF_USART3
+#define  GUI_TX_Pin				GPIO_Pin_6
+#define  GUI_TX_GPIO_Port			GPIOB
+#define  GUI_TX_GPIO_CLK			RCC_AHB1Periph_GPIOB
+#define  GUI_TX_Souce				GPIO_PinSource6
+#define  GUI_TX_AF				GPIO_AF_USART1
 
-#define  GUI_RX_Pin				GPIO_Pin_9
-#define  GUI_RX_GPIO_Port			GPIOD
-#define  GUI_RX_GPIO_CLK			RCC_AHB1Periph_GPIOD
-#define  GUI_RX_Souce				GPIO_PinSource9
-#define  GUI_RX_AF				GPIO_AF_USART3
+#define  GUI_RX_Pin				GPIO_Pin_7
+#define  GUI_RX_GPIO_Port			GPIOB
+#define  GUI_RX_GPIO_CLK			RCC_AHB1Periph_GPIOB
+#define  GUI_RX_Souce				GPIO_PinSource7
+#define  GUI_RX_AF				GPIO_AF_USART1
 
 //------------------------------------------------------------------------------
 

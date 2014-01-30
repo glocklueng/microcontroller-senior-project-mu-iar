@@ -20,38 +20,25 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
     #pragma data_alignment=4
   #endif
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
+
+/* Private typedef -----------------------------------------------------------*/
+//SD_Error Status = SD_OK;
+//FATFS filesystem;		                                                // volume lable
+//FRESULT ret;			                                                // Result code
+//FIL file;				                                        // File object
+//DIR dir;				                                        // Directory object
+//FILINFO fno;			                                                // File information object
+//UINT bw, br;
+//uint8_t buff[128];
+
 //------------------------------------------------------------------------------
 void delay(void);
 void System_Init(void);
 void INTTIM_Config(void);
 void EXTILine0_Config(void);
-// SD Card ---------------------------------------------------------------------
-/** @addtogroup SDIO_uSDCard
-  * @{
-  */
-
-/* Private typedef -----------------------------------------------------------*/
-SD_Error Status = SD_OK;
-
-FATFS filesystem;		                                                /* volume lable */
-
-FRESULT ret;			                                                /* Result code */
-
-FIL file;				                                        /* File object */
-
-DIR dir;				                                        /* Directory object */
-
-FILINFO fno;			                                                /* File information object */
-
-UINT bw, br;
-
-uint8_t buff[128];
 
 /* Private function prototypes -----------------------------------------------*/
-static void Delay(__IO uint32_t nCount);
-static void fault_err (FRESULT rc);
-void ConvertInttoData(uint8_t DataInt[]);
-
+void ConvertInttoString(uint8_t DataInt[]);
 
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
@@ -59,10 +46,20 @@ char Character;
 uint32_t count;
 extern uint16_t time;
 extern uint8_t rx_index_GUI;
-uint8_t Data_GUI[40];
+uint8_t Data_GUI[28];
 uint8_t Oxygen_Sat[14], FiO2[14];
 uint8_t SD_Test[50];
-char SD_String[200];
+char SD_String[250];
+
+// Profile Variable ------------------------------------------------------------
+char Hospital_Number[13];
+uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
+uint8_t FiO2_Maximum, FiO2_Minimum;
+uint8_t RespondsTime;
+uint8_t Prefered_FiO2;
+uint8_t Alarm_Level1, Alarm_Level2;
+uint8_t Mode;
+
 
 // Main Function ---------------------------------------------------------------
 int main()
@@ -70,75 +67,36 @@ int main()
  /* Set Up config System*/
   System_Init();
   lcdInit();
-  lcdString (1,1,"Hello");
-  lcdString (2,1, "Phattaradanai");
-  SentData_DAC ( 0x1EB, 1);
-  SentData_DAC ( 0x3AD, 2);
+  lcdString (1,1,"Setting....");
+  SentData_DAC ( 0x245, 1);
+  SentData_DAC ( 0x2A0, 2);
   
-  if (f_mount(0, &filesystem) != FR_OK)
-  {
-    printf("could not open filesystem \n\r");
-  }
-  
-  ret = f_open(&file, "OXY.TXT", FA_WRITE | FA_CREATE_ALWAYS);
-  if (ret) 
-  {
-    fault_err(ret);
-  } 
-  else 
-  {
-    ret = f_write(&file, "phattaradanai\n kiratiwudhikul", 30, &bw);
-    if (ret) 
-    {
-      printf("Write a text1 data to file error\n\r");
-    } 
-    else 
-    {
-      printf("%u bytes written\n\r", bw);
-    }
-    Delay(50);
-    printf("Close the file\n\r");
-    ret = f_close(&file);
-    if (ret)
-    {
-      printf("Close the hello.txt file error\n\r");			
-    }
-  }  
-  
+//  /*Write Data to SD Card */
+//  if (f_mount(0, &filesystem) != FR_OK);
+//  
+//  ret = f_open(&file, "OXY.TXT", FA_WRITE | FA_CREATE_ALWAYS);
+//  if (ret) 
+//  {
+//    fault_err(ret);
+//  } 
+//  else 
+//  {
+//    ret = f_write(&file, "HR : 1234567898765 \r\nFile: Oxygen Saturation\r\n", 47, &bw);
+//    ret = f_close(&file);
+//  }  
+//  
   //Test Transfer Data to SD Card
-  uint8_t count;
-  for(count = 0; count < 50; count++)
-  {
-    SD_Test[count] = count;
-  }
-  ConvertInttoData(SD_Test);
-  ret = f_open(&file, "OXY.TXT", FA_WRITE);
-  if (ret) 
-  {
-    fault_err(ret);
-  } 
-  else 
-  {
-    ret = f_write(&file, SD_String, 200, &bw);
-    if (ret) 
-    {
-      printf("Write a text1 data to file error\n\r");
-    } 
-    else 
-    {
-      printf("%u bytes written\n\r", bw);
-    }
-    printf("Close the file\n\r");
-    ret = f_close(&file);
-    if (ret)
-    {
-      printf("Close the hello.txt file error\n\r");			
-    }
-  }  
+//  uint8_t count;
+//  for(count = 0; count < 50; count++)
+//  {
+//    SD_Test[count] = count;
+//  }
+//  ConvertInttoString(SD_Test);
+//  SD_Write("OXY.TXT", SD_String, 250);
+
   
   while(1)
   {
-    delay();
   }
   
 }
@@ -178,6 +136,9 @@ void System_Init(void)
   
   //LCD Set Up
   lcdInit();
+ 
+  //SD Card : Check Mount Card
+  Check_Mount();
   
   /* Initialize USB available on STM32F4-Discovery board */
   USBD_Init(&USB_OTG_dev,
@@ -192,15 +153,17 @@ void System_Init(void)
 }
 
 //------------------------------------------------------------------------------
-void ConvertInttoData(uint8_t DataInt[])
+void ConvertInttoString(uint8_t DataInt[])
 {
-  uint8_t i;
-  for(i = 0; i < 200; i+4)
+  uint8_t i,j;
+  for(i = 0; i < 50; i++)
   {
-    SD_String[i] = '0' + (DataInt[i]/100);
-    SD_String[i+1] = '0' + ((DataInt[i]%100)/10);
-    SD_String[i+2] = '0' + ((DataInt[i]%10)/1);
-    SD_String[i+3] = '\n';
+    j = i*5;
+    SD_String[j] = '0' + (DataInt[i]/100);
+    SD_String[j+1] = '0' + ((DataInt[i]%100)/10);
+    SD_String[j+2] = '0' + ((DataInt[i]%10)/1);
+    SD_String[j+3] = '\r';
+    SD_String[j+4] = '\n';
   }
   
 }

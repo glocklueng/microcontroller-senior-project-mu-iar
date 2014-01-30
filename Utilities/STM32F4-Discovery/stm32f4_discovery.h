@@ -167,12 +167,12 @@ typedef enum
   * @{
   */  
 
-#define DISCOVERY_COM                USART1
+#define DISCOVERY_COM                USART2
 
 /**
  * @brief IRQ
  */
-#define DISCOVERY_COM_IRQn           USART1_IRQn
+#define DISCOVERY_COM_IRQn           USART2_IRQn
 
 /**
   * @}

@@ -89,7 +89,7 @@ void lcdInit(void)
    
    GPIO_SetBits(GLCD_NSS_Port, GLCD_NSS_Pin);					//NSS Pin is High
    lcdSend( 0x21, LCD_CMD );  // LCD Extended Commands.
-   lcdSend( 0xD0, LCD_CMD );  // Set LCD Vop (Contrast).
+   lcdSend( 0xC0, LCD_CMD );  // Set LCD Vop (Contrast).
    lcdSend( 0x06, LCD_CMD );  // Set Temp coefficent.
    lcdSend( 0x13, LCD_CMD );  // LCD bias mode 1:48.
    lcdSend( 0x20, LCD_CMD );  // LCD Standard Commands, Horizontal addressing mode.

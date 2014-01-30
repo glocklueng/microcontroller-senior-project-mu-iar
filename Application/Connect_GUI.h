@@ -14,12 +14,14 @@ File : Connect_GUI.c
 */
 #include "main.h"
 #include "DefinePin.h"
+#include "GLCD5110.h"
+
 //------------------------------------------------------------------------------
 // Function
 void USART_GUI_Connect (void);
 void CRC_CALCULATE_TX(void);
 unsigned int TX_CRC(unsigned int crc, unsigned int data);
 void connect_command(void);
-void Updata_Rule(void);
+void Update_Rule(void);
 
 //------------------------------------------------------------------------------
