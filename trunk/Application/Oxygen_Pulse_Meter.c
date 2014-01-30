@@ -22,7 +22,7 @@ void Oxygen_PM_Setup(void)
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB1PeriphClockCmd(OPM_USART_CLK, ENABLE);
+  RCC_APB2PeriphClockCmd(OPM_USART_CLK, ENABLE);
   RCC_AHB1PeriphClockCmd(OPM_Port_CLK, ENABLE);
   /* Connect PXx to USARTx_Tx*/
   GPIO_PinAFConfig(OPM_Port, OPM_TX_Souce, OPM_TX_AF);

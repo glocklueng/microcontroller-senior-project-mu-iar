@@ -47,7 +47,7 @@ typedef struct
 /* The following define is used to route the USART IRQ handler to be used.
    The IRQ handler function is implemented in the usbd_cdc_vcp.c file. */
 
-#define DISCOVERY_COM_IRQHandler            USART1_IRQHandler
+#define DISCOVERY_COM_IRQHandler            USART2_IRQHandler
 
 
 #define DEFAULT_CONFIG                  0

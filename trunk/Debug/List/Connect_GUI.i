@@ -24,8 +24,6 @@
 
 
 
-
-
  
 
 
@@ -17466,6 +17464,419 @@ uint8_t *     USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
   
  
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+ 
+ 
+
+
+
+ 
+typedef int				INT;
+typedef unsigned int	UINT;
+
+ 
+typedef char			CHAR;
+typedef unsigned char	UCHAR;
+typedef unsigned char	BYTE;
+
+ 
+typedef short			SHORT;
+typedef unsigned short	USHORT;
+typedef unsigned short	WORD;
+typedef unsigned short	WCHAR;
+
+ 
+typedef long			LONG;
+typedef unsigned long	ULONG;
+typedef unsigned long	DWORD;
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+typedef char TCHAR;
+
+
+
+
+ 
+
+typedef struct {
+	BYTE	fs_type;		 
+	BYTE	drv;			 
+	BYTE	csize;			 
+	BYTE	n_fats;			 
+	BYTE	wflag;			 
+	BYTE	fsi_flag;		 
+	WORD	id;				 
+	WORD	n_rootdir;		 
+	DWORD	last_clust;		 
+	DWORD	free_clust;		 
+	DWORD	fsi_sector;		 
+	DWORD	n_fatent;		 
+	DWORD	fsize;			 
+	DWORD	fatbase;		 
+	DWORD	dirbase;		 
+	DWORD	database;		 
+	DWORD	winsect;		 
+	BYTE	win[512];	 
+} FATFS;
+
+
+
+ 
+
+typedef struct {
+	FATFS*	fs;				 
+	WORD	id;				 
+	BYTE	flag;			 
+	BYTE	pad1;
+	DWORD	fptr;			 
+	DWORD	fsize;			 
+	DWORD	org_clust;		 
+	DWORD	curr_clust;		 
+	DWORD	dsect;			 
+	DWORD	dir_sect;		 
+	BYTE*	dir_ptr;		 
+	BYTE	buf[512];	 
+} FIL;
+
+
+
+ 
+
+typedef struct {
+	FATFS*	fs;				 
+	WORD	id;				 
+	WORD	index;			 
+	DWORD	sclust;			 
+	DWORD	clust;			 
+	DWORD	sect;			 
+	BYTE*	dir;			 
+	BYTE*	fn;				 
+} DIR;
+
+
+
+ 
+
+typedef struct {
+	DWORD	fsize;			 
+	WORD	fdate;			 
+	WORD	ftime;			 
+	BYTE	fattrib;		 
+	TCHAR	fname[13];		 
+} FILINFO;
+
+
+
+ 
+
+typedef enum {
+	FR_OK = 0,				                                 
+	FR_DISK_ERR,			                                         
+	FR_INT_ERR,				                                 
+	FR_NOT_READY,			                                         
+	FR_NO_FILE,				                                 
+	FR_NO_PATH,				                                 
+	FR_INVALID_NAME,		                                         
+	FR_DENIED,				                                 
+	FR_EXIST,				                                 
+	FR_INVALID_OBJECT,		                                         
+	FR_WRITE_PROTECTED,		                                         
+	FR_INVALID_DRIVE,		                                         
+	FR_NOT_ENABLED,			                                         
+	FR_NO_FILESYSTEM,		                                         
+	FR_MKFS_ABORTED,		                                         
+	FR_TIMEOUT,				                                 
+	FR_LOCKED,				                                 
+	FR_NOT_ENOUGH_CORE,		                                         
+	FR_TOO_MANY_OPEN_FILES	                                                 
+} FRESULT;
+
+
+
+ 
+ 
+
+FRESULT f_mount (BYTE, FATFS*);						 
+FRESULT f_open (FIL*, const TCHAR*, BYTE);			 
+FRESULT f_read (FIL*, void*, UINT, UINT*);			 
+FRESULT f_lseek (FIL*, DWORD);						 
+FRESULT f_close (FIL*);								 
+FRESULT f_opendir (DIR*, const TCHAR*);				 
+FRESULT f_readdir (DIR*, FILINFO*);					 
+FRESULT f_stat (const TCHAR*, FILINFO*);			 
+
+FRESULT f_write (FIL*, const void*, UINT, UINT*);	 
+FRESULT f_getfree (const TCHAR*, DWORD*, FATFS**);	 
+FRESULT f_truncate (FIL*);							 
+FRESULT f_sync (FIL*);								 
+FRESULT f_unlink (const TCHAR*);					 
+FRESULT	f_mkdir (const TCHAR*);						 
+FRESULT f_chmod (const TCHAR*, BYTE, BYTE);			 
+FRESULT f_utime (const TCHAR*, const FILINFO*);		 
+FRESULT f_rename (const TCHAR*, const TCHAR*);		 
+
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+DWORD get_fattime (void);
+
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+static void Delay(volatile uint32_t nCount);
+static void fault_err (FRESULT rc);
+
+void Check_Mount(void);
+static void Delay(volatile uint32_t nCount);
+void Create_file(char FileName[], uint8_t File_Type);
+void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
+
+
  
  
  
@@ -17540,11 +17951,303 @@ void EXTILine0_Config(void);
 
 
 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+ 
+
+
+
+ 
+    
+
+
+
+ 
+
+  
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+ 
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+typedef enum
+{
+    LCD_CMD  = 0,
+    LCD_DATA = 1
+
+} LcdCmdData;
+
+
+ 
+void lcdInit(void);
+void lcdClear(void);
+void lcdUpdate(void);
+void lcdGotoXY(unsigned char x,unsigned char y);
+void lcdChar(char ch);
+void lcdString(unsigned char _x,unsigned char _y,char *dataPtr);
+void lcdPixel(unsigned char x, unsigned char y, unsigned char mode);
+void lcdLine(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2, unsigned char mode);
+void lcdProgBar(    unsigned char _x, 
+				    unsigned char _y, 
+				    unsigned char width, 
+				    unsigned char high, 
+				    unsigned char percentage);
+void configGlcd(void);
+void lcdBackLight(char set);
+
+
+ 
+
+
+static void lcdSend(unsigned char Data_Send, LcdCmdData cd);
+void delay_ms(volatile unsigned long ms);
+
+
+
+
+ 
+static const unsigned char FontLookup [][5] =
+{
+    { 0x00, 0x00, 0x00, 0x00, 0x00 },  
+    { 0x00, 0x00, 0x2f, 0x00, 0x00 },   
+    { 0x00, 0x07, 0x00, 0x07, 0x00 },   
+    { 0x14, 0x7f, 0x14, 0x7f, 0x14 },   
+    { 0x24, 0x2a, 0x7f, 0x2a, 0x12 },   
+    { 0x23, 0x13, 0x08, 0x64, 0x62 },   
+    { 0x36, 0x49, 0x55, 0x22, 0x50 },   
+    { 0x00, 0x05, 0x03, 0x00, 0x00 },   
+    { 0x00, 0x1c, 0x22, 0x41, 0x00 },   
+    { 0x00, 0x41, 0x22, 0x1c, 0x00 },   
+    { 0x14, 0x08, 0x3E, 0x08, 0x14 },   
+    { 0x08, 0x08, 0x3E, 0x08, 0x08 },   
+    { 0x00, 0x00, 0x50, 0x30, 0x00 },   
+    { 0x10, 0x10, 0x10, 0x10, 0x10 },   
+    { 0x00, 0x60, 0x60, 0x00, 0x00 },   
+    { 0x20, 0x10, 0x08, 0x04, 0x02 },   
+    { 0x3E, 0x51, 0x49, 0x45, 0x3E },   
+    { 0x00, 0x42, 0x7F, 0x40, 0x00 },   
+    { 0x42, 0x61, 0x51, 0x49, 0x46 },   
+    { 0x21, 0x41, 0x45, 0x4B, 0x31 },   
+    { 0x18, 0x14, 0x12, 0x7F, 0x10 },   
+    { 0x27, 0x45, 0x45, 0x45, 0x39 },   
+    { 0x3C, 0x4A, 0x49, 0x49, 0x30 },   
+    { 0x01, 0x71, 0x09, 0x05, 0x03 },   
+    { 0x36, 0x49, 0x49, 0x49, 0x36 },   
+    { 0x06, 0x49, 0x49, 0x29, 0x1E },   
+    { 0x00, 0x36, 0x36, 0x00, 0x00 },   
+    { 0x00, 0x56, 0x36, 0x00, 0x00 },   
+    { 0x08, 0x14, 0x22, 0x41, 0x00 },   
+    { 0x14, 0x14, 0x14, 0x14, 0x14 },   
+    { 0x00, 0x41, 0x22, 0x14, 0x08 },   
+    { 0x02, 0x01, 0x51, 0x09, 0x06 },   
+    { 0x32, 0x49, 0x59, 0x51, 0x3E },   
+    { 0x7E, 0x11, 0x11, 0x11, 0x7E },   
+    { 0x7F, 0x49, 0x49, 0x49, 0x36 },   
+    { 0x3E, 0x41, 0x41, 0x41, 0x22 },   
+    { 0x7F, 0x41, 0x41, 0x22, 0x1C },   
+    { 0x7F, 0x49, 0x49, 0x49, 0x41 },   
+    { 0x7F, 0x09, 0x09, 0x09, 0x01 },   
+    { 0x3E, 0x41, 0x49, 0x49, 0x7A },   
+    { 0x7F, 0x08, 0x08, 0x08, 0x7F },   
+    { 0x00, 0x41, 0x7F, 0x41, 0x00 },   
+    { 0x20, 0x40, 0x41, 0x3F, 0x01 },   
+    { 0x7F, 0x08, 0x14, 0x22, 0x41 },   
+    { 0x7F, 0x40, 0x40, 0x40, 0x40 },   
+    { 0x7F, 0x02, 0x0C, 0x02, 0x7F },   
+    { 0x7F, 0x04, 0x08, 0x10, 0x7F },   
+    { 0x3E, 0x41, 0x41, 0x41, 0x3E },   
+    { 0x7F, 0x09, 0x09, 0x09, 0x06 },   
+    { 0x3E, 0x41, 0x51, 0x21, 0x5E },   
+    { 0x7F, 0x09, 0x19, 0x29, 0x46 },   
+    { 0x46, 0x49, 0x49, 0x49, 0x31 },   
+    { 0x01, 0x01, 0x7F, 0x01, 0x01 },   
+    { 0x3F, 0x40, 0x40, 0x40, 0x3F },   
+    { 0x1F, 0x20, 0x40, 0x20, 0x1F },   
+    { 0x3F, 0x40, 0x38, 0x40, 0x3F },   
+    { 0x63, 0x14, 0x08, 0x14, 0x63 },   
+    { 0x07, 0x08, 0x70, 0x08, 0x07 },   
+    { 0x61, 0x51, 0x49, 0x45, 0x43 },   
+    { 0x00, 0x7F, 0x41, 0x41, 0x00 },   
+    { 0x02, 0x04, 0x08, 0x10, 0x20 },   
+    { 0x00, 0x41, 0x41, 0x7F, 0x00 },   
+    { 0x04, 0x02, 0x01, 0x02, 0x04 },   
+    { 0x40, 0x40, 0x40, 0x40, 0x40 },   
+    { 0x00, 0x01, 0x02, 0x04, 0x00 },   
+    { 0x20, 0x54, 0x54, 0x54, 0x78 },   
+    { 0x7F, 0x48, 0x44, 0x44, 0x38 },   
+    { 0x38, 0x44, 0x44, 0x44, 0x20 },   
+    { 0x38, 0x44, 0x44, 0x48, 0x7F },   
+    { 0x38, 0x54, 0x54, 0x54, 0x18 },   
+    { 0x08, 0x7E, 0x09, 0x01, 0x02 },   
+    { 0x0C, 0x52, 0x52, 0x52, 0x3E },   
+    { 0x7F, 0x08, 0x04, 0x04, 0x78 },   
+    { 0x00, 0x44, 0x7D, 0x40, 0x00 },   
+    { 0x20, 0x40, 0x44, 0x3D, 0x00 },   
+    { 0x7F, 0x10, 0x28, 0x44, 0x00 },   
+    { 0x00, 0x41, 0x7F, 0x40, 0x00 },   
+    { 0x7C, 0x04, 0x18, 0x04, 0x78 },   
+    { 0x7C, 0x08, 0x04, 0x04, 0x78 },   
+    { 0x38, 0x44, 0x44, 0x44, 0x38 },   
+    { 0x7C, 0x14, 0x14, 0x14, 0x08 },   
+    { 0x08, 0x14, 0x14, 0x18, 0x7C },   
+    { 0x7C, 0x08, 0x04, 0x04, 0x08 },   
+    { 0x48, 0x54, 0x54, 0x54, 0x20 },   
+    { 0x04, 0x3F, 0x44, 0x40, 0x20 },   
+    { 0x3C, 0x40, 0x40, 0x20, 0x7C },   
+    { 0x1C, 0x20, 0x40, 0x20, 0x1C },   
+    { 0x3C, 0x40, 0x30, 0x40, 0x3C },   
+    { 0x44, 0x28, 0x10, 0x28, 0x44 },   
+    { 0x0C, 0x50, 0x50, 0x50, 0x3C },   
+    { 0x44, 0x64, 0x54, 0x4C, 0x44 }    
+};
+
+
+ 
+
+
+
 void USART_GUI_Connect (void);
 void CRC_CALCULATE_TX(void);
 unsigned int TX_CRC(unsigned int crc, unsigned int data);
 void connect_command(void);
-void Updata_Rule(void);
+void Update_Rule(void);
 
 
 
@@ -17582,6 +18285,82 @@ void Updata_Rule(void);
 
 
 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+
+
+ 
+
+
+
+static void Delay(volatile uint32_t nCount);
+static void fault_err (FRESULT rc);
+
+void Check_Mount(void);
+static void Delay(volatile uint32_t nCount);
+void Create_file(char FileName[], uint8_t File_Type);
+void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
 
@@ -17589,37 +18368,39 @@ void Updata_Rule(void);
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
 
-extern uint8_t Data_GUI [40];
+extern uint8_t Data_GUI [28];
 extern uint8_t Oxygen_Sat[14], FiO2[14];
 
 
 uint16_t Crc;
 uint8_t CRC_Low, CRC_High;
-uint8_t Length_Data = 37;
+uint8_t Length_Data = 25;
 
 
 
-const uint8_t Padding = 0x23;                                                   
+
+
+const uint8_t Padding = 0x91;                                                   
 const uint8_t Connect_Command = 0xE8;                                           
 const uint8_t Upload_Command = 0xD5;                                            
 const uint8_t ETX = 0x33;                                                       
 
 
+extern char Hospital_Number[13];
+extern uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
+extern uint8_t FiO2_Maximum, FiO2_Minimum;
+extern uint8_t RespondsTime;
+extern uint8_t Prefered_FiO2;
+extern uint8_t Alarm_Level1, Alarm_Level2;
+extern uint8_t Mode;
+
 void USART_GUI_Connect(void)
-{
-  
-
-
-
- 
-  
-  
-  
+{  
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB2PeriphClockCmd(((uint32_t)0x00000020), ENABLE);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000004), ENABLE);
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00000010), ENABLE);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
 	
   
 
@@ -17631,12 +18412,12 @@ void USART_GUI_Connect(void)
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStruct);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
   
    
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x06), ((uint8_t)0x08));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint8_t)0x06), ((uint8_t)0x07));
    
-  GPIO_PinAFConfig( ((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x07), ((uint8_t)0x08));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), ((uint8_t)0x07), ((uint8_t)0x07));
   
   
    
@@ -17646,14 +18427,14 @@ void USART_GUI_Connect(void)
   USART_InitStruct.USART_Parity = ((uint16_t)0x0000);
   USART_InitStruct.USART_Mode = ((uint16_t)0x0004) | ((uint16_t)0x0008);
   USART_InitStruct.USART_HardwareFlowControl = ((uint16_t)0x0000);  
-  USART_Init(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), &USART_InitStruct);
+  USART_Init(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), &USART_InitStruct);
   
     
    
   NVIC_InitTypeDef NVIC_InitStruct;
   NVIC_PriorityGroupConfig(((uint32_t)0x700));
   
-  NVIC_InitStruct.NVIC_IRQChannel = USART6_IRQn;
+  NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
@@ -17661,10 +18442,10 @@ void USART_GUI_Connect(void)
 
    
   
-  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525), ENABLE);
+  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525), ENABLE);
 
   
-  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);
+  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ENABLE);
   
 
 
@@ -17696,21 +18477,6 @@ void USART_GUI_Connect(void)
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -17756,14 +18522,13 @@ unsigned int TX_CRC(unsigned int crc, unsigned int data)
 }
 
 
-void USART6_IRQHandler (void)
+void USART1_IRQHandler (void)
 {
   uint8_t Data_in;
 
-  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525)) == SET)
+  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525)) == SET)
   {
-    Data_in = USART_ReceiveData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)));
-    USART_ClearITPendingBit(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525));
+    Data_in = USART_ReceiveData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)));
     Data_GUI[rx_index_GUI] = Data_in;
     
     rx_index_GUI++;
@@ -17774,49 +18539,93 @@ void USART6_IRQHandler (void)
 
       
       CRC_CALCULATE_TX();
-      if (Data_GUI[37] == CRC_High & Data_GUI[38] == CRC_Low)
+      if (Data_GUI[25] == CRC_High & Data_GUI[26] == CRC_Low)
       {
         
-        USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), 0x41);                                            
-        while(USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0040)) == RESET);
+        USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), 0x41);                                            
+        while(USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0040)) == RESET);
         
         if (Data_GUI[1] == Upload_Command)
         {
           
-          
+          Update_Rule();
         }
         else if (Data_GUI[1] == Connect_Command)
         {
           
-          for (uint8_t i = 0; i < 40; i++)
+          for (uint8_t i = 0; i < 28; i++)
           {
             Data_GUI[i] = 0;
           }
         }
-
       }
       else
       {
         
-        USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), 0x65);
-        while(USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0040)) == RESET);
+        USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), 0x65);
+        while(USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0040)) == RESET);
       }
     }
   }
   
-  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727)) != RESET)
+  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727)) != RESET)
   {
-    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727), DISABLE);
+    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727), DISABLE);
   }
+  
+  USART_ClearITPendingBit(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525));
 }
 
 
 void Update_Rule(void)
 {
-  uint8_t i;
-  for(i = 0; i<14 ; i++)
+  uint8_t HN_index;
+  
+  for(HN_index = 3; HN_index < 16 ; HN_index++)
   {
-    
+    Hospital_Number[HN_index-3] = '0' + Data_GUI[HN_index];
   }
   
+  lcdString (1,1,Hospital_Number);
+
+  OxygenSaturaiton_Maximum = Data_GUI[16];
+  OxygenSaturation_Minimum = Data_GUI[17];
+  RespondsTime = Data_GUI[18];
+  Prefered_FiO2 = Data_GUI[19];
+  Mode = Data_GUI[20];
+  
+  if (Mode == 0xB7)
+  {
+    
+    FiO2_Maximum = Data_GUI[21];
+    FiO2_Minimum = Data_GUI[22];
+  }
+  else if (Mode == 0xA2)
+  {
+    FiO2_Maximum = 100;
+    FiO2_Minimum = 21;
+  }
+
+  Alarm_Level1 = Data_GUI[23];
+  Alarm_Level2 = Data_GUI[24];
+
+  
+  Create_file(Hospital_Number, 0);
+  Create_file(Hospital_Number, 1);
+
 }
+
+
+
+int fputc(int ch, FILE *f)
+{
+   
+   
+  USART_SendData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), (uint8_t) ch);
+   
+  while (USART_GetFlagStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0040)) == RESET)
+  {}
+  return ch;
+}
+
+

@@ -49,6 +49,9 @@
 #include "usbd_usr.h"
 #include "usbd_desc.h"
 
+#include "ff.h"
+#include "SD_Card.h"
+
 #ifdef MEDIA_USB_KEY
  #include "waverecorder.h"
  #include "usb_hcd_int.h"

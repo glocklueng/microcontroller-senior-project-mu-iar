@@ -387,11 +387,11 @@ void DISCOVERY_EXTI_IRQHandler(void)
   * @param  None
   * @retval None
   */
-PUTCHAR_PROTOTYPE
-{
-  VCP_DataTx (0, (uint32_t) ch);
-  return ch;
-}
+//PUTCHAR_PROTOTYPE
+//{
+//  VCP_DataTx (0, (uint32_t) ch);
+//  return ch;
+//}
 
 /*
     Add Code

@@ -17443,6 +17443,419 @@ uint8_t *     USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
   
  
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+ 
+ 
+
+
+
+ 
+typedef int				INT;
+typedef unsigned int	UINT;
+
+ 
+typedef char			CHAR;
+typedef unsigned char	UCHAR;
+typedef unsigned char	BYTE;
+
+ 
+typedef short			SHORT;
+typedef unsigned short	USHORT;
+typedef unsigned short	WORD;
+typedef unsigned short	WCHAR;
+
+ 
+typedef long			LONG;
+typedef unsigned long	ULONG;
+typedef unsigned long	DWORD;
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+typedef char TCHAR;
+
+
+
+
+ 
+
+typedef struct {
+	BYTE	fs_type;		 
+	BYTE	drv;			 
+	BYTE	csize;			 
+	BYTE	n_fats;			 
+	BYTE	wflag;			 
+	BYTE	fsi_flag;		 
+	WORD	id;				 
+	WORD	n_rootdir;		 
+	DWORD	last_clust;		 
+	DWORD	free_clust;		 
+	DWORD	fsi_sector;		 
+	DWORD	n_fatent;		 
+	DWORD	fsize;			 
+	DWORD	fatbase;		 
+	DWORD	dirbase;		 
+	DWORD	database;		 
+	DWORD	winsect;		 
+	BYTE	win[512];	 
+} FATFS;
+
+
+
+ 
+
+typedef struct {
+	FATFS*	fs;				 
+	WORD	id;				 
+	BYTE	flag;			 
+	BYTE	pad1;
+	DWORD	fptr;			 
+	DWORD	fsize;			 
+	DWORD	org_clust;		 
+	DWORD	curr_clust;		 
+	DWORD	dsect;			 
+	DWORD	dir_sect;		 
+	BYTE*	dir_ptr;		 
+	BYTE	buf[512];	 
+} FIL;
+
+
+
+ 
+
+typedef struct {
+	FATFS*	fs;				 
+	WORD	id;				 
+	WORD	index;			 
+	DWORD	sclust;			 
+	DWORD	clust;			 
+	DWORD	sect;			 
+	BYTE*	dir;			 
+	BYTE*	fn;				 
+} DIR;
+
+
+
+ 
+
+typedef struct {
+	DWORD	fsize;			 
+	WORD	fdate;			 
+	WORD	ftime;			 
+	BYTE	fattrib;		 
+	TCHAR	fname[13];		 
+} FILINFO;
+
+
+
+ 
+
+typedef enum {
+	FR_OK = 0,				                                 
+	FR_DISK_ERR,			                                         
+	FR_INT_ERR,				                                 
+	FR_NOT_READY,			                                         
+	FR_NO_FILE,				                                 
+	FR_NO_PATH,				                                 
+	FR_INVALID_NAME,		                                         
+	FR_DENIED,				                                 
+	FR_EXIST,				                                 
+	FR_INVALID_OBJECT,		                                         
+	FR_WRITE_PROTECTED,		                                         
+	FR_INVALID_DRIVE,		                                         
+	FR_NOT_ENABLED,			                                         
+	FR_NO_FILESYSTEM,		                                         
+	FR_MKFS_ABORTED,		                                         
+	FR_TIMEOUT,				                                 
+	FR_LOCKED,				                                 
+	FR_NOT_ENOUGH_CORE,		                                         
+	FR_TOO_MANY_OPEN_FILES	                                                 
+} FRESULT;
+
+
+
+ 
+ 
+
+FRESULT f_mount (BYTE, FATFS*);						 
+FRESULT f_open (FIL*, const TCHAR*, BYTE);			 
+FRESULT f_read (FIL*, void*, UINT, UINT*);			 
+FRESULT f_lseek (FIL*, DWORD);						 
+FRESULT f_close (FIL*);								 
+FRESULT f_opendir (DIR*, const TCHAR*);				 
+FRESULT f_readdir (DIR*, FILINFO*);					 
+FRESULT f_stat (const TCHAR*, FILINFO*);			 
+
+FRESULT f_write (FIL*, const void*, UINT, UINT*);	 
+FRESULT f_getfree (const TCHAR*, DWORD*, FATFS**);	 
+FRESULT f_truncate (FIL*);							 
+FRESULT f_sync (FIL*);								 
+FRESULT f_unlink (const TCHAR*);					 
+FRESULT	f_mkdir (const TCHAR*);						 
+FRESULT f_chmod (const TCHAR*, BYTE, BYTE);			 
+FRESULT f_utime (const TCHAR*, const FILINFO*);		 
+FRESULT f_rename (const TCHAR*, const TCHAR*);		 
+
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+DWORD get_fattime (void);
+
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+static void Delay(volatile uint32_t nCount);
+static void fault_err (FRESULT rc);
+
+void Check_Mount(void);
+static void Delay(volatile uint32_t nCount);
+void Create_file(char FileName[], uint8_t File_Type);
+void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
+
+
  
  
  
@@ -17481,8 +17894,8 @@ void EXTILine0_Config(void);
  
 
 void Oxygen_PM_Setup(void);
-int fputc(int ch, FILE *f);
-int GET_FiO2(void);
+
+int Get_OxygenSat(void);
 
 
  
@@ -17508,24 +17921,24 @@ void Oxygen_PM_Setup(void)
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB1PeriphClockCmd(((uint32_t)0x00020000), ENABLE);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE);
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00000020), ENABLE);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000004), ENABLE);
    
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x02), ((uint8_t)0x07));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x06), ((uint8_t)0x08));
    
-  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint8_t)0x03), ((uint8_t)0x07));
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint8_t)0x07), ((uint8_t)0x08));
 	
   
 
 
  
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0004) | ((uint16_t)0x0008);
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0040) | ((uint16_t)0x0080);
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStruct);
   
    
   USART_InitStruct.USART_BaudRate = 4800;
@@ -17534,14 +17947,14 @@ void Oxygen_PM_Setup(void)
   USART_InitStruct.USART_Parity = ((uint16_t)0x0000) ;
   USART_InitStruct.USART_Mode = ((uint16_t)0x0004) | ((uint16_t)0x0008);
   USART_InitStruct.USART_HardwareFlowControl = ((uint16_t)0x0000);  
-  USART_Init(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), &USART_InitStruct);
+  USART_Init(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), &USART_InitStruct);
   
    
    
   
   NVIC_InitTypeDef NVIC_InitStruct;
   
-  NVIC_InitStruct.NVIC_IRQChannel = USART2_IRQn;
+  NVIC_InitStruct.NVIC_IRQChannel = USART6_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 5;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
@@ -17549,12 +17962,12 @@ void Oxygen_PM_Setup(void)
 
    
   
-  USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0525), ENABLE);
+  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525), ENABLE);
   
-  USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727), DISABLE);
+  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727), DISABLE);
   
   
-  USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), DISABLE);
+  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), DISABLE);
 
   
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -17588,16 +18001,16 @@ void Oxygen_PM_Setup(void)
 }
 
 
-void USART2_IRQHandler(void)
+void USART6_IRQHandler(void)
 {
-  if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0525)) != RESET)
+  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0525)) != RESET)
   {
     if (rx_index == 0)
     {
       
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ENABLE);
     }
-    DataFromOPM[rx_index++] = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));
+    DataFromOPM[rx_index++] = USART_ReceiveData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)));
   
     if(rx_index >= (sizeof(DataFromOPM) - 1))
     {  
@@ -17605,9 +18018,9 @@ void USART2_IRQHandler(void)
       rx_index = 0;
     }
   }
-  if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727)) != RESET)
+  if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727)) != RESET)
   {
-    USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727), DISABLE);
+    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727), DISABLE);
   }
 }
 

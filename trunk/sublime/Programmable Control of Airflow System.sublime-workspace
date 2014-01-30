@@ -4,6 +4,74 @@
 		"selected_items":
 		[
 			[
+				"Cre",
+				"Create_file"
+			],
+			[
+				"Hs",
+				"Hospital_Number"
+			],
+			[
+				"Hos",
+				"Hospital_Number"
+			],
+			[
+				"FiO2",
+				"FiO2_File"
+			],
+			[
+				"File",
+				"File_Type"
+			],
+			[
+				"hr",
+				"Hospital_Number"
+			],
+			[
+				"Oxygen",
+				"Oxygen_Sat"
+			],
+			[
+				"HR",
+				"HR_OxygenSat_file"
+			],
+			[
+				"H",
+				"Hospital_Number"
+			],
+			[
+				"Dat",
+				"Data"
+			],
+			[
+				"Al",
+				"Alarm_Level2"
+			],
+			[
+				"Alr",
+				"Alarm_Level1"
+			],
+			[
+				"fi",
+				"FiO2_Minimum"
+			],
+			[
+				"Fi",
+				"FiO2_Maximum"
+			],
+			[
+				"Pre",
+				"Prefered_FiO2"
+			],
+			[
+				"Oxyg",
+				"OxygenSaturation_Minimum"
+			],
+			[
+				"US",
+				"USART2"
+			],
+			[
 				"SPI",
 				"SPI2_PortB_CLK"
 			],
@@ -30,14 +98,6 @@
 			[
 				"Oxyge",
 				"OxygenSat_Percent"
-			],
-			[
-				"FiO2",
-				"FiO2_Value"
-			],
-			[
-				"Fi",
-				"FiO2_ADC"
 			],
 			[
 				"Con",
@@ -86,10 +146,6 @@
 			[
 				"GUI_",
 				"GUI_Port"
-			],
-			[
-				"fi",
-				"FiO2_Value"
 			],
 			[
 				"DAC",
@@ -144,10 +200,6 @@
 				"GPIO_Pin_1"
 			],
 			[
-				"Oxygen",
-				"OxygenSensor_ADC_CLK"
-			],
-			[
 				"G",
 				"GPIOB"
 			],
@@ -180,18 +232,34 @@
 	"buffers":
 	[
 		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/FatFs_vR0.08a/ff.c",
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 			"settings":
 			{
-				"buffer_size": 118356,
+				"buffer_size": 8289,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main_abEvalTest.c",
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
 			"settings":
 			{
-				"buffer_size": 19333,
+				"buffer_size": 9431,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/SD_Card.c",
+			"settings":
+			{
+				"buffer_size": 4902,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
+			"settings":
+			{
+				"buffer_size": 3404,
 				"line_ending": "Windows"
 			}
 		}
@@ -224,14 +292,27 @@
 	},
 	"file_history":
 	[
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.h",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/SD_Card.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/example/users_guide/example1/leds.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/PORTB/pullen.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/h/GenericTypeDefs.h",
+		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/PORTB/rb1open.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/PORTB/pbopen.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/mwire/mw_open.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/ancom/open_ancomp.c",
+		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/PORTB/rb0open.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/FatFs_vR0.08a/ff.c",
+		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main_abEvalTest.c",
+		"/C/Program Files/PICC/Devices/16F877A.h",
+		"/C/Program Files/PICC/Examples/EX_SPI.C",
+		"/C/Program Files/PICC/Examples/ex_RS232_485.c",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main.h",
 		"/E/My document/TESA Top Gun/top-gun2013/Top Gun microcontroller/main.c",
 		"/C/Program Files/Microchip/xc8/v1.20/sources/pic18/plib/USART/u1open.c",
-		"/C/Program Files/PICC/Examples/EX_SPI.C",
 		"/C/Program Files/PICC/Examples/EX_LED.C",
 		"/C/Program Files/PICC/Drivers/INPUT.C",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/sublime/Programmable Control of Airflow System.sublime-workspace",
-		"/C/Program Files/PICC/Devices/16F877A.h",
 		"/C/Users/Phattaradanai/Desktop/newyear.c",
 		"/C/Program Files/Microchip/mplabc18/v3.46/h/usart.h",
 		"/C/Program Files/Microchip/mplabc18/v3.46/h/portb.h",
@@ -247,7 +328,6 @@
 		"/C/Program Files/Microchip/mplabc18/v3.46/example/Interrupt/main.c",
 		"/C/Users/Phattaradanai/Desktop/C Programming/PIC Microcontroller/CApps/CApps/Part2/2_1/outnum/outnum.c",
 		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/ADC/adcopen.c",
-		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/PORTB/rb1open.c",
 		"/C/Program Files/Microchip/mplabc18/v3.46/h/io.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DAC_LTC1661.c",
@@ -286,7 +366,6 @@
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/SDIO/SDIO_uSDCard/stm32f4xx_it.h",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/SDIO/SDIO_uSDCard/SD_Card.h",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/SDIO/SDIO_uSDCard/SD_Card.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.h",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/SDIO/SDIO_uSDCard/main.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c",
 		"/C/Users/Phattaradanai/Downloads/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Project/STM32F4xx_StdPeriph_Examples/EXTI/EXTI_Example/main.c",
@@ -317,7 +396,6 @@
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/sx1App.c",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/sx1App.h",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/board/tesaDemoBoard.h",
-		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main_abEvalTest.c",
 		"/C/Users/Phattaradanai/Downloads/Core407i_5110-Sample1/5110/5110.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/GLCD5110.h",
 		"/F/Microcontroller/ARM/JX-STM32/Example_code_FWL2/GLCD5110/GLCD_01/GLCD5110.H",
@@ -341,17 +419,7 @@
 		"/E/My document/TESA Top Gun/top-gun2013/Top Gun microcontroller/Application/oled_app/oledApp.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_flash.c",
 		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/FLASH_Write_Protection/main.c",
-		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/FLASH_Program/main.c",
-		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/AirTest.c",
-		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/userLib/dgSaijoApp.c",
-		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/ADC_Interleaved_DMAmode2/main.c",
-		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/ADC3_DMA/main.c",
-		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/TIM_PWM_Input/stm32f4xx_it.c",
-		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/TIM_ComplementarySignals/main.c",
-		"/C/Users/Phattaradanai/Desktop/LCD/Letters_LCD.h",
-		"/C/Users/Phattaradanai/Desktop/LCD/lcd_pcd8544.c",
-		"/C/Users/Phattaradanai/Desktop/LCD/main.c",
-		"/C/Users/Phattaradanai/Downloads/glcd-0.5/glcd-0.5/glcd.c"
+		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4discovery_fw/STM32F4-Discovery_FW_V1.1.0/Project/Peripheral_Examples/FLASH_Program/main.c"
 	],
 	"find":
 	{
@@ -369,6 +437,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"USART2",
+			"HN_OxygenSat_file",
+			"GUI_index",
+			"HN_index",
+			"USart6",
 			"f_write",
 			"f_read",
 			"sentdata_Dac",
@@ -416,59 +489,115 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Utilities/FatFs_vR0.08a/ff.c",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 					"settings":
 					{
-						"buffer_size": 118356,
+						"buffer_size": 8289,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								2461,
+								2461
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 41279.0,
+						"translation.y": 720.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main_abEvalTest.c",
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
 					"settings":
 					{
-						"buffer_size": 19333,
+						"buffer_size": 9431,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								3843,
+								3843
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 10652.0,
+						"translation.y": 1920.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/SD_Card.c",
+					"settings":
+					{
+						"buffer_size": 4902,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2445,
+								2445
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 960.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
+					"settings":
+					{
+						"buffer_size": 3404,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3319,
+								3319
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1380.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

@@ -539,3 +539,4 @@ void ff_rel_grant (_SYNC_t);		/* Unlock sync object */
 #endif
 
 #endif /* _FATFS */
+

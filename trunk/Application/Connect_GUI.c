@@ -5,32 +5,33 @@ File : Connect_GUI.c
 */
 //------------------------------------------------------------------------------
 /*
-    Connect to GUI USE USART3 via RS-232 Protocol
-    USART6 - Tx -> Port C Pin PC6
-    USART6 - Rx -> Port C Pin PC7
+    Connect to GUI USE USART1 via RS-232 Protocol
+    USART1 - Tx -> Port D Pin PB6
+    USART1 - Rx -> Port D Pin PB7
     Baud Rate = 115200
     package = 8-n-1
     
 */
 /*
             Package of Data 
-         * Length 40 Bytes
+         * Length 28 Bytes
          * Byte 0 : Head of Bytes : "$"
-         * Byte 1 : Command : Connect (0x00xE8A), Upload (0xD5)
+         * Byte 1 : Command : Connect (0xE8), Upload (0xD5)
          * Byte 2 : SOH     : 0xFF
-         * Byte 3 - 36: Data (if don't have data replace with Padding Bytes (0x23) (Padding Bytes : 30 - Data))
-         *      1.) Oxygen Saturation and FiO2 Value 14 rule = 28 Bytes (Byte 3 - 31)
-         *      2.) Alarm Level 1 and Level 2 = 2 Bytes (Byte 32 - 33)
-         *      3.) Padding : 0x23 (32 - Data - Alarm = 3 Bytes (Byte 34 - 36))
+         * Byte 3 - 24: Data (if don't have data replace with Padding Bytes (0x91)
+         *     
          *      
-         * Byte 37-38 : CRC 16 - ModBus (2 Bytes)
-         * Byte 39 : End of Package Bytes (0x03)
+         * Byte 25-26 : CRC 16 - ModBus (2 Bytes)
+         * Byte 27 : End of Package Bytes (0x03)
          
 */
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "Connect_GUI.h"
 #include "DefinePin.h"
+#include "GLCD5110.h"
+#include "SD_Card.h"
+
 //------------------------------------------------------------------------------
 #define ERROR   0x65                                                            //Data Error = 'e' (0x65)
 #define ACK     0x41                                                            //Data Correct = 'A' (0x41)
@@ -38,41 +39,43 @@ File : Connect_GUI.c
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
 
-extern uint8_t Data_GUI [40];
+extern uint8_t Data_GUI [28];
 extern uint8_t Oxygen_Sat[14], FiO2[14];
 
 //Define Variable for CRC ------------------------------------------------------
 uint16_t Crc;
 uint8_t CRC_Low, CRC_High;
-uint8_t Length_Data = 37;
+uint8_t Length_Data = 25;
+
+
 
 //------------------------------------------------------------------------------
 //Define Value for Data Packaging
-const uint8_t Padding = 0x23;                                                   //Padding Bytes for dummy Bytes of Data (Value = 0x23)
+const uint8_t Padding = 0x91;                                                   //Padding Bytes for dummy Bytes of Data (Value = 0x23)
 const uint8_t Connect_Command = 0xE8;                                           //0xE8 is Connect Command
 const uint8_t Upload_Command = 0xD5;                                            //0xD5 is Upload Profile data Command
 const uint8_t ETX = 0x33;                                                       //End of Package Transmittion
 
+// Extern Profile Variable -----------------------------------------------------
+extern char Hospital_Number[13];
+extern uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
+extern uint8_t FiO2_Maximum, FiO2_Minimum;
+extern uint8_t RespondsTime;
+extern uint8_t Prefered_FiO2;
+extern uint8_t Alarm_Level1, Alarm_Level2;
+extern uint8_t Mode;
 //------------------------------------------------------------------------------
 void USART_GUI_Connect(void)
-{
-  /*
-      NFC_Setup - USE USART6 
-        PC6 - NFC_TX
-        PC7 - NFC_RX
-  */
-  //Set Up USART
-  //USE USART6 Set up for NFC
-  
+{  
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	
   /*
-    Use Port C Pin PC6 - NFC_TX
-    Use Port C Pin PC7 - NFC_RX
+    Use Port B Pin PD6 
+    Use Port B Pin PD7 
   */
   /* set GPIO init structure parameters values */
   GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_6 | GPIO_Pin_7;
@@ -80,12 +83,12 @@ void USART_GUI_Connect(void)
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOC, &GPIO_InitStruct);
+  GPIO_Init(GPIOB, &GPIO_InitStruct);
   
   /* Connect PXx to USARTx_Tx*/
-  GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_USART6);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_USART1);
   /* Connect PXx to USARTx_Rx*/
-  GPIO_PinAFConfig( GPIOC, GPIO_PinSource7, GPIO_AF_USART6);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);
   
   
   /* USART_InitStruct members default value */
@@ -95,14 +98,14 @@ void USART_GUI_Connect(void)
   USART_InitStruct.USART_Parity = USART_Parity_No;
   USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
-  USART_Init(USART6, &USART_InitStruct);
+  USART_Init(USART1, &USART_InitStruct);
   
    /*USART Interrupt*/
   /* Set interrupt: NVIC_Setup */
   NVIC_InitTypeDef NVIC_InitStruct;
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-  //ENABLE USART4 Interruper
-  NVIC_InitStruct.NVIC_IRQChannel = USART6_IRQn;
+  //ENABLE USART1 Interruper
+  NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
@@ -110,10 +113,10 @@ void USART_GUI_Connect(void)
 
   /* Set Interrupt Mode*/
   //ENABLE the USART Receive Interrupt
-  USART_ITConfig(USART6, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 
-  //Enable USART6
-  USART_Cmd(USART6, ENABLE);
+  //Enable USART1
+  USART_Cmd(USART1, ENABLE);
   
 //  //Set Up Timer 3
 //  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -145,21 +148,6 @@ void USART_GUI_Connect(void)
 //  /* TIM3 enable counter */
 //  TIM_Cmd(TIM3, DISABLE);
 }
-
-// Connect Command -------------------------------------------------------------
-//void connect_command(void)
-//{
-//  //Connect command
-//  Data_Package[0] = '$';
-//  Data_Package[1] = Connect_Command;
-//  for(uint8_t j = 3; j<37; j++)
-//  {
-//    Data_Package[j] = Padding;
-//  }
-//  CRC_CALCULATE_TX();
-//  Data_Package[37] = CRC_High;
-//  Data_Package[38] = CRC_Low;
-//}
 
 // CRC Calculate ---------------------------------------------------------------
 /*
@@ -209,10 +197,9 @@ void GUI_IRQHandler (void)
 {
   uint8_t Data_in;
 
-  if(USART_GetITStatus(USART6, USART_IT_RXNE) == SET)
+  if(USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
   {
-    Data_in = USART_ReceiveData(USART6);
-    USART_ClearITPendingBit(USART6, USART_IT_RXNE);
+    Data_in = USART_ReceiveData(USART1);
     Data_GUI[rx_index_GUI] = Data_in;
     //Data_GUI[rx_index_GUI] = USART_ReceiveData(GUI_USART);
     rx_index_GUI++;
@@ -223,49 +210,93 @@ void GUI_IRQHandler (void)
 
       //Check CRC16 - ModBus
       CRC_CALCULATE_TX();
-      if (Data_GUI[37] == CRC_High & Data_GUI[38] == CRC_Low)
+      if (Data_GUI[25] == CRC_High & Data_GUI[26] == CRC_Low)
       {
         //CRC is Correct
-        USART_SendData(USART6, ACK);                                            //Send Acknowlege to GUI
-        while(USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
+        USART_SendData(USART1, ACK);                                            //Send Acknowlege to GUI
+        while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
         
         if (Data_GUI[1] == Upload_Command)
         {
           //Update Rule
-          
+          Update_Rule();
         }
         else if (Data_GUI[1] == Connect_Command)
         {
           //Clear Data out from Buffer
-          for (uint8_t i = 0; i < 40; i++)
+          for (uint8_t i = 0; i < 28; i++)
           {
             Data_GUI[i] = 0;
           }
         }
-
       }
       else
       {
         //CRC is ERROR, Send ERROR ACK to GUI (ERROR ACK = 0xEA)
-        USART_SendData(USART6, ERROR);
-        while(USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
+        USART_SendData(USART1, ERROR);
+        while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
       }
     }
   }
   
-  if(USART_GetITStatus(USART6, USART_IT_TXE) != RESET)
+  if(USART_GetITStatus(USART1, USART_IT_TXE) != RESET)
   {
-    USART_ITConfig(USART6, USART_IT_TXE, DISABLE);
+    USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
   }
+  
+  USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 }
 
 // Update Rule -----------------------------------------------------------------
 void Update_Rule(void)
 {
-  uint8_t i;
-  for(i = 0; i<14 ; i++)
+  uint8_t HN_index;
+  // Update Hospital Number
+  for(HN_index = 3; HN_index < 16 ; HN_index++)
   {
-    
+    Hospital_Number[HN_index-3] = '0' + Data_GUI[HN_index];
   }
-  
+  //Show Hospital Number to LCD Display
+  lcdString (1,1,Hospital_Number);
+
+  OxygenSaturaiton_Maximum = Data_GUI[16];
+  OxygenSaturation_Minimum = Data_GUI[17];
+  RespondsTime = Data_GUI[18];
+  Prefered_FiO2 = Data_GUI[19];
+  Mode = Data_GUI[20];
+  //Select Mode
+  if (Mode == 0xB7)
+  {
+    //Select Range Mode
+    FiO2_Maximum = Data_GUI[21];
+    FiO2_Minimum = Data_GUI[22];
+  }
+  else if (Mode == 0xA2)
+  {
+    FiO2_Maximum = 100;
+    FiO2_Minimum = 21;
+  }
+
+  Alarm_Level1 = Data_GUI[23];
+  Alarm_Level2 = Data_GUI[24];
+
+  //Create Oxygen Saturation file, FiO2 file to SD Card
+  Create_file(Hospital_Number, OxygenSaturation_file);
+  Create_file(Hospital_Number, FiO2_file);
+
 }
+
+//------------------------------------------------------------------------------
+// Function can use printf(); in sent data
+int fputc(int ch, FILE *f)
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART */
+  USART_SendData(GUI_USART, (uint8_t) ch);
+  /* Loop until the end of transmission */
+  while (USART_GetFlagStatus(OPM_USART, USART_FLAG_TC) == RESET)
+  {}
+  return ch;
+}
+
+// End of File -------------------------------------------------------------------

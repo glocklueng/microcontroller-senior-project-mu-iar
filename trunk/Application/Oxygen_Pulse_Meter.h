@@ -8,7 +8,7 @@ File : Oxygen_Pulse_Meter.h
 #include <stdlib.h>
 // Function --------------------------------------------------------------------
 void Oxygen_PM_Setup(void);
-int fputc(int ch, FILE *f);
-int GET_FiO2(void);
+//int fputc(int ch, FILE *f);
+int Get_OxygenSat(void);
 
 //------------------------------------------------------------------------------
