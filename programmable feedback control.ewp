@@ -2017,9 +2017,6 @@
       <name>$PROJ_DIR$\Application\Oxygen_sensor.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\Application\SD_Card.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\stm32f4xx_it.c</name>
     </file>
     <file>

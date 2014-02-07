@@ -17846,6 +17846,56 @@ DWORD get_fattime (void);
 
 
 
+ 
+
+
+
+
+
+ 
+typedef BYTE	DSTATUS;
+
+ 
+typedef enum {
+	RES_OK = 0,		 
+	RES_ERROR,		 
+	RES_WRPRT,		 
+	RES_NOTRDY,		 
+	RES_PARERR		 
+} DRESULT;
+
+
+ 
+ 
+
+int assign_drives (int, int);
+DSTATUS disk_initialize (BYTE);
+DSTATUS disk_status (BYTE);
+DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
+DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
+DRESULT disk_ioctl (BYTE, BYTE, void*);
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
 static void Delay(volatile uint32_t nCount);
 static void fault_err (FRESULT rc);
 

@@ -12,6 +12,7 @@ File : main.c
 #include "DefinePin.h"
 #include "Connect_GUI.h"
 #include "ff.h"
+#include <stdlib.h>
 
 //------------------------------------------------------------------------------
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
@@ -22,14 +23,14 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
 
 /* Private typedef -----------------------------------------------------------*/
-//SD_Error Status = SD_OK;
-//FATFS filesystem;		                                                // volume lable
-//FRESULT ret;			                                                // Result code
-//FIL file;				                                        // File object
-//DIR dir;				                                        // Directory object
-//FILINFO fno;			                                                // File information object
-//UINT bw, br;
-//uint8_t buff[128];
+SD_Error Status = SD_OK;
+FATFS filesystem;		                                                // volume lable
+FRESULT ret;			                                                // Result code
+FIL file;				                                        // File object
+DIR dir;				                                        // Directory object
+FILINFO fno;			                                                // File information object
+UINT bw, br;
+uint8_t buff[128];
 
 //------------------------------------------------------------------------------
 void delay(void);
@@ -39,7 +40,7 @@ void EXTILine0_Config(void);
 
 /* Private function prototypes -----------------------------------------------*/
 void ConvertInttoString(uint8_t DataInt[]);
-
+void USART_HyperTermianl_Connect(void);
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
 char Character;
@@ -47,12 +48,14 @@ uint32_t count;
 extern uint16_t time;
 extern uint8_t rx_index_GUI;
 uint8_t Data_GUI[28];
-uint8_t Oxygen_Sat[14], FiO2[14];
 uint8_t SD_Test[50];
 char SD_String[250];
+uint8_t index = 0;                                                                  //for count receving Data form Hyperterminal for controling Drive Circuit
 
 // Profile Variable ------------------------------------------------------------
 char Hospital_Number[13];
+char HospitalNumber_File[13];
+char Drive_command_Data[5];
 uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
 uint8_t FiO2_Maximum, FiO2_Minimum;
 uint8_t RespondsTime;
@@ -68,23 +71,35 @@ int main()
   System_Init();
   lcdInit();
   lcdString (1,1,"Setting....");
+  lcdString (1,6,"Setting....");
   SentData_DAC ( 0x245, 1);
   SentData_DAC ( 0x2A0, 2);
   
-//  /*Write Data to SD Card */
-//  if (f_mount(0, &filesystem) != FR_OK);
-//  
-//  ret = f_open(&file, "OXY.TXT", FA_WRITE | FA_CREATE_ALWAYS);
-//  if (ret) 
-//  {
-//    fault_err(ret);
-//  } 
-//  else 
-//  {
-//    ret = f_write(&file, "HR : 1234567898765 \r\nFile: Oxygen Saturation\r\n", 47, &bw);
-//    ret = f_close(&file);
-//  }  
-//  
+  HospitalNumber_File[0] = '7';
+  for (int i = 1; i < 8; i++)
+  {
+    HospitalNumber_File[i] = '1';
+  }
+    HospitalNumber_File[8] = '.';
+    HospitalNumber_File[9] = 'T';
+    HospitalNumber_File[10] = 'X';
+    HospitalNumber_File[11] = 'T';
+    HospitalNumber_File[12] = '\0';
+  
+  /*Write Data to SD Card */
+  if (f_mount(0, &filesystem) != FR_OK);
+  
+  ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
+  if (ret) 
+  {
+    fault_err(ret);
+  } 
+  else 
+  {
+    ret = f_write(&file, "HR : 1234567898765 \r\nFile: Oxygen Saturation\r\n", 47, &bw);
+    ret = f_close(&file);
+  }  
+  
   //Test Transfer Data to SD Card
 //  uint8_t count;
 //  for(count = 0; count < 50; count++)
@@ -97,6 +112,7 @@ int main()
   
   while(1)
   {
+
   }
   
 }
@@ -121,6 +137,7 @@ void System_Init(void)
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   Timer6_SetUp();
   USART_GUI_Connect();
+  USART_HyperTermianl_Connect();
 
   //INTTIM_Config();
   
@@ -138,7 +155,7 @@ void System_Init(void)
   lcdInit();
  
   //SD Card : Check Mount Card
-  Check_Mount();
+  //Check_Mount();
   
   /* Initialize USB available on STM32F4-Discovery board */
   USBD_Init(&USB_OTG_dev,
@@ -259,7 +276,7 @@ static void fault_err (FRESULT rc)
     while (*str++) ;
   }
   printf("rc=%u FR_%s\n\r", (UINT)rc, str);
-  STM_EVAL_LEDOn(LED6);
+  STM_EVAL_LEDOff(LED6);
   while(1);
 }
 
@@ -274,6 +291,160 @@ static void Delay(__IO uint32_t nCount)
   for (index = (100000 * nCount); index != 0; index--);
 }
 
+//-----------------------------------------------------------------------------
+void USART_HyperTermianl_Connect(void)
+{  
+  GPIO_InitTypeDef GPIO_InitStruct;
+  USART_InitTypeDef USART_InitStruct;
+  
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+  
+  /*
+    Use Port B Pin PD6 
+    Use Port B Pin PD7 
+  */
+  /* set GPIO init structure parameters values */
+  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_8 | GPIO_Pin_9;
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOD, &GPIO_InitStruct);
+  
+  /* Connect PXx to USARTx_Tx*/
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_USART3);
+  /* Connect PXx to USARTx_Rx*/
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_USART3);
+  
+  
+  /* USART_InitStruct members default value */
+  USART_InitStruct.USART_BaudRate = 115200;
+  USART_InitStruct.USART_WordLength = USART_WordLength_8b;
+  USART_InitStruct.USART_StopBits = USART_StopBits_1;
+  USART_InitStruct.USART_Parity = USART_Parity_No;
+  USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
+  USART_Init(USART3, &USART_InitStruct);
+  
+   /*USART Interrupt*/
+  /* Set interrupt: NVIC_Setup */
+  NVIC_InitTypeDef NVIC_InitStruct;
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+  //ENABLE USART1 Interruper
+  NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStruct);
+
+  /* Set Interrupt Mode*/
+  //ENABLE the USART Receive Interrupt
+  USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+
+  //Enable USART1
+  USART_Cmd(USART3, ENABLE);
+}
+//------------------------------------------------------------------------------
+void USART3_IRQHandler(void)
+{
+  uint16_t Drive_Data;
+  if(USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
+  {
+    Drive_command_Data[index] = USART_ReceiveData(USART3);
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+    USART_SendData(USART3, Drive_command_Data[index]); 
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+    index++;
+    if (index >= 5)
+    {
+      index = 0;
+      if (Drive_command_Data[0] == '1')
+      {
+        Drive_command_Data[0] = '0';
+        Drive_Data = atoi(Drive_command_Data);
+        SentData_DAC (Drive_Data, 1);
+      }
+      else if (Drive_command_Data[0] == '2')
+      {
+        Drive_command_Data[0] = '0';
+        Drive_Data = atoi(Drive_command_Data);
+        SentData_DAC (Drive_Data, 2);
+      }
+    } 
+  }
+  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+}
+
+// SD Card Section -------------------------------------------------------------
+void Create_file(char Hospital_Number[], uint8_t File_Type)
+{
+  for (int i = 0; i < 7; i++)
+  {
+    HospitalNumber_File[i] = '1';
+  }
+    HospitalNumber_File[8] = '.';
+    HospitalNumber_File[9] = 'T';
+    HospitalNumber_File[10] = 'X';
+    HospitalNumber_File[11] = 'T';
+    HospitalNumber_File[12] = '\0';
+  if(File_Type == 0)
+  {
+    HospitalNumber_File[7] = 'O';
+    //if (f_mount(0, &filesystem) != FR_OK);
+    
+    // Create Oxygen Saturation file
+    ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
+    if (ret) 
+    {
+      fault_err(ret);
+    } 
+    else 
+    {
+      ret = f_write(&file, "Hospital Number : ", 18, &bw);
+      ret = f_lseek(&file,f_size(&file));
+      ret = f_write(&file, HospitalNumber_File, 30, &bw);
+      ret = f_lseek(&file,f_size(&file));
+      ret = f_write(&file, "\r\nFile: Oxygen Saturation\r\n", 32, &bw);
+      ret = f_close(&file);
+    }  
+  }
+  else if (File_Type == 1)
+  {
+    HospitalNumber_File[7] = 'F';
+    // Create FiO2 File
+    ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
+    if (ret) 
+    {
+      fault_err(ret);
+    } 
+    else 
+    {
+      ret = f_write(&file, "HR : ", 5, &bw);
+      ret = f_lseek(&file,f_size(&file));
+      ret = f_write(&file, HospitalNumber_File, 30, &bw);
+      ret = f_lseek(&file,f_size(&file));
+      ret = f_write(&file, "\r\nFile: FiO2_File\r\n", 25, &bw);
+      ret = f_close(&file);
+    }  
+
+  }
+}
+//------------------------------------------------------------------------------
+void SD_Write(char FileName[], char SD_Data[], UINT Data_size)
+{
+  ret = f_open(&file, FileName, FA_WRITE);
+  if (ret) 
+  {
+    fault_err(ret);
+  } 
+  else 
+  {
+    ret = f_lseek (&file,f_size(&file));
+    ret = f_write(&file, SD_Data, Data_size, &bw);
+    ret = f_close(&file);
+  }  
+}
 
 //------------------------------------------------------------------------------
 #ifdef USE_FULL_ASSERT

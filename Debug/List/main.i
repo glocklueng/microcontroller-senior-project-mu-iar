@@ -17846,6 +17846,56 @@ DWORD get_fattime (void);
 
 
 
+ 
+
+
+
+
+
+ 
+typedef BYTE	DSTATUS;
+
+ 
+typedef enum {
+	RES_OK = 0,		 
+	RES_ERROR,		 
+	RES_WRPRT,		 
+	RES_NOTRDY,		 
+	RES_PARERR		 
+} DRESULT;
+
+
+ 
+ 
+
+int assign_drives (int, int);
+DSTATUS disk_initialize (BYTE);
+DSTATUS disk_status (BYTE);
+DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
+DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
+DRESULT disk_ioctl (BYTE, BYTE, void*);
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
 static void Delay(volatile uint32_t nCount);
 static void fault_err (FRESULT rc);
 
@@ -18328,10 +18378,7 @@ void connect_command(void);
 void Update_Rule(void);
 
 
-
-
- USB_OTG_CORE_HANDLE    USB_OTG_dev ;
-
+ 
  
 
 
@@ -18339,8 +18386,20 @@ void Update_Rule(void);
 
 
 
+ 
 
 
+ USB_OTG_CORE_HANDLE    USB_OTG_dev ;
+
+ 
+SD_Error Status = SD_OK;
+FATFS filesystem;		                                                
+FRESULT ret;			                                                
+FIL file;				                                        
+DIR dir;				                                        
+FILINFO fno;			                                                
+UINT bw, br;
+uint8_t buff[128];
 
 
 void delay(void);
@@ -18350,7 +18409,7 @@ void EXTILine0_Config(void);
 
  
 void ConvertInttoString(uint8_t DataInt[]);
-
+void USART_HyperTermianl_Connect(void);
 
 unsigned char msg ;
 char Character;
@@ -18358,12 +18417,14 @@ uint32_t count;
 extern uint16_t time;
 extern uint8_t rx_index_GUI;
 uint8_t Data_GUI[28];
-uint8_t Oxygen_Sat[14], FiO2[14];
 uint8_t SD_Test[50];
 char SD_String[250];
+uint8_t index = 0;                                                                  
 
 
 char Hospital_Number[13];
+char HospitalNumber_File[13];
+char Drive_command_Data[5];
 uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
 uint8_t FiO2_Maximum, FiO2_Minimum;
 uint8_t RespondsTime;
@@ -18379,23 +18440,35 @@ int main()
   System_Init();
   lcdInit();
   lcdString (1,1,"Setting....");
+  lcdString (1,6,"Setting....");
   SentData_DAC ( 0x245, 1);
   SentData_DAC ( 0x2A0, 2);
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  HospitalNumber_File[0] = '7';
+  for (int i = 1; i < 8; i++)
+  {
+    HospitalNumber_File[i] = '1';
+  }
+    HospitalNumber_File[8] = '.';
+    HospitalNumber_File[9] = 'T';
+    HospitalNumber_File[10] = 'X';
+    HospitalNumber_File[11] = 'T';
+    HospitalNumber_File[12] = '\0';
+  
+   
+  if (f_mount(0, &filesystem) != FR_OK);
+  
+  ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
+  if (ret) 
+  {
+    fault_err(ret);
+  } 
+  else 
+  {
+    ret = f_write(&file, "HR : 1234567898765 \r\nFile: Oxygen Saturation\r\n", 47, &bw);
+    ret = f_close(&file);
+  }  
+  
   
 
 
@@ -18408,6 +18481,7 @@ int main()
   
   while(1)
   {
+
   }
   
 }
@@ -18432,6 +18506,7 @@ void System_Init(void)
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   Timer6_SetUp();
   USART_GUI_Connect();
+  USART_HyperTermianl_Connect();
 
   
   
@@ -18449,7 +18524,7 @@ void System_Init(void)
   lcdInit();
  
   
-  Check_Mount();
+  
   
    
   USBD_Init(&USB_OTG_dev,
@@ -18566,7 +18641,7 @@ static void fault_err (FRESULT rc)
     while (*str++) ;
   }
   printf("rc=%u FR_%s\n\r", (UINT)rc, str);
-  STM_EVAL_LEDOn(LED6);
+  STM_EVAL_LEDOff(LED6);
   while(1);
 }
 
@@ -18581,6 +18656,160 @@ static void Delay(volatile uint32_t nCount)
   for (index = (100000 * nCount); index != 0; index--);
 }
 
+
+void USART_HyperTermianl_Connect(void)
+{  
+  GPIO_InitTypeDef GPIO_InitStruct;
+  USART_InitTypeDef USART_InitStruct;
+  
+  RCC_APB1PeriphClockCmd(((uint32_t)0x00040000), ENABLE);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000008), ENABLE);
+  
+  
+
+
+ 
+   
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0100) | ((uint16_t)0x0200);
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStruct);
+  
+   
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint8_t)0x08), ((uint8_t)0x07));
+   
+  GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint8_t)0x09), ((uint8_t)0x07));
+  
+  
+   
+  USART_InitStruct.USART_BaudRate = 115200;
+  USART_InitStruct.USART_WordLength = ((uint16_t)0x0000);
+  USART_InitStruct.USART_StopBits = ((uint16_t)0x0000);
+  USART_InitStruct.USART_Parity = ((uint16_t)0x0000);
+  USART_InitStruct.USART_Mode = ((uint16_t)0x0004) | ((uint16_t)0x0008);
+  USART_InitStruct.USART_HardwareFlowControl = ((uint16_t)0x0000);  
+  USART_Init(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), &USART_InitStruct);
+  
+    
+   
+  NVIC_InitTypeDef NVIC_InitStruct;
+  NVIC_PriorityGroupConfig(((uint32_t)0x700));
+  
+  NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStruct);
+
+   
+  
+  USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525), ENABLE);
+
+  
+  USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ENABLE);
+}
+
+void USART3_IRQHandler(void)
+{
+  uint16_t Drive_Data;
+  if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525)) == SET)
+  {
+    Drive_command_Data[index] = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)));
+    while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0080)) == RESET);
+    USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), Drive_command_Data[index]); 
+    while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0040)) == RESET);
+    index++;
+    if (index >= 5)
+    {
+      index = 0;
+      if (Drive_command_Data[0] == '1')
+      {
+        Drive_command_Data[0] = '0';
+        Drive_Data = atoi(Drive_command_Data);
+        SentData_DAC (Drive_Data, 1);
+      }
+      else if (Drive_command_Data[0] == '2')
+      {
+        Drive_command_Data[0] = '0';
+        Drive_Data = atoi(Drive_command_Data);
+        SentData_DAC (Drive_Data, 2);
+      }
+    } 
+  }
+  USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525));
+}
+
+
+void Create_file(char Hospital_Number[], uint8_t File_Type)
+{
+  for (int i = 0; i < 7; i++)
+  {
+    HospitalNumber_File[i] = '1';
+  }
+    HospitalNumber_File[8] = '.';
+    HospitalNumber_File[9] = 'T';
+    HospitalNumber_File[10] = 'X';
+    HospitalNumber_File[11] = 'T';
+    HospitalNumber_File[12] = '\0';
+  if(File_Type == 0)
+  {
+    HospitalNumber_File[7] = 'O';
+    
+    
+    
+    ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
+    if (ret) 
+    {
+      fault_err(ret);
+    } 
+    else 
+    {
+      ret = f_write(&file, "Hospital Number : ", 18, &bw);
+      ret = f_lseek(&file,((&file)->fsize));
+      ret = f_write(&file, HospitalNumber_File, 30, &bw);
+      ret = f_lseek(&file,((&file)->fsize));
+      ret = f_write(&file, "\r\nFile: Oxygen Saturation\r\n", 32, &bw);
+      ret = f_close(&file);
+    }  
+  }
+  else if (File_Type == 1)
+  {
+    HospitalNumber_File[7] = 'F';
+    
+    ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
+    if (ret) 
+    {
+      fault_err(ret);
+    } 
+    else 
+    {
+      ret = f_write(&file, "HR : ", 5, &bw);
+      ret = f_lseek(&file,((&file)->fsize));
+      ret = f_write(&file, HospitalNumber_File, 30, &bw);
+      ret = f_lseek(&file,((&file)->fsize));
+      ret = f_write(&file, "\r\nFile: FiO2_File\r\n", 25, &bw);
+      ret = f_close(&file);
+    }  
+
+  }
+}
+
+void SD_Write(char FileName[], char SD_Data[], UINT Data_size)
+{
+  ret = f_open(&file, FileName, 0x02);
+  if (ret) 
+  {
+    fault_err(ret);
+  } 
+  else 
+  {
+    ret = f_lseek (&file,((&file)->fsize));
+    ret = f_write(&file, SD_Data, Data_size, &bw);
+    ret = f_close(&file);
+  }  
+}
 
 
 

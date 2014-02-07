@@ -17868,6 +17868,56 @@ DWORD get_fattime (void);
 
 
 
+ 
+
+
+
+
+
+ 
+typedef BYTE	DSTATUS;
+
+ 
+typedef enum {
+	RES_OK = 0,		 
+	RES_ERROR,		 
+	RES_WRPRT,		 
+	RES_NOTRDY,		 
+	RES_PARERR		 
+} DRESULT;
+
+
+ 
+ 
+
+int assign_drives (int, int);
+DSTATUS disk_initialize (BYTE);
+DSTATUS disk_status (BYTE);
+DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
+DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
+DRESULT disk_ioctl (BYTE, BYTE, void*);
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
 static void Delay(volatile uint32_t nCount);
 static void fault_err (FRESULT rc);
 
@@ -18365,11 +18415,12 @@ void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
 
+
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
 
 extern uint8_t Data_GUI [28];
-extern uint8_t Oxygen_Sat[14], FiO2[14];
+
 
 
 uint16_t Crc;
@@ -18394,13 +18445,14 @@ extern uint8_t Prefered_FiO2;
 extern uint8_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
 
+
 void USART_GUI_Connect(void)
 {  
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB2PeriphClockCmd(((uint32_t)0x00000010), ENABLE);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00000010), 1);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), 1);
 	
   
 
@@ -18437,15 +18489,15 @@ void USART_GUI_Connect(void)
   NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_InitStruct.NVIC_IRQChannelCmd = 1;
   NVIC_Init(&NVIC_InitStruct);
 
    
   
-  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525), ENABLE);
+  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525), 1);
 
   
-  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ENABLE);
+  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), 1);
   
 
 
@@ -18549,6 +18601,7 @@ void USART1_IRQHandler (void)
         {
           
           Update_Rule();
+          
         }
         else if (Data_GUI[1] == Connect_Command)
         {
@@ -18570,7 +18623,7 @@ void USART1_IRQHandler (void)
   
   if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727)) != RESET)
   {
-    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727), DISABLE);
+    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727), 0);
   }
   
   USART_ClearITPendingBit(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525));

@@ -13,8 +13,8 @@ Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SaO2)
 unsigned char DataFromOPM[133]; 
 //------------------------------------------------------------------------------
 uint8_t OxygenSat_Percent;
-uint8_t tx_index = 0;
-uint8_t rx_index = 0;
+uint8_t tx_index_OPM = 0;
+uint8_t rx_index_OPM = 0;
 // Set Up ----------------------------------------------------------------------
 void Oxygen_PM_Setup(void)
 {
@@ -106,17 +106,18 @@ void OPM_IRQHandler(void)
 {
   if(USART_GetITStatus(OPM_USART, USART_IT_RXNE) != RESET)
   {
-    if (rx_index == 0)
+    if (rx_index_OPM == 0)
     {
       //Start Receive Data from Oxygen Pulse Meter
       TIM_Cmd(TIM4, ENABLE);
     }
-    DataFromOPM[rx_index++] = USART_ReceiveData(OPM_USART);
+    DataFromOPM[rx_index_OPM++] = USART_ReceiveData(OPM_USART);
   
-    if(rx_index >= (sizeof(DataFromOPM) - 1))
+    if(rx_index_OPM >= (sizeof(DataFromOPM) - 1))
     {  
       TIM_Cmd(TIM4, DISABLE);
-      rx_index = 0;
+      rx_index_OPM = 0;
+      OxygenSat_Percent = Get_OxygenSat();
     }
   }
   if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
@@ -138,21 +139,23 @@ int Get_OxygenSat(void)
   //check this command is getting SaO2 or Headding Command
   if (DataFromOPM[0] == '+' && DataFromOPM[4] == 'P' && DataFromOPM[5] == 'V' && DataFromOPM[6] == 'I')
   {
-    for (i = 0; i < 133; i++)
-    {
-      /* code */
-      rx_index = 0;
-      DataFromOPM[i] = '\0';
-    }
-    OxygenSat_Percent = '\0';
-  }
-  else
-  {
+    // Case : Correct
     for(i=0;i<3;i++)
     {
       OxygenSat_string[i] = DataFromOPM[37+i];
     }
-    OxygenSat_Percent = atio(OxygenSat_string);
+    OxygenSat_Percent = atoi(OxygenSat_string);                                             // atoi is function convert from String to Int 
+  }
+  else
+  {
+    // Case : Error
+    for (i = 0; i < 133; i++)
+    {
+      rx_index_OPM = 0;
+      DataFromOPM[i] = '\0';
+    }
+    OxygenSat_Percent = '\0';
+    
   }
   
   return OxygenSat_Percent;
@@ -259,12 +262,12 @@ void TIM4_IRQHandler (void)
 {
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
   {
-    uint8_t rx_index = 0;
+    uint8_t rx_index_OPM = 0;
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
     //Clear Buffer Data from Oxygen Pulse Meter (OPM)
-    for (rx_index = 0; rx_index < 133; rx_index++)
+    for (rx_index_OPM = 0; rx_index_OPM < 133; rx_index_OPM++)
     {
-      DataFromOPM[rx_index] = '\0';
+      DataFromOPM[rx_index_OPM] = '\0';
     }
     //Diable Timer4
     TIM_Cmd(TIM4, DISABLE);

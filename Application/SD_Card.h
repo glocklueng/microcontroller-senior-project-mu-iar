@@ -6,6 +6,7 @@ File : SD_Card.c
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "ff.h"
+#include "diskio.h"
 // Define ----------------------------------------------------------------------
 #define OxygenSaturation_file           0
 #define FiO2_file                       1
