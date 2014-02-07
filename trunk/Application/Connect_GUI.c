@@ -35,12 +35,17 @@ File : Connect_GUI.c
 //------------------------------------------------------------------------------
 #define ERROR   0x65                                                            //Data Error = 'e' (0x65)
 #define ACK     0x41                                                            //Data Correct = 'A' (0x41)
+#define OxygenSaturation_file           0
+#define FiO2_file                       1
+
+#define ENABLE                          1
+#define DISABLE                         0
 
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
 
 extern uint8_t Data_GUI [28];
-extern uint8_t Oxygen_Sat[14], FiO2[14];
+
 
 //Define Variable for CRC ------------------------------------------------------
 uint16_t Crc;
@@ -64,6 +69,7 @@ extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
 extern uint8_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
+
 //------------------------------------------------------------------------------
 void USART_GUI_Connect(void)
 {  
@@ -220,6 +226,7 @@ void GUI_IRQHandler (void)
         {
           //Update Rule
           Update_Rule();
+          //Profile_Connect = ENABLE;
         }
         else if (Data_GUI[1] == Connect_Command)
         {

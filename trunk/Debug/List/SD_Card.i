@@ -17846,6 +17846,56 @@ DWORD get_fattime (void);
 
 
 
+ 
+
+
+
+
+
+ 
+typedef BYTE	DSTATUS;
+
+ 
+typedef enum {
+	RES_OK = 0,		 
+	RES_ERROR,		 
+	RES_WRPRT,		 
+	RES_NOTRDY,		 
+	RES_PARERR		 
+} DRESULT;
+
+
+ 
+ 
+
+int assign_drives (int, int);
+DSTATUS disk_initialize (BYTE);
+DSTATUS disk_status (BYTE);
+DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
+DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
+DRESULT disk_ioctl (BYTE, BYTE, void*);
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
 static void Delay(volatile uint32_t nCount);
 static void fault_err (FRESULT rc);
 
@@ -17896,17 +17946,15 @@ void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
 
-
-
  
-SD_Error Status = SD_OK;
-FATFS filesystem;		                                                
-FRESULT ret;			                                                
-FIL file;				                                        
-DIR dir;				                                        
-FILINFO fno;			                                                
-UINT bw, br;
-uint8_t buff[128];
+
+
+
+
+
+
+
+
 
 
 static void fault_err (FRESULT rc)
@@ -17943,7 +17991,20 @@ static void fault_err (FRESULT rc)
 void Check_Mount(void)
 {
      
-  if (f_mount(0, &filesystem) != FR_OK);
+  if (f_mount(0, &filesystem) != FR_OK)
+  {
+    
+  }
+  ret = f_open(&file, "OXY.TXT", 0x02 | 0x08);
+    if (ret) 
+    {
+      fault_err(ret);
+    } 
+    else 
+    {
+      ret = f_write(&file, "HR : ", 5, &bw);
+      ret = f_close(&file);
+    }
 }
 
 
@@ -17953,7 +18014,7 @@ void Check_Mount(void)
  
 void Create_file(char Hospital_Number[], uint8_t File_Type)
 {
-  char HospitalNumber_File[30];
+  char HospitalNumber_File[34];
   for (int i = 0; i < 13; i++)
   {
     HospitalNumber_File[i] = Hospital_Number[i];
@@ -17978,11 +18039,14 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     HospitalNumber_File[26] = 'i';
     HospitalNumber_File[27] = 'o';
     HospitalNumber_File[28] = 'n';
-    HospitalNumber_File[29] = '\0';
+    HospitalNumber_File[29] = '.';
+    HospitalNumber_File[30] = 'T';
+    HospitalNumber_File[31] = 'X';
+    HospitalNumber_File[32] = 'T';
+    HospitalNumber_File[33] = '\0';
     
+    ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
     
-    
-    ret = f_open(&file, "OXY.TXT", 0x02 | 0x08);
     if (ret) 
     {
       fault_err(ret);
@@ -18003,20 +18067,24 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     HospitalNumber_File[14] = 'i';
     HospitalNumber_File[15] = 'O';
     HospitalNumber_File[16] = '2';
-    HospitalNumber_File[17] = '\0';
-    for (int j = 18; j < 29; j++)
+    HospitalNumber_File[17] = '.';
+    HospitalNumber_File[18] = 'T';
+    HospitalNumber_File[19] = 'X';
+    HospitalNumber_File[20] = 'T';
+    HospitalNumber_File[21] = '\0';
+    for (int j = 22; j < 33; j++)
     {
       HospitalNumber_File[j] = '\0';
     }
 
     
-    ret = f_open(&file, "FiO2.TXT", 0x02 | 0x08);
+    ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
     if (ret) 
     {
-
-
-
-
+      fault_err(ret);
+    } 
+    else 
+    {
       ret = f_write(&file, "HR : ", 5, &bw);
       ret = f_lseek(&file,((&file)->fsize));
       ret = f_write(&file, HospitalNumber_File, 30, &bw);
