@@ -3,6 +3,8 @@
 
 
 
+
+
  
 
 
@@ -14619,6 +14621,7 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+ 
 
 
 
@@ -14647,6 +14650,11 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+ 
 
 
 
@@ -17843,7 +17851,12 @@ DWORD get_fattime (void);
 
 
 
+
+
+
+
  
+
 
 
 
@@ -17906,6 +17919,9 @@ void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
+
+ 
+
  
  
  
@@ -17926,7 +17942,11 @@ void Delay(volatile uint32_t nTime);
 void EXTILine0_Config(void);
 
 
+
  
+
+
+
 
 
 
@@ -17948,6 +17968,9 @@ void Oxygen_PM_Setup(void);
 int Get_OxygenSat(void);
 
 
+
+
+ 
  
  
 
@@ -17961,9 +17984,11 @@ int Get_OxygenSat(void);
 
 unsigned char DataFromOPM[133]; 
 
-uint8_t OxygenSat_Percent;
+uint8_t Current_OyxgenSat;
+uint8_t SD_Card_index = 0;
 uint8_t tx_index_OPM = 0;
 uint8_t rx_index_OPM = 0;
+uint8_t OxygenSat_buffer[100];                                                  
 
 void Oxygen_PM_Setup(void)
 {
@@ -18066,7 +18091,9 @@ void USART6_IRQHandler(void)
     {  
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), DISABLE);
       rx_index_OPM = 0;
-      OxygenSat_Percent = Get_OxygenSat();
+      Current_OyxgenSat = Get_OxygenSat();
+      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      SD_Card_index++;
     }
   }
   if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ((uint16_t)0x0727)) != RESET)
@@ -18083,6 +18110,7 @@ int Get_OxygenSat(void)
 
  
   char OxygenSat_string[3];
+  uint8_t OxygenSat_Percent;
   OxygenSat_Percent = 0 ;
   uint8_t i;
   
@@ -18094,6 +18122,7 @@ int Get_OxygenSat(void)
       OxygenSat_string[i] = DataFromOPM[37+i];
     }
     OxygenSat_Percent = atoi(OxygenSat_string);                                             
+    Current_OyxgenSat = OxygenSat_Percent;
   }
   else
   {
@@ -18240,3 +18269,7 @@ void TIM4_IRQHandler (void)
 
 
 
+
+
+
+ 

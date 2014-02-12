@@ -2,7 +2,12 @@
 Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : SD_Card.c
-*/
+------------------------------------------------------------------------------------------------
+Credit:
+  Deverloper : Phattaradanai Kiratiwudhikul
+  Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+----------------------------------------------------------------------------------------------*/
+
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "ff.h"
@@ -19,3 +24,6 @@ static void Delay(__IO uint32_t nCount);
 void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 //------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

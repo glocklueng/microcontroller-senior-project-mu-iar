@@ -2,6 +2,9 @@
 Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term Infants
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : GLCD5110.h
+
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 //------------------------------------------------------------------------------
 #include "stm32f4xx.h"
@@ -200,3 +203,6 @@ static const unsigned char FontLookup [][5] =
                                          End of file.
 --------------------------------------------------------------------------------------------------*/
 #endif
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

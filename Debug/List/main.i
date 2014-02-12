@@ -2,6 +2,8 @@
 
 
 
+
+
  
 
 
@@ -14618,6 +14620,7 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+ 
 
 
 
@@ -14646,6 +14649,11 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+ 
 
 
 
@@ -17842,7 +17850,12 @@ DWORD get_fattime (void);
 
 
 
+
+
+
+
  
+
 
 
 
@@ -17905,6 +17918,9 @@ void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
+
+ 
+
  
  
  
@@ -17925,7 +17941,12 @@ void Delay(volatile uint32_t nTime);
 void EXTILine0_Config(void);
 
 
+
  
+
+
+
+
 
 
 
@@ -17952,6 +17973,13 @@ void EXTILine0_Config(void);
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
 
 
 
@@ -17975,6 +18003,13 @@ int Get_OxygenSat(void);
 
 
 
+ 
+
+
+
+
+
+
 
 
  
@@ -17989,8 +18024,53 @@ void Timer6_SetUp (void);
 
 
 
+ 
+
+
+
+
+
+
 
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
 
 
 
@@ -18021,29 +18101,7 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
  
@@ -18223,50 +18281,7 @@ static const unsigned char FontLookup [][5] =
  
 
 
-
-
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
 
 
 
@@ -18309,11 +18324,78 @@ static const unsigned char FontLookup [][5] =
 
 
 
+ 
+
+
 
 
 
 
  
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
 
 
 
@@ -18344,6 +18426,14 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
+ 
+
+
+
+
+
+
+
 
 
 
@@ -18367,6 +18457,15 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+ 
+
 
 
 
@@ -18378,6 +18477,9 @@ void connect_command(void);
 void Update_Rule(void);
 
 
+
+
+ 
  
  
 
@@ -18391,6 +18493,8 @@ void Update_Rule(void);
 
  USB_OTG_CORE_HANDLE    USB_OTG_dev ;
 
+
+
  
 SD_Error Status = SD_OK;
 FATFS filesystem;		                                                
@@ -18402,14 +18506,19 @@ UINT bw, br;
 uint8_t buff[128];
 
 
+
 void delay(void);
 void System_Init(void);
 void INTTIM_Config(void);
 void EXTILine0_Config(void);
+void Alarm_Timer_SetUp (void);
+void Alarm_Function(uint8_t Command);
 
  
 void ConvertInttoString(uint8_t DataInt[]);
 void USART_HyperTermianl_Connect(void);
+void Create_file(char Hospital_Number[], uint8_t File_Type);
+
 
 unsigned char msg ;
 char Character;
@@ -18420,6 +18529,14 @@ uint8_t Data_GUI[28];
 uint8_t SD_Test[50];
 char SD_String[250];
 uint8_t index = 0;                                                                  
+
+extern uint8_t OxygenSat_buffer[100];
+extern uint8_t Current_OyxgenSat;
+
+
+
+uint8_t Current_Status;
+uint8_t Time_AlarmLevel = 0;
 
 
 char Hospital_Number[13];
@@ -18432,42 +18549,16 @@ uint8_t Prefered_FiO2;
 uint8_t Alarm_Level1, Alarm_Level2;
 uint8_t Mode;
 
-
+uint8_t Profile_Upload;
 
 int main()
 {  
   
   System_Init();
-  lcdInit();
-  lcdString (1,1,"Setting....");
-  lcdString (1,6,"Setting....");
-  SentData_DAC ( 0x245, 1);
-  SentData_DAC ( 0x2A0, 2);
+  lcdString (1,1,"Please Upload Profile");
   
-  HospitalNumber_File[0] = '7';
-  for (int i = 1; i < 8; i++)
-  {
-    HospitalNumber_File[i] = '1';
-  }
-    HospitalNumber_File[8] = '.';
-    HospitalNumber_File[9] = 'T';
-    HospitalNumber_File[10] = 'X';
-    HospitalNumber_File[11] = 'T';
-    HospitalNumber_File[12] = '\0';
-  
-   
-  if (f_mount(0, &filesystem) != FR_OK);
-  
-  ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
-  if (ret) 
-  {
-    fault_err(ret);
-  } 
-  else 
-  {
-    ret = f_write(&file, "HR : 1234567898765 \r\nFile: Oxygen Saturation\r\n", 47, &bw);
-    ret = f_close(&file);
-  }  
+  Profile_Upload = 0;
+ 
   
   
 
@@ -18478,12 +18569,84 @@ int main()
 
 
 
-  
   while(1)
   {
+    
+    if (Profile_Upload == 2)
+    {
+      USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);                                             
+      Create_file(Hospital_Number, 0);                      
+      Create_file(Hospital_Number, 1);                                  
+      Profile_Upload = 1;
+    }
+    else if (Profile_Upload == 0)
+    {
+      USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), DISABLE);                                            
+      SentData_DAC(0x00,3);                                                     
+    }
 
+    
+    if (Current_OyxgenSat < OxygenSaturation_Minimum)
+    {
+      
+      if (Current_Status == 0)
+      {
+        Current_Status = 1;
+        Alarm_Function(1);
+        lcdString(1,5,"Status: Below L1");
+      }      
+    }
+    else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
+    {
+      
+      if (Current_Status == 0)
+      {
+        Current_Status = 3;
+        Alarm_Function(1);
+        lcdString(1,5,"Status: Behigh L1");
+      }
+
+    }
+    else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
+    {
+      if (Current_Status!= 0)
+      {
+        Current_Status = 0;
+        Alarm_Function(0);  
+      }
+    }
+    else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
+    {
+      if (Current_Status!= 0)
+      {
+        Current_Status = 0;
+        Alarm_Function(0); 
+      }
+    }
+    else
+    {
+      
+      if (Current_Status!= 0)
+      {
+        Current_Status = 0;
+        Alarm_Function(0); 
+      }
+    }
   }
   
+}
+
+
+void Alarm_Function(uint8_t Command)
+{
+  if (Command == 1)
+  {
+    TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ENABLE);
+  }
+  else if (Command == 0)
+  {
+    TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), DISABLE);
+  }
 }
 	
 
@@ -18509,6 +18672,9 @@ void System_Init(void)
   USART_HyperTermianl_Connect();
 
   
+
+  
+  Alarm_Timer_SetUp();
   
   
   STM_EVAL_LEDInit(LED3);
@@ -18520,12 +18686,15 @@ void System_Init(void)
   STM_EVAL_LEDOn(LED5);
   STM_EVAL_LEDOn(LED6);
   
-  
-  lcdInit();
+  lcdInit();                                                                
  
   
-  
-  
+  if (f_mount(0, &filesystem) != FR_OK)
+  {
+    lcdString(4,1,"ERROR");
+    lcdString(1,3,"Please inset SD Card");
+  }
+
    
   USBD_Init(&USB_OTG_dev,
     USB_OTG_FS_CORE_ID,
@@ -18549,7 +18718,6 @@ void ConvertInttoString(uint8_t DataInt[])
   }
   
 }
-
 
 
 
@@ -18626,6 +18794,9 @@ void EXTILine0_Config(void)
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
+
+
+
 
 static void fault_err (FRESULT rc)
 {
@@ -18741,12 +18912,80 @@ void USART3_IRQHandler(void)
   USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525));
 }
 
+void Alarm_Timer_SetUp (void)
+{
+  
+
+
+
+
+ 
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+   
+  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+   
+   
+  RCC_APB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE);
+   
+  TIM_TimeBaseStructure.TIM_Period = 2000; 
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000; 
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = ((uint16_t)0x0000);
+  TIM_TimeBaseInit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), &TIM_TimeBaseStructure);
+   
+  TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ((uint16_t)0x0001), ENABLE);
+   
+  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ENABLE);
+  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), DISABLE);
+}
+
+void TIM2_IRQHandler(void)
+{
+  if (TIM_GetITStatus (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ((uint16_t)0x0001)) != RESET)
+  {
+    Time_AlarmLevel = Time_AlarmLevel + 1;
+    STM_EVAL_LEDOff(LED5);
+    TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
+    if (Current_Status == 1 | Current_Status == 3)
+    {
+      if (Time_AlarmLevel >= Alarm_Level1)
+      {
+        Time_AlarmLevel = 0;
+        if (Current_Status == 1)
+        {
+          Current_Status = 2;
+          lcdString(1,5,"Status: Below L2");
+        }
+        else if (Current_Status == 3)
+        {
+          Current_Status = 4;
+          lcdString(1,5,"Status: Behigh L2");
+        }
+      }
+    }
+    if (Current_Status == 2 | Current_Status == 4)
+    {
+      if (Time_AlarmLevel >= Alarm_Level2)
+      {
+         
+      }
+    }
+
+  }
+}
+
 
 void Create_file(char Hospital_Number[], uint8_t File_Type)
 {
+  
   for (int i = 0; i < 7; i++)
   {
-    HospitalNumber_File[i] = '1';
+    HospitalNumber_File[i] = Hospital_Number[i+6];
   }
     HospitalNumber_File[8] = '.';
     HospitalNumber_File[9] = 'T';
@@ -18758,15 +18997,14 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     HospitalNumber_File[7] = 'O';
     
     
-    
     ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
     if (ret) 
     {
       fault_err(ret);
     } 
     else 
-    {
-      ret = f_write(&file, "Hospital Number : ", 18, &bw);
+    {  
+      ret = f_write(&file, "Hospital Number : ", 20, &bw);
       ret = f_lseek(&file,((&file)->fsize));
       ret = f_write(&file, HospitalNumber_File, 30, &bw);
       ret = f_lseek(&file,((&file)->fsize));
@@ -18785,11 +19023,11 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     } 
     else 
     {
-      ret = f_write(&file, "HR : ", 5, &bw);
+      ret = f_write(&file, "Hospital Number : ", 20, &bw);
       ret = f_lseek(&file,((&file)->fsize));
       ret = f_write(&file, HospitalNumber_File, 30, &bw);
       ret = f_lseek(&file,((&file)->fsize));
-      ret = f_write(&file, "\r\nFile: FiO2_File\r\n", 25, &bw);
+      ret = f_write(&file, "\r\nFile: FiO2\r\n", 15, &bw);
       ret = f_close(&file);
     }  
 
@@ -18813,3 +19051,6 @@ void SD_Write(char FileName[], char SD_Data[], UINT Data_size)
 
 
 
+
+
+ 

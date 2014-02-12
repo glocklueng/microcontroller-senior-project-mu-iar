@@ -3,6 +3,11 @@ Project : Programmable Feedback Control of Airflow System for Pre-term infant ox
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : DefinePin.h
 */
+/*----------------------------------------------------------------------------------------------
+Credit:
+  Deverloper : Phattaradanai Kiratiwudhikul
+  Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+----------------------------------------------------------------------------------------------*/
 //------------------------------------------------------------------------------
 #include "main.h"
 //------------------------------------------------------------------------------
@@ -96,5 +101,6 @@ File : DefinePin.h
 #define  GUI_RX_AF				GPIO_AF_USART1
 
 //------------------------------------------------------------------------------
-
-
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

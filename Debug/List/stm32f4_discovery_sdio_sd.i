@@ -14618,6 +14618,7 @@ uint32_t ReadUnit(uint8_t *buffer, uint8_t idx, uint8_t NbrOfBytes, Endianness B
 
 
 
+ 
 
 
 
@@ -14646,6 +14647,11 @@ uint32_t ReadUnit(uint8_t *buffer, uint8_t idx, uint8_t NbrOfBytes, Endianness B
 
 
 
+
+
+
+
+ 
 
 
 
@@ -17842,7 +17848,12 @@ DWORD get_fattime (void);
 
 
 
+
+
+
+
  
+
 
 
 
@@ -17905,6 +17916,9 @@ void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
+
+ 
+
  
  
  
@@ -17923,6 +17937,7 @@ void TimingDelay_Decrement(void);
 void Delay(volatile uint32_t nTime);
 
 void EXTILine0_Config(void);
+
 
 
  

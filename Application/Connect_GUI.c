@@ -2,6 +2,10 @@
 Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : Connect_GUI.c
+
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+
 */
 //------------------------------------------------------------------------------
 /*
@@ -38,8 +42,6 @@ File : Connect_GUI.c
 #define OxygenSaturation_file           0
 #define FiO2_file                       1
 
-#define ENABLE                          1
-#define DISABLE                         0
 
 uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
@@ -51,8 +53,6 @@ extern uint8_t Data_GUI [28];
 uint16_t Crc;
 uint8_t CRC_Low, CRC_High;
 uint8_t Length_Data = 25;
-
-
 
 //------------------------------------------------------------------------------
 //Define Value for Data Packaging
@@ -69,7 +69,7 @@ extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
 extern uint8_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
-
+extern uint8_t Profile_Upload;
 //------------------------------------------------------------------------------
 void USART_GUI_Connect(void)
 {  
@@ -106,7 +106,7 @@ void USART_GUI_Connect(void)
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
   USART_Init(USART1, &USART_InitStruct);
   
-   /*USART Interrupt*/
+  /*USART Interrupt*/
   /* Set interrupt: NVIC_Setup */
   NVIC_InitTypeDef NVIC_InitStruct;
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
@@ -226,7 +226,7 @@ void GUI_IRQHandler (void)
         {
           //Update Rule
           Update_Rule();
-          //Profile_Connect = ENABLE;
+          Profile_Upload = PROFILE_JUST_UPLOAD;
         }
         else if (Data_GUI[1] == Connect_Command)
         {
@@ -275,21 +275,20 @@ void Update_Rule(void)
   if (Mode == 0xB7)
   {
     //Select Range Mode
+    lcdString(1,2,"Mode: Range Mode");
     FiO2_Maximum = Data_GUI[21];
     FiO2_Minimum = Data_GUI[22];
   }
   else if (Mode == 0xA2)
   {
+    //Selecte Auto Mode
+    lcdString(1,2,"Mode: Auto Mode");
     FiO2_Maximum = 100;
     FiO2_Minimum = 21;
   }
 
   Alarm_Level1 = Data_GUI[23];
   Alarm_Level2 = Data_GUI[24];
-
-  //Create Oxygen Saturation file, FiO2 file to SD Card
-  Create_file(Hospital_Number, OxygenSaturation_file);
-  Create_file(Hospital_Number, FiO2_file);
 
 }
 
@@ -307,3 +306,6 @@ int fputc(int ch, FILE *f)
 }
 
 // End of File -------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=2002367440
+Checksum=-166572747
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -106,12 +106,7 @@ Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
-Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.397.5" 0 0 1 "" 0 "" 0
-Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.404.7" 0 0 1 "" 0 "" 0
-Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.407.7" 0 0 1 "" 0 "" 0
-Bp9=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.405.7" 0 0 1 "" 0 "" 0
-Bp10=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.406.7" 0 0 1 "" 0 "" 0
-Count=11
+Count=6
 [Aliases]
 Count=0
 SuppressDialog=0

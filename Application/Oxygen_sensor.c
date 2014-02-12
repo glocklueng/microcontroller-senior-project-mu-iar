@@ -2,7 +2,11 @@
 Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : Oxygen_sensor.c
+
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
+
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "Oxygen_sensor.h"
@@ -219,5 +223,8 @@ uint8_t Convert_FiO2 (float FiO2_ADC)
 {
   FiO2_Percent = (FiO2_ADC);
   
-
+  return FiO2_Percent;
 }
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

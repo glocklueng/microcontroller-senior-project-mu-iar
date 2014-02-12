@@ -3,6 +3,8 @@ Project : Programmable Control of Airflow System for Maintaining Oxygen Saturati
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : Oxygen_Pulse_Meter.c
 Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SaO2)
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -12,9 +14,11 @@ Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SaO2)
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
 unsigned char DataFromOPM[133]; 
 //------------------------------------------------------------------------------
-uint8_t OxygenSat_Percent;
+uint8_t Current_OyxgenSat;
+uint8_t SD_Card_index = 0;
 uint8_t tx_index_OPM = 0;
 uint8_t rx_index_OPM = 0;
+uint8_t OxygenSat_buffer[100];                                                  // Oxygen Saturation Buffer for Store Data to SD Card
 // Set Up ----------------------------------------------------------------------
 void Oxygen_PM_Setup(void)
 {
@@ -117,7 +121,9 @@ void OPM_IRQHandler(void)
     {  
       TIM_Cmd(TIM4, DISABLE);
       rx_index_OPM = 0;
-      OxygenSat_Percent = Get_OxygenSat();
+      Current_OyxgenSat = Get_OxygenSat();
+      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      SD_Card_index++;
     }
   }
   if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
@@ -134,6 +140,7 @@ int Get_OxygenSat(void)
     Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
   */
   char OxygenSat_string[3];
+  uint8_t OxygenSat_Percent;
   OxygenSat_Percent = 0 ;
   uint8_t i;
   //check this command is getting SaO2 or Headding Command
@@ -145,6 +152,7 @@ int Get_OxygenSat(void)
       OxygenSat_string[i] = DataFromOPM[37+i];
     }
     OxygenSat_Percent = atoi(OxygenSat_string);                                             // atoi is function convert from String to Int 
+    Current_OyxgenSat = OxygenSat_Percent;
   }
   else
   {
@@ -273,6 +281,7 @@ void TIM4_IRQHandler (void)
     TIM_Cmd(TIM4, DISABLE);
   }
 }
+
 //------------------------------------------------------------------------------
 // Function can use printf(); in sent data
 //int fputc(int ch, FILE *f)
@@ -291,3 +300,6 @@ void TIM4_IRQHandler (void)
 
 
 // End of File -----------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/
