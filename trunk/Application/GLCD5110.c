@@ -2,7 +2,14 @@
 Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term Infants
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : GLCD5110.c
-*/
+
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+
+
+Note : Maximum line 6
+
+----------------------------------------------------------------------------------------------*/
 //------------------------------------------------------------------------------
 #include "stm32f4xx.h"
 #include "main.h"
@@ -31,11 +38,13 @@ unsigned char glcd_ini=0;
 //------------------------------------------------------------------------------
 //--------------------------- Function delay -----------------------------------
 //------------------------------------------------------------------------------
-void delay_ms(volatile unsigned long ms)  // delay 1 ms per count @ Crystal 8.0 MHz and PLL9x or SYSCLK = 72 MHz
+void delay_ms(unsigned long ms)  // delay 1 ms per count @ Crystal 8.0 MHz and PLL9x or SYSCLK = 72 MHz
 {
-   volatile unsigned long i,j;
+   __IO unsigned long i,j;
 	for (i = 0; i < ms; i++ )
-	for (j = 0; j < 5525; j++ );
+        {
+          for (j = 0; j < 5525; j++ );
+        }
 }
 
 void port_init()
@@ -536,3 +545,6 @@ void lcdBackLight(char set)
 }
 
 //--------------------------------- END of File --------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

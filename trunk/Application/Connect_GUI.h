@@ -2,6 +2,8 @@
 Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : Connect_GUI.c
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 //------------------------------------------------------------------------------
 /*
@@ -16,6 +18,11 @@ File : Connect_GUI.c
 #include "DefinePin.h"
 #include "GLCD5110.h"
 
+// Define ----------------------------------------------------------------------
+#define PROFILE_NOTUPLOAD				0
+#define PROFILE_SETTING_COMPLETE        1
+#define PROFILE_JUST_UPLOAD				2
+
 //------------------------------------------------------------------------------
 // Function
 void USART_GUI_Connect (void);
@@ -25,3 +32,6 @@ void connect_command(void);
 void Update_Rule(void);
 
 //------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

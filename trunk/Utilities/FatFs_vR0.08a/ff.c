@@ -299,7 +299,6 @@ static WCHAR LfnBuf[_MAX_LFN+1];
 
 
 
-
 /*--------------------------------------------------------------------------
 
    Module Private Functions

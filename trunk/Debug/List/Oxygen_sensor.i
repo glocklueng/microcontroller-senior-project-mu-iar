@@ -2,7 +2,11 @@
 
 
 
+
+
+
  
+
 
 
 
@@ -14618,6 +14622,7 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+ 
 
 
 
@@ -14646,6 +14651,11 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+ 
 
 
 
@@ -17842,7 +17852,12 @@ DWORD get_fattime (void);
 
 
 
+
+
+
+
  
+
 
 
 
@@ -17905,6 +17920,9 @@ void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
+
+ 
+
  
  
  
@@ -17925,7 +17943,12 @@ void Delay(volatile uint32_t nTime);
 void EXTILine0_Config(void);
 
 
+
  
+
+
+
+
 
 
 
@@ -17939,6 +17962,13 @@ float Oxygen_convert(void);
 void timer_setting (void);
 void Calibrate_OxygenSensor(void);
 void Timer6_SetUp (void);
+
+
+
+ 
+
+
+
 
 
 
@@ -18019,28 +18049,6 @@ void Timer6_SetUp (void);
 
 
 
- 
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -18053,6 +18061,44 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
 
 
  
@@ -18232,6 +18278,13 @@ static const unsigned char FontLookup [][5] =
  
 
 
+ 
+
+
+
+
+
+
 
 
 
@@ -18256,6 +18309,10 @@ static const unsigned char FontLookup [][5] =
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
 
 
 uint16_t ADC_Value, ADC_V;
@@ -18467,5 +18524,8 @@ uint8_t Convert_FiO2 (float FiO2_ADC)
 {
   FiO2_Percent = (FiO2_ADC);
   
-
+  return FiO2_Percent;
 }
+
+
+ 

@@ -2,6 +2,10 @@
 
 
 
+
+
+
+
  
 
 
@@ -14640,6 +14644,7 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+ 
 
 
 
@@ -14668,6 +14673,11 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+ 
 
 
 
@@ -17864,7 +17874,12 @@ DWORD get_fattime (void);
 
 
 
+
+
+
+
  
+
 
 
 
@@ -17927,6 +17942,9 @@ void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
 
+
+ 
+
  
  
  
@@ -17947,21 +17965,10 @@ void Delay(volatile uint32_t nTime);
 void EXTILine0_Config(void);
 
 
- 
-
-
-
 
  
 
 
-
-
-
-
-
-
- 
 
 
 
@@ -17975,6 +17982,17 @@ void EXTILine0_Config(void);
 
 
 
+ 
+
+
+
+
+ 
+
+
+
+
+ 
 
 
 
@@ -17996,6 +18014,18 @@ void EXTILine0_Config(void);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 
@@ -18079,28 +18109,6 @@ void EXTILine0_Config(void);
 
 
 
- 
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -18113,6 +18121,44 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
 
 
  
@@ -18292,6 +18338,11 @@ static const unsigned char FontLookup [][5] =
  
 
 
+ 
+
+
+
+
 
 void USART_GUI_Connect (void);
 void CRC_CALCULATE_TX(void);
@@ -18302,6 +18353,14 @@ void Update_Rule(void);
 
 
 
+ 
+
+
+
+
+ 
+
+
 
 
  
@@ -18337,11 +18396,53 @@ void Update_Rule(void);
 
 
 
+ 
+
+
+
 
 
 
 
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
 
 
 
@@ -18372,13 +18473,11 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
+ 
 
 
 
-
-
-
-
+ 
 
 
 
@@ -18389,18 +18488,6 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
  
 
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
-
-
- 
 
 
 
@@ -18412,6 +18499,9 @@ static void Delay(volatile uint32_t nCount);
 void Create_file(char FileName[], uint8_t File_Type);
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
 
+
+
+ 
 
 
 
@@ -18429,8 +18519,6 @@ uint8_t Length_Data = 25;
 
 
 
-
-
 const uint8_t Padding = 0x91;                                                   
 const uint8_t Connect_Command = 0xE8;                                           
 const uint8_t Upload_Command = 0xD5;                                            
@@ -18444,15 +18532,15 @@ extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
 extern uint8_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
-
+extern uint8_t Profile_Upload;
 
 void USART_GUI_Connect(void)
 {  
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB2PeriphClockCmd(((uint32_t)0x00000010), 1);
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), 1);
+  RCC_APB2PeriphClockCmd(((uint32_t)0x00000010), ENABLE);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
 	
   
 
@@ -18481,7 +18569,7 @@ void USART_GUI_Connect(void)
   USART_InitStruct.USART_HardwareFlowControl = ((uint16_t)0x0000);  
   USART_Init(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), &USART_InitStruct);
   
-    
+   
    
   NVIC_InitTypeDef NVIC_InitStruct;
   NVIC_PriorityGroupConfig(((uint32_t)0x700));
@@ -18489,15 +18577,15 @@ void USART_GUI_Connect(void)
   NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStruct.NVIC_IRQChannelCmd = 1;
+  NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
 
    
   
-  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525), 1);
+  USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525), ENABLE);
 
   
-  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), 1);
+  USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ENABLE);
   
 
 
@@ -18601,7 +18689,7 @@ void USART1_IRQHandler (void)
         {
           
           Update_Rule();
-          
+          Profile_Upload = 2;
         }
         else if (Data_GUI[1] == Connect_Command)
         {
@@ -18623,7 +18711,7 @@ void USART1_IRQHandler (void)
   
   if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727)) != RESET)
   {
-    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727), 0);
+    USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0727), DISABLE);
   }
   
   USART_ClearITPendingBit(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1000)), ((uint16_t)0x0525));
@@ -18650,21 +18738,20 @@ void Update_Rule(void)
   if (Mode == 0xB7)
   {
     
+    lcdString(1,2,"Mode: Range Mode");
     FiO2_Maximum = Data_GUI[21];
     FiO2_Minimum = Data_GUI[22];
   }
   else if (Mode == 0xA2)
   {
+    
+    lcdString(1,2,"Mode: Auto Mode");
     FiO2_Maximum = 100;
     FiO2_Minimum = 21;
   }
 
   Alarm_Level1 = Data_GUI[23];
   Alarm_Level2 = Data_GUI[24];
-
-  
-  Create_file(Hospital_Number, 0);
-  Create_file(Hospital_Number, 1);
 
 }
 
@@ -18682,3 +18769,6 @@ int fputc(int ch, FILE *f)
 }
 
 
+
+
+ 

@@ -2,9 +2,14 @@
 Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term Infants
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : DAC_LTC1661.c
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+*/
+//------------------------------------------------------------------------------
+/*   
+Note :
 Function : Transfer Data to LTC1661. LTC1661 is Ditital to Analog Convertor IC
-           Use Serial to Periphral (SPI) to Transfer Data
-          
+           Use Serial to Periphral (SPI) to Transfer Data    
 LTC 1661 
   - DAC Resolution 10 bits
   - Header code for transfer SPI to LTC 1661 (DAC 10 bits)
@@ -171,3 +176,6 @@ void SentData_DAC (uint16_t DAC_data, uint8_t channel)
 }
 
 //------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/

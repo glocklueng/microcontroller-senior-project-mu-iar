@@ -2,6 +2,8 @@
 Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : main.c
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -21,6 +23,8 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
     #pragma data_alignment=4
   #endif
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
+// Define ----------------------------------------------------------------------
+
 
 /* Private typedef -----------------------------------------------------------*/
 SD_Error Status = SD_OK;
@@ -32,15 +36,20 @@ FILINFO fno;			                                                // File informati
 UINT bw, br;
 uint8_t buff[128];
 
+
 //------------------------------------------------------------------------------
 void delay(void);
 void System_Init(void);
 void INTTIM_Config(void);
 void EXTILine0_Config(void);
+void Alarm_Timer_SetUp (void);
+void Alarm_Function(uint8_t Command);
 
 /* Private function prototypes -----------------------------------------------*/
 void ConvertInttoString(uint8_t DataInt[]);
 void USART_HyperTermianl_Connect(void);
+void Create_file(char Hospital_Number[], uint8_t File_Type);
+
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
 char Character;
@@ -51,6 +60,21 @@ uint8_t Data_GUI[28];
 uint8_t SD_Test[50];
 char SD_String[250];
 uint8_t index = 0;                                                                  //for count receving Data form Hyperterminal for controling Drive Circuit
+
+extern uint8_t OxygenSat_buffer[100];
+extern uint8_t Current_OyxgenSat;
+// Status ----------------------------------------------------------------------
+#define ALARM_DISABLE         0
+#define ALARM_ENABLE          1
+
+#define Status_Normal                         0
+#define Status_OxygenSat_Below_L1             1
+#define Status_OxygenSat_Below_L2             2
+#define Status_OxygenSat_Behigh_L1            3
+#define Status_OxygenSat_Behigh_L2            4
+
+uint8_t Current_Status;
+uint8_t Time_AlarmLevel = 0;
 
 // Profile Variable ------------------------------------------------------------
 char Hospital_Number[13];
@@ -63,42 +87,16 @@ uint8_t Prefered_FiO2;
 uint8_t Alarm_Level1, Alarm_Level2;
 uint8_t Mode;
 
-
+uint8_t Profile_Upload;
 // Main Function ---------------------------------------------------------------
 int main()
 {  
  /* Set Up config System*/
   System_Init();
-  lcdInit();
-  lcdString (1,1,"Setting....");
-  lcdString (1,6,"Setting....");
-  SentData_DAC ( 0x245, 1);
-  SentData_DAC ( 0x2A0, 2);
+  lcdString (1,1,"Please Upload Profile");
   
-  HospitalNumber_File[0] = '7';
-  for (int i = 1; i < 8; i++)
-  {
-    HospitalNumber_File[i] = '1';
-  }
-    HospitalNumber_File[8] = '.';
-    HospitalNumber_File[9] = 'T';
-    HospitalNumber_File[10] = 'X';
-    HospitalNumber_File[11] = 'T';
-    HospitalNumber_File[12] = '\0';
-  
-  /*Write Data to SD Card */
-  if (f_mount(0, &filesystem) != FR_OK);
-  
-  ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
-  if (ret) 
-  {
-    fault_err(ret);
-  } 
-  else 
-  {
-    ret = f_write(&file, "HR : 1234567898765 \r\nFile: Oxygen Saturation\r\n", 47, &bw);
-    ret = f_close(&file);
-  }  
+  Profile_Upload = PROFILE_NOTUPLOAD;
+ 
   
   //Test Transfer Data to SD Card
 //  uint8_t count;
@@ -109,12 +107,84 @@ int main()
 //  ConvertInttoString(SD_Test);
 //  SD_Write("OXY.TXT", SD_String, 250);
 
-  
   while(1)
   {
+    
+    if (Profile_Upload == PROFILE_JUST_UPLOAD)
+    {
+      USART_Cmd(OPM_USART, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
+      Create_file(Hospital_Number, OxygenSaturation_file);                      // Create Oxygen Saturation file
+      Create_file(Hospital_Number, FiO2_file);                                  // Create FiO2 file
+      Profile_Upload = PROFILE_SETTING_COMPLETE;
+    }
+    else if (Profile_Upload == PROFILE_NOTUPLOAD)
+    {
+      USART_Cmd(OPM_USART, DISABLE);                                            // DISABLE Oxygen Pulse Meter USART
+      SentData_DAC(0x00,3);                                                     // Close air and oxygen valve
+    }
 
+    // Check Oxygen Saturation condition
+    if (Current_OyxgenSat < OxygenSaturation_Minimum)
+    {
+      // Current Oxygen Saturation less than Minimum Oxygen Saturation
+      if (Current_Status == Status_Normal)
+      {
+        Current_Status = Status_OxygenSat_Below_L1;
+        Alarm_Function(ALARM_ENABLE);
+        lcdString(1,5,"Status: Below L1");
+      }      
+    }
+    else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
+    {
+      // Current Oxygen Saturation more than maximum Oxygen Saturation
+      if (Current_Status == Status_Normal)
+      {
+        Current_Status = Status_OxygenSat_Behigh_L1;
+        Alarm_Function(ALARM_ENABLE);
+        lcdString(1,5,"Status: Behigh L1");
+      }
+
+    }
+    else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
+    {
+      if (Current_Status!= Status_Normal)
+      {
+        Current_Status = Status_Normal;
+        Alarm_Function(ALARM_DISABLE);  
+      }
+    }
+    else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
+    {
+      if (Current_Status!= Status_Normal)
+      {
+        Current_Status = Status_Normal;
+        Alarm_Function(ALARM_DISABLE); 
+      }
+    }
+    else
+    {
+      // Current Oxygen Saturaiton is between Maximum Oxygen Saturation and Minimum Oxygen Saturation
+      if (Current_Status!= Status_Normal)
+      {
+        Current_Status = Status_Normal;
+        Alarm_Function(ALARM_DISABLE); 
+      }
+    }
   }
   
+}
+
+// Alarm Function --------------------------------------------------------------
+void Alarm_Function(uint8_t Command)
+{
+  if (Command == ALARM_ENABLE)
+  {
+    TIM_Cmd(TIM2, ENABLE);
+  }
+  else if (Command == ALARM_DISABLE)
+  {
+    TIM_Cmd(TIM2, DISABLE);
+  }
 }
 	
 // delay function --------------------------------------------------------------
@@ -140,6 +210,9 @@ void System_Init(void)
   USART_HyperTermianl_Connect();
 
   //INTTIM_Config();
+
+  //Alarm Timer Setup
+  Alarm_Timer_SetUp();
   
   // LED Set UP
   STM_EVAL_LEDInit(LED3);
@@ -151,12 +224,15 @@ void System_Init(void)
   STM_EVAL_LEDOn(LED5);
   STM_EVAL_LEDOn(LED6);
   
-  //LCD Set Up
-  lcdInit();
+  lcdInit();                                                                //LCD Set Up
  
   //SD Card : Check Mount Card
-  //Check_Mount();
-  
+  if (f_mount(0, &filesystem) != FR_OK)
+  {
+    lcdString(4,1,"ERROR");
+    lcdString(1,3,"Please inset SD Card");
+  }
+
   /* Initialize USB available on STM32F4-Discovery board */
   USBD_Init(&USB_OTG_dev,
   #ifdef USE_USB_OTG_HS 
@@ -185,7 +261,6 @@ void ConvertInttoString(uint8_t DataInt[])
   
 }
 //------------------------------------------------------------------------------
-
 //void INTTIM_Config(void)
 //{
 //  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -261,6 +336,9 @@ void EXTILine0_Config(void)
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
+
+
+
 //------------------------------------------------------------------------------
 static void fault_err (FRESULT rc)
 {
@@ -280,6 +358,7 @@ static void fault_err (FRESULT rc)
   while(1);
 }
 
+// Delay ---------------------------------------------------------------------
 /**
   * @brief  Delay
   * @param  None
@@ -376,12 +455,80 @@ void USART3_IRQHandler(void)
   USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 }
 
+void Alarm_Timer_SetUp (void)
+{
+  /*
+    Timer 2 use count time of Alarm Level 1 and Alarm Level 2
+    when Timer 2 is Enable. it will set TIM_CMD(TIM2, ENABLE) function. 
+    Timer 2 is count and interrupt every a second
+    interrupt servies routine : TIM2_IRQHandler
+  */
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+  /* Enable the TIM2 gloabal Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+   
+  /* TIM2 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 2000; // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000; // 24 MHz Clock down to 1 MHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+  /* TIM IT enable */
+  TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+  /* TIM2 enable counter */
+  TIM_Cmd(TIM2, ENABLE);
+  TIM_Cmd(TIM2, DISABLE);
+}
+
+void TIM2_IRQHandler(void)
+{
+  if (TIM_GetITStatus (TIM2, TIM_IT_Update) != RESET)
+  {
+    Time_AlarmLevel = Time_AlarmLevel + 1;
+    STM_EVAL_LEDOff(LED5);
+    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
+    if (Current_Status == Status_OxygenSat_Below_L1 | Current_Status == Status_OxygenSat_Behigh_L1)
+    {
+      if (Time_AlarmLevel >= Alarm_Level1)
+      {
+        Time_AlarmLevel = 0;
+        if (Current_Status == Status_OxygenSat_Below_L1)
+        {
+          Current_Status = Status_OxygenSat_Below_L2;
+          lcdString(1,5,"Status: Below L2");
+        }
+        else if (Current_Status == Status_OxygenSat_Behigh_L1)
+        {
+          Current_Status = Status_OxygenSat_Behigh_L2;
+          lcdString(1,5,"Status: Behigh L2");
+        }
+      }
+    }
+    if (Current_Status == Status_OxygenSat_Below_L2 | Current_Status == Status_OxygenSat_Behigh_L2)
+    {
+      if (Time_AlarmLevel >= Alarm_Level2)
+      {
+        /* Notification Alarm Board (Toggle Pin to Alarm Circuit) */
+      }
+    }
+
+  }
+}
+
 // SD Card Section -------------------------------------------------------------
 void Create_file(char Hospital_Number[], uint8_t File_Type)
 {
+  //ret = f_mount(0, &filesystem);
   for (int i = 0; i < 7; i++)
   {
-    HospitalNumber_File[i] = '1';
+    HospitalNumber_File[i] = Hospital_Number[i+6];
   }
     HospitalNumber_File[8] = '.';
     HospitalNumber_File[9] = 'T';
@@ -391,7 +538,6 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
   if(File_Type == 0)
   {
     HospitalNumber_File[7] = 'O';
-    //if (f_mount(0, &filesystem) != FR_OK);
     
     // Create Oxygen Saturation file
     ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
@@ -400,8 +546,8 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
       fault_err(ret);
     } 
     else 
-    {
-      ret = f_write(&file, "Hospital Number : ", 18, &bw);
+    {  
+      ret = f_write(&file, "Hospital Number : ", 20, &bw);
       ret = f_lseek(&file,f_size(&file));
       ret = f_write(&file, HospitalNumber_File, 30, &bw);
       ret = f_lseek(&file,f_size(&file));
@@ -420,11 +566,11 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     } 
     else 
     {
-      ret = f_write(&file, "HR : ", 5, &bw);
+      ret = f_write(&file, "Hospital Number : ", 20, &bw);
       ret = f_lseek(&file,f_size(&file));
       ret = f_write(&file, HospitalNumber_File, 30, &bw);
       ret = f_lseek(&file,f_size(&file));
-      ret = f_write(&file, "\r\nFile: FiO2_File\r\n", 25, &bw);
+      ret = f_write(&file, "\r\nFile: FiO2\r\n", 15, &bw);
       ret = f_close(&file);
     }  
 
@@ -467,3 +613,6 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif
 // End of File -----------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/
