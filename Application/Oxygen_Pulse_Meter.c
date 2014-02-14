@@ -94,7 +94,7 @@ void Oxygen_PM_Setup(void)
   Timer Prescale 4200
   */
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 20;            
+  TIM_TimeBaseStructure.TIM_Period = 5000;            
   TIM_TimeBaseStructure.TIM_Prescaler = 42000;        // 42 MHz Clock down to 1 kHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -271,7 +271,6 @@ void TIM4_IRQHandler (void)
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
   {
     uint8_t rx_index_OPM = 0;
-    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
     //Clear Buffer Data from Oxygen Pulse Meter (OPM)
     for (rx_index_OPM = 0; rx_index_OPM < 133; rx_index_OPM++)
     {
@@ -279,6 +278,7 @@ void TIM4_IRQHandler (void)
     }
     //Diable Timer4
     TIM_Cmd(TIM4, DISABLE);
+    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
   }
 }
 

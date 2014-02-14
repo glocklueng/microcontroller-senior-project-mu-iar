@@ -18333,15 +18333,15 @@ void OxygenSensor_Setup(void)
 
  
   RCC_APB2PeriphClockCmd(((uint32_t)0x00000100), ENABLE); 
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE); 
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE); 
 	
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0002);
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0008);
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStruct);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
 	
    
    
@@ -18374,7 +18374,7 @@ void OxygenSensor_Setup(void)
   ADC_CommonInitStruct.ADC_TwoSamplingDelay = ((uint32_t)0x00000000);
   ADC_CommonInit(&ADC_CommonInitStruct);
   
-  ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x09), 1,((uint8_t)0x02));
+  ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x03), 1,((uint8_t)0x02));
 }
 
 

@@ -53,6 +53,7 @@ void port_init()
   GPIO_InitTypeDef GPIO_InitStruct;
   
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);  
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
   RCC_AHB1PeriphClockCmd(GLCD_CLK, ENABLE);
 
   //For NSS Pin
@@ -65,10 +66,10 @@ void port_init()
   
   /*
   	set output for NSS, RESET, D/C(Data/Command)
-                (3)NSS           |      PD1
-		(4)RESET	 |	PD6
-		(5)D/C		 |	PD4
-                (6)LED           |      PD5
+                (3)NSS           |      PA8
+		            (4)RESET	       |	    PA10
+		            (5)D/C		       |	    PA15
+                (6)LED           |      PA5
   */
 
   /* set GPIO init structure parameters values */
