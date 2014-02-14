@@ -73,7 +73,7 @@ void OxygenSensor_Setup(void)
   ADC_CommonInitStruct.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
   ADC_CommonInit(&ADC_CommonInitStruct);
   
-  ADC_RegularChannelConfig(OxygenSensor, ADC_Channel_9, 1,ADC_SampleTime_28Cycles);
+  ADC_RegularChannelConfig(OxygenSensor, ADC_Channel_3, 1,ADC_SampleTime_28Cycles);
 }
 
 //------------------------------------------------------------------------------

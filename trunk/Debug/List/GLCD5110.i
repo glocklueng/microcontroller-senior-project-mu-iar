@@ -18259,14 +18259,15 @@ void port_init()
   
   RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);  
   RCC_AHB1PeriphClockCmd(((uint32_t)0x00000008), ENABLE);
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE);
 
   
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0002) ;                                     
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0100) ;                                     
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStruct);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
   
   
 
@@ -18277,20 +18278,20 @@ void port_init()
  
 
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0040) | ((uint16_t)0x0010) | ((uint16_t)0x0020);        
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0400) | ((uint16_t)0x8000) | ((uint16_t)0x0020);        
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), &GPIO_InitStruct);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
   
-  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));                                    
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0100));                                    
 	
   
   SPI_DataSizeConfig(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0000));
   
   
-  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0020));
+  GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0020));
 }
 
 
@@ -18298,10 +18299,10 @@ void lcdInit(void)
 {
    port_init();
    delay_ms(10); 
-   GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0040));					
-   GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0040));
+   GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0400));					
+   GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0400));
    
-   GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));					
+   GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0100));					
    lcdSend( 0x21, LCD_CMD );  
    lcdSend( 0xC0, LCD_CMD );  
    lcdSend( 0x06, LCD_CMD );  
@@ -18405,15 +18406,15 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
     if ( cd == LCD_DATA )
     {
       
-      GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0010));
+      GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x8000));
     }
     else 
     {
       
-      GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0010));
+      GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x8000));
     }
     
-    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));				
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0100));				
     
     while (SPI_I2S_GetFlagStatus(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)), ((uint16_t)0x0080)) == RESET)
     {
@@ -18423,7 +18424,7 @@ void lcdSend ( unsigned char Data_Send, LcdCmdData cd )
       }
     }
     for(i=0;i<625;i++);
-    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0002));					
+    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0100));					
 }
 
 
@@ -18741,11 +18742,11 @@ void lcdBackLight(char set)
 {
   if(set == SET)
   {
-    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)),((uint16_t)0x0020));                                   
+    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)),((uint16_t)0x0020));                                   
   }
   else if (set ==  RESET)
   {
-    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0C00)), ((uint16_t)0x0020));                                
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), ((uint16_t)0x0020));                                
   }
 }
 

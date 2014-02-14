@@ -18820,6 +18820,7 @@ static void fault_err (FRESULT rc)
 
 
 
+
  
 static void Delay(volatile uint32_t nCount)
 {
@@ -18940,7 +18941,6 @@ void Alarm_Timer_SetUp (void)
    
   TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ((uint16_t)0x0001), ENABLE);
    
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ENABLE);
   TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), DISABLE);
 }
 
@@ -18950,7 +18950,6 @@ void TIM2_IRQHandler(void)
   {
     Time_AlarmLevel = Time_AlarmLevel + 1;
     STM_EVAL_LEDOff(LED5);
-    TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
     if (Current_Status == 1 | Current_Status == 3)
     {
       if (Time_AlarmLevel >= Alarm_Level1)
@@ -18975,7 +18974,7 @@ void TIM2_IRQHandler(void)
          
       }
     }
-
+    TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ((uint16_t)0x0001));
   }
 }
 

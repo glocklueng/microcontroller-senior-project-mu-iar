@@ -482,8 +482,7 @@ void Alarm_Timer_SetUp (void)
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
   /* TIM IT enable */
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
-  /* TIM2 enable counter */
-  TIM_Cmd(TIM2, ENABLE);
+  /* TIM2 ALARM_DISABLE counter */
   TIM_Cmd(TIM2, DISABLE);
 }
 
@@ -493,7 +492,6 @@ void TIM2_IRQHandler(void)
   {
     Time_AlarmLevel = Time_AlarmLevel + 1;
     STM_EVAL_LEDOff(LED5);
-    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
     if (Current_Status == Status_OxygenSat_Below_L1 | Current_Status == Status_OxygenSat_Behigh_L1)
     {
       if (Time_AlarmLevel >= Alarm_Level1)
@@ -518,7 +516,7 @@ void TIM2_IRQHandler(void)
         /* Notification Alarm Board (Toggle Pin to Alarm Circuit) */
       }
     }
-
+    TIM_ClearITPendingBit (TIM2, TIM_IT_Update);
   }
 }
 
