@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-1670272396
+Checksum=-1952960395
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -50,13 +50,14 @@ ShowSource=1
 Fmt0=uint8_t[50]	3	0
 [watch_formats]
 Fmt0={W}42:ADC_Value	3	0
-Fmt1={W}42:DAC_data	4	4
-Fmt2={W}42:DAC_data_1	4	0
-Fmt3={W}42:DAC_real	0	4
-Fmt4={W}42:DAC_sent	4	0
-Fmt5={W}42:LCD_DATA	3	0
-Fmt6={W}42:bitset	3	0
-Fmt7={W}42:dac_data	4	0
+Fmt1={W}42:Current_OyxgenSat	3	0
+Fmt2={W}42:DAC_data	4	4
+Fmt3={W}42:DAC_data_1	4	0
+Fmt4={W}42:DAC_real	0	4
+Fmt5={W}42:DAC_sent	4	0
+Fmt6={W}42:LCD_DATA	3	0
+Fmt7={W}42:bitset	3	0
+Fmt8={W}42:dac_data	4	0
 [DataLog]
 LogEnabled=0
 SumEnabled=0

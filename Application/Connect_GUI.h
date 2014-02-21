@@ -20,7 +20,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 
 // Define ----------------------------------------------------------------------
 #define PROFILE_NOTUPLOAD				0
-#define PROFILE_SETTING_COMPLETE        1
+#define PROFILE_SETTING_COMPLETE                        1
 #define PROFILE_JUST_UPLOAD				2
 
 //------------------------------------------------------------------------------

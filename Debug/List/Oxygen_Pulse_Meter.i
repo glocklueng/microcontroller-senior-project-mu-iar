@@ -18064,7 +18064,7 @@ void Oxygen_PM_Setup(void)
 
  
    
-  TIM_TimeBaseStructure.TIM_Period = 20;            
+  TIM_TimeBaseStructure.TIM_Period = 5000;            
   TIM_TimeBaseStructure.TIM_Prescaler = 42000;        
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = ((uint16_t)0x0000);
@@ -18241,7 +18241,6 @@ void TIM4_IRQHandler (void)
   if (TIM_GetITStatus(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ((uint16_t)0x0001)) != RESET)
   {
     uint8_t rx_index_OPM = 0;
-    TIM_ClearITPendingBit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ((uint16_t)0x0001));
     
     for (rx_index_OPM = 0; rx_index_OPM < 133; rx_index_OPM++)
     {
@@ -18249,6 +18248,7 @@ void TIM4_IRQHandler (void)
     }
     
     TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), DISABLE);
+    TIM_ClearITPendingBit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), ((uint16_t)0x0001));
   }
 }
 

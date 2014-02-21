@@ -18501,7 +18501,11 @@ void Calibrate_OxygenSensor(void)
 
 void EXTI0_IRQHandler(void)
 {
-  Calibrate_OxygenSensor();
+  if (EXTI_GetFlagStatus(((uint32_t)0x00001)) == SET)
+  {
+    Calibrate_OxygenSensor();
+  }
+  
   
   
   EXTI_ClearITPendingBit(((uint32_t)0x00001));

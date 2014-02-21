@@ -18513,6 +18513,7 @@ void INTTIM_Config(void);
 void EXTILine0_Config(void);
 void Alarm_Timer_SetUp (void);
 void Alarm_Function(uint8_t Command);
+void Button_EXTI_Config(void);
 
  
 void ConvertInttoString(uint8_t DataInt[]);
@@ -18529,8 +18530,11 @@ uint8_t Data_GUI[28];
 uint8_t SD_Test[50];
 char SD_String[250];
 uint8_t index = 0;                                                                  
+char DataFromOPM_TEST[3];
 
 extern uint8_t OxygenSat_buffer[100];
+extern uint8_t SD_Card_index;
+extern uint8_t rx_index_OPM;
 extern uint8_t Current_OyxgenSat;
 
 
@@ -18585,51 +18589,56 @@ int main()
       SentData_DAC(0x00,3);                                                     
     }
 
-    
-    if (Current_OyxgenSat < OxygenSaturation_Minimum)
+    if (Profile_Upload == 1)
     {
       
-      if (Current_Status == 0)
+      if (Current_OyxgenSat < OxygenSaturation_Minimum)
       {
-        Current_Status = 1;
-        Alarm_Function(1);
-        lcdString(1,5,"Status: Below L1");
-      }      
-    }
-    else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
-    {
-      
-      if (Current_Status == 0)
-      {
-        Current_Status = 3;
-        Alarm_Function(1);
-        lcdString(1,5,"Status: Behigh L1");
+        
+        if (Current_Status == 0)
+        {
+          Current_Status = 1;
+          Alarm_Function(1);
+          lcdString(1,5,"Status: Below L1");
+        }      
       }
-
-    }
-    else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
-    {
-      if (Current_Status!= 0)
+      else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
       {
-        Current_Status = 0;
-        Alarm_Function(0);  
+        
+        if (Current_Status == 0)
+        {
+          Current_Status = 3;
+          Alarm_Function(1);
+          lcdString(1,5,"Status: Behigh L1");
+        }
       }
-    }
-    else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
-    {
-      if (Current_Status!= 0)
+      else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
       {
-        Current_Status = 0;
-        Alarm_Function(0); 
+        if (Current_Status!= 0)
+        {
+          Current_Status = 0;
+          lcdString(1,5,"Status: Normal");
+          Alarm_Function(0);  
+        }
       }
-    }
-    else
-    {
-      
-      if (Current_Status!= 0)
+      else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
       {
-        Current_Status = 0;
-        Alarm_Function(0); 
+        if (Current_Status!= 0)
+        {
+          Current_Status = 0;
+          lcdString(1,5,"Status: Normal");
+          Alarm_Function(0); 
+        }
+      }
+      else
+      {
+        
+        if (Current_Status!= 0)
+        {
+          lcdString(1,5,"Status: Normal");
+          Current_Status = 0;
+          Alarm_Function(0); 
+        }
       }
     }
   }
@@ -18687,7 +18696,11 @@ void System_Init(void)
   STM_EVAL_LEDOn(LED6);
   
   lcdInit();                                                                
- 
+
+  
+    
+  Button_EXTI_Config();
+
   
   if (f_mount(0, &filesystem) != FR_OK)
   {
@@ -18796,6 +18809,90 @@ void EXTILine0_Config(void)
 }
 
 
+void Button_EXTI_Config (void)
+{
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
+
+  
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
+   
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0001) | ((uint16_t)0x0002) | ((uint16_t)0x0010) | ((uint16_t)0x0020);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
+
+   
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x00));
+
+   
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00001);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+   
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x01));
+
+   
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00002);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+   
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x04));
+
+   
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00010);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+   
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x05));
+
+   
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00020);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+}
 
 
 static void fault_err (FRESULT rc)
@@ -18883,32 +18980,57 @@ void USART_HyperTermianl_Connect(void)
   USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ENABLE);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void USART3_IRQHandler(void)
 {
-  uint16_t Drive_Data;
   if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525)) == SET)
   {
-    Drive_command_Data[index] = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)));
+    DataFromOPM_TEST[rx_index_OPM] = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)));
     while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0080)) == RESET);
-    USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), Drive_command_Data[index]); 
+    USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), DataFromOPM_TEST[rx_index_OPM]); 
     while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0040)) == RESET);
-    index++;
-    if (index >= 5)
-    {
-      index = 0;
-      if (Drive_command_Data[0] == '1')
-      {
-        Drive_command_Data[0] = '0';
-        Drive_Data = atoi(Drive_command_Data);
-        SentData_DAC (Drive_Data, 1);
-      }
-      else if (Drive_command_Data[0] == '2')
-      {
-        Drive_command_Data[0] = '0';
-        Drive_Data = atoi(Drive_command_Data);
-        SentData_DAC (Drive_Data, 2);
-      }
-    } 
+    rx_index_OPM++;
+    if(rx_index_OPM >= 3)
+    {  
+      rx_index_OPM = 0;
+      Current_OyxgenSat = atoi(DataFromOPM_TEST);    
+      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      SD_Card_index++;
+    }
   }
   USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525));
 }
@@ -18943,6 +19065,7 @@ void Alarm_Timer_SetUp (void)
    
   TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), DISABLE);
 }
+
 
 void TIM2_IRQHandler(void)
 {

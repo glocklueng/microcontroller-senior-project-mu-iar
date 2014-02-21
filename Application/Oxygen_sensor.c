@@ -200,7 +200,11 @@ void Calibrate_OxygenSensor(void)
 // Interrupt Push Botton User (Blue Botton)
 void EXTI0_IRQHandler(void)
 {
-  Calibrate_OxygenSensor();
+  if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
+  {
+    Calibrate_OxygenSensor();
+  }
+  
   
   // Clear Flag Interrupt
   EXTI_ClearITPendingBit(EXTI_Line0);
