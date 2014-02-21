@@ -44,6 +44,7 @@ void INTTIM_Config(void);
 void EXTILine0_Config(void);
 void Alarm_Timer_SetUp (void);
 void Alarm_Function(uint8_t Command);
+void Button_EXTI_Config(void);
 
 /* Private function prototypes -----------------------------------------------*/
 void ConvertInttoString(uint8_t DataInt[]);
@@ -60,8 +61,11 @@ uint8_t Data_GUI[28];
 uint8_t SD_Test[50];
 char SD_String[250];
 uint8_t index = 0;                                                                  //for count receving Data form Hyperterminal for controling Drive Circuit
+char DataFromOPM_TEST[3];
 
 extern uint8_t OxygenSat_buffer[100];
+extern uint8_t SD_Card_index;
+extern uint8_t rx_index_OPM;
 extern uint8_t Current_OyxgenSat;
 // Status ----------------------------------------------------------------------
 #define ALARM_DISABLE         0
@@ -123,51 +127,56 @@ int main()
       SentData_DAC(0x00,3);                                                     // Close air and oxygen valve
     }
 
-    // Check Oxygen Saturation condition
-    if (Current_OyxgenSat < OxygenSaturation_Minimum)
+    if (Profile_Upload == PROFILE_SETTING_COMPLETE)
     {
-      // Current Oxygen Saturation less than Minimum Oxygen Saturation
-      if (Current_Status == Status_Normal)
+      // Check Oxygen Saturation condition
+      if (Current_OyxgenSat < OxygenSaturation_Minimum)
       {
-        Current_Status = Status_OxygenSat_Below_L1;
-        Alarm_Function(ALARM_ENABLE);
-        lcdString(1,5,"Status: Below L1");
-      }      
-    }
-    else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
-    {
-      // Current Oxygen Saturation more than maximum Oxygen Saturation
-      if (Current_Status == Status_Normal)
-      {
-        Current_Status = Status_OxygenSat_Behigh_L1;
-        Alarm_Function(ALARM_ENABLE);
-        lcdString(1,5,"Status: Behigh L1");
+        // Current Oxygen Saturation less than Minimum Oxygen Saturation
+        if (Current_Status == Status_Normal)
+        {
+          Current_Status = Status_OxygenSat_Below_L1;
+          Alarm_Function(ALARM_ENABLE);
+          lcdString(1,5,"Status: Below L1");
+        }      
       }
-
-    }
-    else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
-    {
-      if (Current_Status!= Status_Normal)
+      else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
       {
-        Current_Status = Status_Normal;
-        Alarm_Function(ALARM_DISABLE);  
+        // Current Oxygen Saturation more than maximum Oxygen Saturation
+        if (Current_Status == Status_Normal)
+        {
+          Current_Status = Status_OxygenSat_Behigh_L1;
+          Alarm_Function(ALARM_ENABLE);
+          lcdString(1,5,"Status: Behigh L1");
+        }
       }
-    }
-    else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
-    {
-      if (Current_Status!= Status_Normal)
+      else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
       {
-        Current_Status = Status_Normal;
-        Alarm_Function(ALARM_DISABLE); 
+        if (Current_Status!= Status_Normal)
+        {
+          Current_Status = Status_Normal;
+          lcdString(1,5,"Status: Normal");
+          Alarm_Function(ALARM_DISABLE);  
+        }
       }
-    }
-    else
-    {
-      // Current Oxygen Saturaiton is between Maximum Oxygen Saturation and Minimum Oxygen Saturation
-      if (Current_Status!= Status_Normal)
+      else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
       {
-        Current_Status = Status_Normal;
-        Alarm_Function(ALARM_DISABLE); 
+        if (Current_Status!= Status_Normal)
+        {
+          Current_Status = Status_Normal;
+          lcdString(1,5,"Status: Normal");
+          Alarm_Function(ALARM_DISABLE); 
+        }
+      }
+      else
+      {
+        // Current Oxygen Saturaiton is between Maximum Oxygen Saturation and Minimum Oxygen Saturation
+        if (Current_Status!= Status_Normal)
+        {
+          lcdString(1,5,"Status: Normal");
+          Current_Status = Status_Normal;
+          Alarm_Function(ALARM_DISABLE); 
+        }
       }
     }
   }
@@ -225,7 +234,11 @@ void System_Init(void)
   STM_EVAL_LEDOn(LED6);
   
   lcdInit();                                                                //LCD Set Up
- 
+
+  // Button Set Up ---------------------------------------------------------
+    // Button Config (Interrupt)
+  Button_EXTI_Config();
+
   //SD Card : Check Mount Card
   if (f_mount(0, &filesystem) != FR_OK)
   {
@@ -337,7 +350,91 @@ void EXTILine0_Config(void)
   NVIC_Init(&NVIC_InitStructure);
 }
 
+//-------------------------------------------------------------------------------------
+void Button_EXTI_Config (void)
+{
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
 
+  // Button Set Up
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  /* Configure PB0, PB1, PB4, PB5 pin as input floating */
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+  /* Connect EXTI Line0 to PB0 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource0);
+
+  /* Configure EXTI Line0 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line0;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+  /* Connect EXTI Line1 to PB1 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource1);
+
+  /* Configure EXTI Line1 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line1;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line1 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+  /* Connect EXTI Line4 to PB4 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource4);
+
+  /* Configure EXTI Line4 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line4;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line4 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+  /* Connect EXTI Line5 to PB5 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource5);
+
+  /* Configure EXTI Line5 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line5;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line5 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+}
 
 //------------------------------------------------------------------------------
 static void fault_err (FRESULT rc)
@@ -425,36 +522,61 @@ void USART_HyperTermianl_Connect(void)
   USART_Cmd(USART3, ENABLE);
 }
 //------------------------------------------------------------------------------
+// USART3 use for Debug and send command to Microcontroller
+//------------------------------------------------------------------------------
+//void USART3_IRQHandler(void)
+//{
+//  uint16_t Drive_Data;
+//  if(USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
+//  {
+//    Drive_command_Data[index] = USART_ReceiveData(USART3);
+//    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+//    USART_SendData(USART3, Drive_command_Data[index]); 
+//    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+//    index++;
+//    if (index >= 5)
+//    {
+//      index = 0;
+//      if (Drive_command_Data[0] == '1')
+//      {
+//        Drive_command_Data[0] = '0';
+//        Drive_Data = atoi(Drive_command_Data);
+//        SentData_DAC (Drive_Data, 1);
+//      }
+//      else if (Drive_command_Data[0] == '2')
+//      {
+//        Drive_command_Data[0] = '0';
+//        Drive_Data = atoi(Drive_command_Data);
+//        SentData_DAC (Drive_Data, 2);
+//      }
+//    } 
+//  }
+//  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+//}
+
+//------------------------------------------------------------------------------
+// USART 3: This function use for simulation Oxygen Pulse Meter
+//------------------------------------------------------------------------------
 void USART3_IRQHandler(void)
 {
-  uint16_t Drive_Data;
   if(USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
   {
-    Drive_command_Data[index] = USART_ReceiveData(USART3);
+    DataFromOPM_TEST[rx_index_OPM] = USART_ReceiveData(USART3);
     while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-    USART_SendData(USART3, Drive_command_Data[index]); 
+    USART_SendData(USART3, DataFromOPM_TEST[rx_index_OPM]); 
     while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-    index++;
-    if (index >= 5)
-    {
-      index = 0;
-      if (Drive_command_Data[0] == '1')
-      {
-        Drive_command_Data[0] = '0';
-        Drive_Data = atoi(Drive_command_Data);
-        SentData_DAC (Drive_Data, 1);
-      }
-      else if (Drive_command_Data[0] == '2')
-      {
-        Drive_command_Data[0] = '0';
-        Drive_Data = atoi(Drive_command_Data);
-        SentData_DAC (Drive_Data, 2);
-      }
-    } 
+    rx_index_OPM++;
+    if(rx_index_OPM >= 3)
+    {  
+      rx_index_OPM = 0;
+      Current_OyxgenSat = atoi(DataFromOPM_TEST);    
+      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      SD_Card_index++;
+    }
   }
   USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 }
-
+//------------------------------------------------------------------------------------
 void Alarm_Timer_SetUp (void)
 {
   /*
@@ -486,6 +608,7 @@ void Alarm_Timer_SetUp (void)
   TIM_Cmd(TIM2, DISABLE);
 }
 
+//--------------------------------------------------------------------------------------
 void TIM2_IRQHandler(void)
 {
   if (TIM_GetITStatus (TIM2, TIM_IT_Update) != RESET)
