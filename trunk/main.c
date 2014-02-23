@@ -1,5 +1,5 @@
 /*
-Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
+Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : main.c
 Deverloper : Phattaradanai Kiratiwudhikul
@@ -88,7 +88,7 @@ uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
 uint8_t FiO2_Maximum, FiO2_Minimum;
 uint8_t RespondsTime;
 uint8_t Prefered_FiO2;
-uint8_t Alarm_Level1, Alarm_Level2;
+uint16_t Alarm_Level1, Alarm_Level2;
 uint8_t Mode;
 
 uint8_t Profile_Upload;
@@ -113,7 +113,6 @@ int main()
 
   while(1)
   {
-    
     if (Profile_Upload == PROFILE_JUST_UPLOAD)
     {
       USART_Cmd(OPM_USART, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
@@ -133,7 +132,7 @@ int main()
       if (Current_OyxgenSat < OxygenSaturation_Minimum)
       {
         // Current Oxygen Saturation less than Minimum Oxygen Saturation
-        if (Current_Status == Status_Normal)
+        if (Current_Status != Status_OxygenSat_Below_L1)
         {
           Current_Status = Status_OxygenSat_Below_L1;
           Alarm_Function(ALARM_ENABLE);
@@ -143,7 +142,7 @@ int main()
       else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
       {
         // Current Oxygen Saturation more than maximum Oxygen Saturation
-        if (Current_Status == Status_Normal)
+        if (Current_Status != Status_OxygenSat_Behigh_L1)
         {
           Current_Status = Status_OxygenSat_Behigh_L1;
           Alarm_Function(ALARM_ENABLE);
@@ -155,7 +154,7 @@ int main()
         if (Current_Status!= Status_Normal)
         {
           Current_Status = Status_Normal;
-          lcdString(1,5,"Status: Normal");
+          lcdString(1,5,"Status: Normal   ");
           Alarm_Function(ALARM_DISABLE);  
         }
       }
@@ -164,7 +163,7 @@ int main()
         if (Current_Status!= Status_Normal)
         {
           Current_Status = Status_Normal;
-          lcdString(1,5,"Status: Normal");
+          lcdString(1,5,"Status: Normal   ");
           Alarm_Function(ALARM_DISABLE); 
         }
       }
@@ -173,7 +172,7 @@ int main()
         // Current Oxygen Saturaiton is between Maximum Oxygen Saturation and Minimum Oxygen Saturation
         if (Current_Status!= Status_Normal)
         {
-          lcdString(1,5,"Status: Normal");
+          lcdString(1,5,"Status: Normal   ");
           Current_Status = Status_Normal;
           Alarm_Function(ALARM_DISABLE); 
         }
@@ -572,6 +571,7 @@ void USART3_IRQHandler(void)
       Current_OyxgenSat = atoi(DataFromOPM_TEST);    
       OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
       SD_Card_index++;
+      lcdString(6,2,DataFromOPM_TEST);
     }
   }
   USART_ClearITPendingBit(USART3, USART_IT_RXNE);

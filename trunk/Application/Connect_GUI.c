@@ -1,5 +1,5 @@
 /*
-Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
+Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : Connect_GUI.c
 
@@ -17,17 +17,27 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
     
 */
 /*
-            Package of Data 
+           Package of Data 
          * Length 28 Bytes
          * Byte 0 : Head of Bytes : "$"
          * Byte 1 : Command : Connect (0xE8), Upload (0xD5)
          * Byte 2 : SOH     : 0xFF
-         * Byte 3 - 24: Data (if don't have data replace with Padding Bytes (0x91)
-         *     
+         * Byte 3 - 24: Data (if don't have data replace with Padding Bytes (0x23) (Padding Bytes : 22 - Data))
+         *      1.) Hospital Number 13 Bytes (Bytes : 3-15)
+         *      2.) Oxygen Saturation max (1 Byte) (Byte: 16)
+         *      3.) Oxygen Saturation min (1 Byte) (Byte: 17)
+         *      4.) Respond time (1 Byte) (Byte: 18)
+         *      5.) Prefered FiO2 (1 Byte)(Byte: 19)
+         *      6.) Select Mode (Byte: 20)
+         *              Range Mode(0xB7)
+         *              Auto Mode (0xA2)
+         *      7.) if selected Range mode : FiO2 Max (Byte 21), FiO2 Min (Byte 22)
+         *          else selected Auto mode: Padding (0x91) (2 Bytes) (Byte : 21-22)
+         *      8.) Alarm Level 1(Byte 23) and Alarm Level 2 (Byte 24)
+         * Byte 25-26: CRC-16 Modbus(2 Bytes) (Byte 25: CRC-High, Byte 26: CRC-Low)
+         * Byte 27 : End of Transmission (ETX) (0x03)
          *      
-         * Byte 25-26 : CRC 16 - ModBus (2 Bytes)
-         * Byte 27 : End of Package Bytes (0x03)
-         
+         *       
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -67,7 +77,7 @@ extern uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
 extern uint8_t FiO2_Maximum, FiO2_Minimum;
 extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
-extern uint8_t Alarm_Level1, Alarm_Level2;
+extern uint16_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
 extern uint8_t Profile_Upload;
 //------------------------------------------------------------------------------
@@ -224,9 +234,12 @@ void GUI_IRQHandler (void)
         
         if (Data_GUI[1] == Upload_Command)
         {
+          lcdClear();
           //Update Rule
           Update_Rule();
           Profile_Upload = PROFILE_JUST_UPLOAD;
+          lcdString(1,2,"SaO2: ");
+          lcdString(1,3,"FiO2:");
         }
         else if (Data_GUI[1] == Connect_Command)
         {
@@ -275,20 +288,20 @@ void Update_Rule(void)
   if (Mode == 0xB7)
   {
     //Select Range Mode
-    lcdString(1,2,"Mode: Range Mode");
+    lcdString(1,4,"Mode: Range");
     FiO2_Maximum = Data_GUI[21];
     FiO2_Minimum = Data_GUI[22];
   }
   else if (Mode == 0xA2)
   {
     //Selecte Auto Mode
-    lcdString(1,2,"Mode: Auto Mode");
+    lcdString(1,4,"Mode: Auto");
     FiO2_Maximum = 100;
     FiO2_Minimum = 21;
   }
 
-  Alarm_Level1 = Data_GUI[23];
-  Alarm_Level2 = Data_GUI[24];
+  Alarm_Level1 = Data_GUI[23] * 60;
+  Alarm_Level2 = Data_GUI[24] * 60;
 
 }
 

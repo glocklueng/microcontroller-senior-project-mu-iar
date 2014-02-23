@@ -1,7 +1,10 @@
 /*
-Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
+Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : DefinePin.h
+
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 /*----------------------------------------------------------------------------------------------
 Credit:
@@ -70,7 +73,7 @@ Credit:
 
 #define  GLCD_LED_Pin				GPIO_Pin_5
 #define  GLCD_LED_Port				GPIOA
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //Define Oxygen Sensor (ADC)
 #define  OxygenSensor 				ADC1 
 #define  OxygenSensor_ADC_CLK		RCC_APB2Periph_ADC1
@@ -79,7 +82,7 @@ Credit:
 #define  OxygenSensor_Pin 			GPIO_Pin_3
 #define  OxygenSensor_Port			GPIOA
 
-//---------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //Define Connect GUI (Tx-PD8, Rx-PD9)
 #define  GUI_USART					USART1
 #define  GUI_USART_CLK				RCC_APB1Periph_USART1
