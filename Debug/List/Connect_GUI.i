@@ -28,19 +28,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
  
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -14229,21 +14227,12 @@ void SysTick_Handler(void);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   
   
  
+
+
+
 
  
 
@@ -14635,6 +14624,9 @@ SD_Error SD_WaitWriteOperation(void);
   
 
  
+
+
+
 
 
 
@@ -17966,10 +17958,6 @@ void EXTILine0_Config(void);
 
 
 
- 
-
-
-
 
 
 
@@ -17980,9 +17968,19 @@ void EXTILine0_Config(void);
 
 
 
+ 
+
+
+
+
+
+
 
 
  
+
+
+
 
 
 
@@ -18358,6 +18356,9 @@ void Update_Rule(void);
 
 
 
+
+
+
  
 
 
@@ -18530,7 +18531,7 @@ extern uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
 extern uint8_t FiO2_Maximum, FiO2_Minimum;
 extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
-extern uint8_t Alarm_Level1, Alarm_Level2;
+extern uint16_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
 extern uint8_t Profile_Upload;
 
@@ -18687,9 +18688,12 @@ void USART1_IRQHandler (void)
         
         if (Data_GUI[1] == Upload_Command)
         {
+          lcdClear();
           
           Update_Rule();
           Profile_Upload = 2;
+          lcdString(1,2,"SaO2: ");
+          lcdString(1,3,"FiO2:");
         }
         else if (Data_GUI[1] == Connect_Command)
         {
@@ -18738,20 +18742,20 @@ void Update_Rule(void)
   if (Mode == 0xB7)
   {
     
-    lcdString(1,2,"Mode: Range Mode");
+    lcdString(1,4,"Mode: Range");
     FiO2_Maximum = Data_GUI[21];
     FiO2_Minimum = Data_GUI[22];
   }
   else if (Mode == 0xA2)
   {
     
-    lcdString(1,2,"Mode: Auto Mode");
+    lcdString(1,4,"Mode: Auto");
     FiO2_Maximum = 100;
     FiO2_Minimum = 21;
   }
 
-  Alarm_Level1 = Data_GUI[23];
-  Alarm_Level2 = Data_GUI[24];
+  Alarm_Level1 = Data_GUI[23] * 60;
+  Alarm_Level2 = Data_GUI[24] * 60;
 
 }
 

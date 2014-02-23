@@ -1,5 +1,5 @@
 /*
-Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term Infants
+Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : GLCD5110.c
 

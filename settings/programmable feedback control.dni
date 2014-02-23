@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-1952960395
+Checksum=1333241779
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -50,18 +50,19 @@ ShowSource=1
 Fmt0=uint8_t[50]	3	0
 [watch_formats]
 Fmt0={W}42:ADC_Value	3	0
-Fmt1={W}42:Current_OyxgenSat	3	0
-Fmt2={W}42:DAC_data	4	4
-Fmt3={W}42:DAC_data_1	4	0
-Fmt4={W}42:DAC_real	0	4
-Fmt5={W}42:DAC_sent	4	0
-Fmt6={W}42:LCD_DATA	3	0
-Fmt7={W}42:bitset	3	0
-Fmt8={W}42:dac_data	4	0
+Fmt1={W}42:Alarm_Level1	3	0
+Fmt2={W}42:Current_OyxgenSat	3	0
+Fmt3={W}42:DAC_data	4	4
+Fmt4={W}42:DAC_data_1	4	0
+Fmt5={W}42:DAC_real	0	4
+Fmt6={W}42:DAC_sent	4	0
+Fmt7={W}42:LCD_DATA	3	0
+Fmt8={W}42:bitset	3	0
+Fmt9={W}42:dac_data	4	0
 [DataLog]
 LogEnabled=0
 SumEnabled=0
-GraphEnabled=0
+GraphEnabled=1
 ShowTimeLog=1
 ShowTimeSum=1
 [InterruptLog]
@@ -71,6 +72,16 @@ GraphEnabled=0
 ShowTimeLog=1
 ShowTimeSum=1
 SumSortOrder=0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.156.7" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.103.5" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
+Count=6
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -78,6 +89,9 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
+[Aliases]
+Count=0
+SuppressDialog=0
 [Trace2]
 Enabled=0
 ShowSource=0
@@ -98,16 +112,3 @@ Mode=3
 Graph=0
 Symbiont=0
 Exclusions=
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.156.7" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.103.5" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
-Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
-Count=6
-[Aliases]
-Count=0
-SuppressDialog=0

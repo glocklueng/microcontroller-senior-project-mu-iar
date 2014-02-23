@@ -1,5 +1,5 @@
 /*
-Project : Programmable Feedback Control of Airflow System for Pre-term infant oxygen saturation
+Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : SD_Card.c
 Deverloper : Phattaradanai Kiratiwudhikul

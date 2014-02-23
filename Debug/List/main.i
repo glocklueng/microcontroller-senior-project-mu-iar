@@ -13,18 +13,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   
   
  
@@ -14205,21 +14193,12 @@ void SysTick_Handler(void);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   
   
  
+
+
+
 
  
 
@@ -14611,6 +14590,9 @@ SD_Error SD_WaitWriteOperation(void);
   
 
  
+
+
+
 
 
 
@@ -17942,6 +17924,9 @@ void EXTILine0_Config(void);
 
 
 
+
+
+
  
 
 
@@ -18286,47 +18271,10 @@ static const unsigned char FontLookup [][5] =
 
 
 
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
  
-
-
 
 
 
@@ -18340,7 +18288,50 @@ static const unsigned char FontLookup [][5] =
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
 
 
 
@@ -18550,7 +18541,7 @@ uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
 uint8_t FiO2_Maximum, FiO2_Minimum;
 uint8_t RespondsTime;
 uint8_t Prefered_FiO2;
-uint8_t Alarm_Level1, Alarm_Level2;
+uint16_t Alarm_Level1, Alarm_Level2;
 uint8_t Mode;
 
 uint8_t Profile_Upload;
@@ -18575,7 +18566,6 @@ int main()
 
   while(1)
   {
-    
     if (Profile_Upload == 2)
     {
       USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);                                             
@@ -18595,7 +18585,7 @@ int main()
       if (Current_OyxgenSat < OxygenSaturation_Minimum)
       {
         
-        if (Current_Status == 0)
+        if (Current_Status != 1)
         {
           Current_Status = 1;
           Alarm_Function(1);
@@ -18605,7 +18595,7 @@ int main()
       else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
       {
         
-        if (Current_Status == 0)
+        if (Current_Status != 3)
         {
           Current_Status = 3;
           Alarm_Function(1);
@@ -18617,7 +18607,7 @@ int main()
         if (Current_Status!= 0)
         {
           Current_Status = 0;
-          lcdString(1,5,"Status: Normal");
+          lcdString(1,5,"Status: Normal   ");
           Alarm_Function(0);  
         }
       }
@@ -18626,7 +18616,7 @@ int main()
         if (Current_Status!= 0)
         {
           Current_Status = 0;
-          lcdString(1,5,"Status: Normal");
+          lcdString(1,5,"Status: Normal   ");
           Alarm_Function(0); 
         }
       }
@@ -18635,7 +18625,7 @@ int main()
         
         if (Current_Status!= 0)
         {
-          lcdString(1,5,"Status: Normal");
+          lcdString(1,5,"Status: Normal   ");
           Current_Status = 0;
           Alarm_Function(0); 
         }
@@ -19030,6 +19020,7 @@ void USART3_IRQHandler(void)
       Current_OyxgenSat = atoi(DataFromOPM_TEST);    
       OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
       SD_Card_index++;
+      lcdString(6,2,DataFromOPM_TEST);
     }
   }
   USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525));
