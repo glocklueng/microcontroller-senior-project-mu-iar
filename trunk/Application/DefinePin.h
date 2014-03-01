@@ -103,7 +103,51 @@ Credit:
 #define  GUI_RX_Souce				GPIO_PinSource7
 #define  GUI_RX_AF					GPIO_AF_USART1
 
-//------------------------------------------------------------------------------
+// Button Down -------------------------------------------------------------------
+#define Button_Down_Pin				GPIO_Pin_0
+#define Button_Down_GPIO_Port		GPIOB
+#define Button_Down_GPIO_CLK		RCC_AHB1Periph_GPIOB
+
+#define Button_Down_EXTI_Line		EXTI_Line0
+#define Button_Down_IRQn			EXTI0_IRQn
+#define Button_Down_IRQHandler      EXTI0_IRQHandler
+
+// Run Button --------------------------------------------------------------------
+#define Run_Button_Pin				GPIO_Pin_1
+#define Run_Button_GPIO_Port		GPIOB
+#define Run_Button_GPIO_CLK			RCC_AHB1Periph_GPIOB
+
+#define Run_Button_EXTI_Line		EXTI_Line1
+#define Run_Button_IRQn				EXTI1_IRQn
+#define Run_Button_IRQHandler		EXTI1_IRQHandler
+
+// Alarm Set Pin -----------------------------------------------------------------
+#define Alarm_Set_Pin				GPIO_Pin_2
+#define Alarm_Set_GPIO_Port			GPIOC
+#define Alarm_Set_GPIO_CLK			RCC_AHB1Periph_GPIOC
+
+#define Alarm_Set_EXTI_Line			EXTI_Line2
+#define Alarm_Set_IRQn				EXTI2_IRQn
+#define Alarm_Set_IRQHandler		EXTI2_IRQHandler
+
+// Alarm Button ------------------------------------------------------------------
+#define Alarm_Button_Pin			GPIO_Pin_4
+#define Alarm_Button_GPIO_Port		GPIOB
+#define Alarm_Button_GPIO_CLK		RCC_AHB1Periph_GPIOB
+
+#define Alarm_Button_EXTI_Line		EXTI_Line4
+#define Alarm_Button_IRQn			EXTI4_IRQn
+#define Alarm_Button_IRQHandler		EXTI4_IRQHandler
+
+// Button UP ---------------------------------------------------------------------
+#define Button_Up_Pin				GPIO_Pin_5	
+#define Button_Up_GPIO_Port			GPIOB
+#define Button_Up_GPIO_CLK			RCC_AHB1Periph_GPIOB
+
+#define Button_Up_EXTI_Line			EXTI_Line5
+#define Button_Up_IRQn				EXTI9_5_IRQn
+#define Button_Up_IRQHandler		EXTI9_5_IRQHandler
+
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 --------------------------------------------------------------------------------------------------*/

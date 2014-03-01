@@ -14669,6 +14669,20 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
@@ -18023,6 +18037,20 @@ void EXTILine0_Config(void);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
@@ -18342,6 +18370,7 @@ static const unsigned char FontLookup [][5] =
 
 
 
+
 void USART_GUI_Connect (void);
 void CRC_CALCULATE_TX(void);
 unsigned int TX_CRC(unsigned int crc, unsigned int data);
@@ -18365,6 +18394,20 @@ void Update_Rule(void);
 
 
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -18533,7 +18576,7 @@ extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
 extern uint16_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
-extern uint8_t Profile_Upload;
+extern uint8_t Profile_Status;
 
 void USART_GUI_Connect(void)
 {  
@@ -18616,7 +18659,6 @@ void USART_GUI_Connect(void)
 
 
 
-
 }
 
 
@@ -18663,6 +18705,14 @@ unsigned int TX_CRC(unsigned int crc, unsigned int data)
 }
 
 
+
+
+
+
+
+
+
+ 
 void USART1_IRQHandler (void)
 {
   uint8_t Data_in;
@@ -18691,7 +18741,7 @@ void USART1_IRQHandler (void)
           lcdClear();
           
           Update_Rule();
-          Profile_Upload = 2;
+          Profile_Status = 2;
           lcdString(1,2,"SaO2: ");
           lcdString(1,3,"FiO2:");
         }

@@ -11,11 +11,13 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "main.h"
 
 //define Function --------------------------------------------------------------
-void OxygenSensor_Setup(void);
+void OxygenSensor_Config(void);
 float Oxygen_convert(void);
 void timer_setting (void);
+void FiO2_Check_Timer_Config(void);
 void Calibrate_OxygenSensor(void);
 void Timer6_SetUp (void);
+float Convert_FiO2 (float FiO2_ADC);
 
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
