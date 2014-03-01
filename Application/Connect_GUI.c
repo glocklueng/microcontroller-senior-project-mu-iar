@@ -79,7 +79,7 @@ extern uint8_t RespondsTime;
 extern uint8_t Prefered_FiO2;
 extern uint16_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
-extern uint8_t Profile_Upload;
+extern uint8_t Profile_Status;
 //------------------------------------------------------------------------------
 void USART_GUI_Connect(void)
 {  
@@ -146,7 +146,6 @@ void USART_GUI_Connect(void)
 //  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 8;
 //  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 //  NVIC_Init(&NVIC_InitStructure);
-//   
 //  /*
 //
 //  Pre-Scale : APB1 Prescale 4
@@ -209,6 +208,14 @@ unsigned int TX_CRC(unsigned int crc, unsigned int data)
 }
 
 // GUI Interrupt Service Routine -----------------------------------------------
+/*
+  Function : GUI_IRQHandler
+  Input : None
+  Return: None
+  Description : USART Interrupt Service Routine - get profile data in buffer and calculate CRC-16 (Modbus)
+                if data is correct, it will update profile with Update_Rule() Function
+                if data is error, it will abandon data in buffer
+*/
 void GUI_IRQHandler (void)
 {
   uint8_t Data_in;
@@ -237,7 +244,7 @@ void GUI_IRQHandler (void)
           lcdClear();
           //Update Rule
           Update_Rule();
-          Profile_Upload = PROFILE_JUST_UPLOAD;
+          Profile_Status = PROFILE_JUST_UPLOAD;
           lcdString(1,2,"SaO2: ");
           lcdString(1,3,"FiO2:");
         }

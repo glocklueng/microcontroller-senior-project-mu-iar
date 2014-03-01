@@ -18,8 +18,14 @@ uint8_t Current_OyxgenSat;
 uint8_t SD_Card_index = 0;
 uint8_t tx_index_OPM = 0;
 uint8_t rx_index_OPM = 0;
-uint8_t OxygenSat_buffer[100];                                                  // Oxygen Saturation Buffer for Store Data to SD Card
-// Set Up ----------------------------------------------------------------------
+uint8_t OxygenSat_buffer[10];                                                   // Oxygen Saturation Buffer for Store Data to SD Card
+//------------------------------------------------------------------------------
+/*
+  Function : Oxygen_PM_Setup
+  Input : None
+  Return : None
+  Description : Setup driver for connecting Oxygen Pulse Meter with USART
+*/
 void Oxygen_PM_Setup(void)
 {
   //Set Up USART
@@ -132,6 +138,13 @@ void OPM_IRQHandler(void)
   }
 }
 //--------------------------------------------------------------------------------------
+/*
+  Function : Get_OxygenSat
+  Input : None
+  Return : int OxygenSat_Percent
+  Description : This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter
+                via RS-232 Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
+*/
 
 int Get_OxygenSat(void)
 {

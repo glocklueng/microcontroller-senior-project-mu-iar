@@ -23,6 +23,9 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #define PROFILE_SETTING_COMPLETE                        1
 #define PROFILE_JUST_UPLOAD				2
 
+#define RUN_BUTTON_SET					3
+#define RUN_BUTTON_RESET				4
+
 //------------------------------------------------------------------------------
 // Function
 void USART_GUI_Connect (void);

@@ -14635,6 +14635,20 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
@@ -18001,11 +18015,13 @@ int Get_OxygenSat(void);
 
 
 
-void OxygenSensor_Setup(void);
+void OxygenSensor_Config(void);
 float Oxygen_convert(void);
 void timer_setting (void);
+void FiO2_Check_Timer_Config(void);
 void Calibrate_OxygenSensor(void);
 void Timer6_SetUp (void);
+float Convert_FiO2 (float FiO2_ADC);
 
 
 
@@ -18312,54 +18328,6 @@ static const unsigned char FontLookup [][5] =
 
 
 
- 
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -18378,6 +18346,27 @@ static const unsigned char FontLookup [][5] =
 
 
 
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
 
 
 
@@ -18406,18 +18395,39 @@ static const unsigned char FontLookup [][5] =
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
 
 
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
  
+
 
 
 
@@ -18455,7 +18465,42 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+ 
+
 
 
 
@@ -18490,7 +18535,7 @@ void Update_Rule(void);
 SD_Error Status = SD_OK;
 FATFS filesystem;		                                                
 FRESULT ret;			                                                
-FIL file;				                                        
+FIL file_F, file_O, file;		                                        
 DIR dir;				                                        
 FILINFO fno;			                                                
 UINT bw, br;
@@ -18505,6 +18550,7 @@ void EXTILine0_Config(void);
 void Alarm_Timer_SetUp (void);
 void Alarm_Function(uint8_t Command);
 void Button_EXTI_Config(void);
+void Timer3_Config(void);
 
  
 void ConvertInttoString(uint8_t DataInt[]);
@@ -18519,14 +18565,17 @@ extern uint16_t time;
 extern uint8_t rx_index_GUI;
 uint8_t Data_GUI[28];
 uint8_t SD_Test[50];
-char SD_String[250];
+char SD_String[50];
 uint8_t index = 0;                                                                  
 char DataFromOPM_TEST[3];
 
-extern uint8_t OxygenSat_buffer[100];
+float FiO2_Current[60];
+
+extern uint8_t OxygenSat_buffer[10];
 extern uint8_t SD_Card_index;
 extern uint8_t rx_index_OPM;
 extern uint8_t Current_OyxgenSat;
+
 
 
 
@@ -18544,7 +18593,7 @@ uint8_t Prefered_FiO2;
 uint16_t Alarm_Level1, Alarm_Level2;
 uint8_t Mode;
 
-uint8_t Profile_Upload;
+uint8_t Profile_Status;
 
 int main()
 {  
@@ -18552,10 +18601,10 @@ int main()
   System_Init();
   lcdString (1,1,"Please Upload Profile");
   
-  Profile_Upload = 0;
+  Profile_Status = 0;
  
   
-  
+
 
 
 
@@ -18566,40 +18615,52 @@ int main()
 
   while(1)
   {
-    if (Profile_Upload == 2)
+    if (Profile_Status == 2)
     {
       USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);                                             
       Create_file(Hospital_Number, 0);                      
       Create_file(Hospital_Number, 1);                                  
-      Profile_Upload = 1;
+      Profile_Status = 1;
+      
+      NVIC_InitTypeDef   NVIC_InitStructure;
+
+       
+      NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
+      NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+      NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+      NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+      NVIC_Init(&NVIC_InitStructure);
     }
-    else if (Profile_Upload == 0)
+    else if (Profile_Status == 0)
     {
       USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), DISABLE);                                            
       SentData_DAC(0x00,3);                                                     
     }
 
-    if (Profile_Upload == 1)
+    
+    if (Profile_Status == 1)
     {
       
       if (Current_OyxgenSat < OxygenSaturation_Minimum)
       {
         
-        if (Current_Status != 1)
+        if (Current_Status != 1 & Current_Status != 2)
         {
           Current_Status = 1;
           Alarm_Function(1);
-          lcdString(1,5,"Status: Below L1");
+          lcdString(1,5,"Status: Below");
+          lcdString(1,6,"Alarm Level 1");
         }      
       }
       else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
       {
         
-        if (Current_Status != 3)
+        if (Current_Status != 3 & Current_Status != 4)
         {
           Current_Status = 3;
           Alarm_Function(1);
-          lcdString(1,5,"Status: Behigh L1");
+          lcdString(1,5,"Status: Behigh");
+          lcdString(1,6,"Alarm Level 1");
         }
       }
       else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
@@ -18607,7 +18668,8 @@ int main()
         if (Current_Status!= 0)
         {
           Current_Status = 0;
-          lcdString(1,5,"Status: Normal   ");
+          lcdString(1,5,"Status: Normal");
+          lcdString(1,6,"              ");
           Alarm_Function(0);  
         }
       }
@@ -18616,19 +18678,39 @@ int main()
         if (Current_Status!= 0)
         {
           Current_Status = 0;
-          lcdString(1,5,"Status: Normal   ");
+          lcdString(1,5,"Status: Normal");
+          lcdString(1,6,"              ");
           Alarm_Function(0); 
         }
       }
-      else
+      else if (Current_OyxgenSat >= OxygenSaturation_Minimum & Current_OyxgenSat <= OxygenSaturaiton_Maximum)
       {
         
         if (Current_Status!= 0)
         {
-          lcdString(1,5,"Status: Normal   ");
+          lcdString(1,5,"Status: Normal");
+          lcdString(1,6,"              ");
           Current_Status = 0;
           Alarm_Function(0); 
         }
+      }
+      
+      if (SD_Card_index >= sizeof(OxygenSat_buffer))
+      {
+        HospitalNumber_File[7] = 'O';
+        SD_Card_index = 0;
+        ConvertInttoString(OxygenSat_buffer);
+        ret = f_open(&file_O, HospitalNumber_File, 0x02);
+        if (ret) 
+        {
+          fault_err(ret);
+        } 
+        else 
+        {  
+          ret = f_lseek(&file_O,((&file_O)->fsize));
+          ret = f_write(&file_O, SD_String, 50, &bw);
+          ret = f_close(&file_O);
+        }  
       }
     }
   }
@@ -18636,6 +18718,14 @@ int main()
 }
 
 
+
+
+
+
+
+
+
+ 
 void Alarm_Function(uint8_t Command)
 {
   if (Command == 1)
@@ -18645,6 +18735,7 @@ void Alarm_Function(uint8_t Command)
   else if (Command == 0)
   {
     TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), DISABLE);
+    Time_AlarmLevel = 0;
   }
 }
 	
@@ -18659,17 +18750,34 @@ void delay(void)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 void System_Init(void)
 {
   SPI2_SetUp();
   LTC1661_Setup();
-  OxygenSensor_Setup();
+  OxygenSensor_Config();
   Oxygen_PM_Setup();
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
-  Timer6_SetUp();
+  lcdInit();                                                                    
   USART_GUI_Connect();
   USART_HyperTermianl_Connect();
-
+  Timer6_SetUp();
+  FiO2_Check_Timer_Config();
+  
   
 
   
@@ -18685,11 +18793,11 @@ void System_Init(void)
   STM_EVAL_LEDOn(LED5);
   STM_EVAL_LEDOn(LED6);
   
-  lcdInit();                                                                
 
   
-    
+  
   Button_EXTI_Config();
+  EXTILine0_Config();
 
   
   if (f_mount(0, &filesystem) != FR_OK)
@@ -18707,20 +18815,7 @@ void System_Init(void)
 }
 
 
-void ConvertInttoString(uint8_t DataInt[])
-{
-  uint8_t i,j;
-  for(i = 0; i < 50; i++)
-  {
-    j = i*5;
-    SD_String[j] = '0' + (DataInt[i]/100);
-    SD_String[j+1] = '0' + ((DataInt[i]%100)/10);
-    SD_String[j+2] = '0' + ((DataInt[i]%10)/1);
-    SD_String[j+3] = '\r';
-    SD_String[j+4] = '\n';
-  }
-  
-}
+
 
 
 
@@ -18808,29 +18903,37 @@ void Button_EXTI_Config (void)
   
   RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
    
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0002) | ((uint16_t)0x0010) | ((uint16_t)0x0020) | ((uint16_t)0x0001);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
+
+   
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0001) | ((uint16_t)0x0002) | ((uint16_t)0x0010) | ((uint16_t)0x0020);
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0004);
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
 
    
   SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x00));
 
-   
-  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00001);
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
 
-   
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+
+
+
+
+
+
+
+
+
+
+
+
 
    
   SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x01));
@@ -18846,7 +18949,7 @@ void Button_EXTI_Config (void)
   NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
   NVIC_Init(&NVIC_InitStructure);
 
    
@@ -18863,7 +18966,7 @@ void Button_EXTI_Config (void)
   NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
   NVIC_Init(&NVIC_InitStructure);
 
    
@@ -18880,28 +18983,94 @@ void Button_EXTI_Config (void)
   NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
 
 
-static void fault_err (FRESULT rc)
-{
-  const char *str =
-                    "OK\0" "DISK_ERR\0" "INT_ERR\0" "NOT_READY\0" "NO_FILE\0" "NO_PATH\0"
-                    "INVALID_NAME\0" "DENIED\0" "EXIST\0" "INVALID_OBJECT\0" "WRITE_PROTECTED\0"
-                    "INVALID_DRIVE\0" "NOT_ENABLED\0" "NO_FILE_SYSTEM\0" "MKFS_ABORTED\0" "TIMEOUT\0"
-                    "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
-  FRESULT i;
 
-  for (i = (FRESULT)0; i != rc && *str; i++) 
+
+
+
+
+
+
+
+
+
+
+void EXTI9_5_IRQHandler(void)
+{
+  if (EXTI_GetITStatus(((uint32_t)0x00020)) != RESET)
   {
-    while (*str++) ;
+     
+    EXTI_ClearITPendingBit(((uint32_t)0x00020));
   }
-  printf("rc=%u FR_%s\n\r", (UINT)rc, str);
-  STM_EVAL_LEDOff(LED6);
-  while(1);
 }
+
+
+void EXTI1_IRQHandler(void)
+{
+  if (EXTI_GetITStatus(((uint32_t)0x00002)) != RESET)
+  {
+    if (Profile_Status == 1)
+    {
+      Profile_Status = 3;
+    }
+    else if (Profile_Status == 3)
+    {
+      Profile_Status = 1;
+    }
+     
+    EXTI_ClearITPendingBit(((uint32_t)0x00002));
+  }
+}
+
+
+void EXTI4_IRQHandler(void)
+{
+  if (EXTI_GetITStatus(((uint32_t)0x00010)) != RESET)
+  {
+    NVIC_InitTypeDef   NVIC_InitStructure;
+    
+     
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+     
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint16_t)0x0004));
+
+     
+    EXTI_ClearITPendingBit(((uint32_t)0x00010));
+  }
+}
+
+
+
+
+
+
+ 
+void TIM3_IRQHandler (void)
+{
+  if (TIM_GetITStatus (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001)) != RESET)
+  {
+    STM_EVAL_LEDOff(LED5);
+    FiO2_Current[time] = Oxygen_convert();
+  }
+  STM_EVAL_LEDOn(LED5);
+  TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001));
+}
+
 
 
 
@@ -19005,6 +19174,12 @@ void USART_HyperTermianl_Connect(void)
 
 
 
+
+
+
+
+ 
+
 void USART3_IRQHandler(void)
 {
   if(USART_GetITStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525)) == SET)
@@ -19017,10 +19192,11 @@ void USART3_IRQHandler(void)
     if(rx_index_OPM >= 3)
     {  
       rx_index_OPM = 0;
-      Current_OyxgenSat = atoi(DataFromOPM_TEST);    
+      Current_OyxgenSat = atoi(DataFromOPM_TEST);
       OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
       SD_Card_index++;
       lcdString(6,2,DataFromOPM_TEST);
+      lcdString(9,2,"%");
     }
   }
   USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525));
@@ -19072,12 +19248,14 @@ void TIM2_IRQHandler(void)
         if (Current_Status == 1)
         {
           Current_Status = 2;
-          lcdString(1,5,"Status: Below L2");
+          lcdString(1,5,"Status: Below");
+          lcdString(1,6,"Alarm Level 2");
         }
         else if (Current_Status == 3)
         {
           Current_Status = 4;
-          lcdString(1,5,"Status: Behigh L2");
+          lcdString(1,5,"Status: Behigh");
+          lcdString(1,6,"Alarm Level 2");
         }
       }
     }
@@ -19085,7 +19263,21 @@ void TIM2_IRQHandler(void)
     {
       if (Time_AlarmLevel >= Alarm_Level2)
       {
+        NVIC_InitTypeDef   NVIC_InitStructure;
+        
          
+        NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStructure);
+
+         
+        lcdClear();
+        lcdString(2,3,"Alram !!!");
+        Alarm_Function(0);
+        GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint16_t)0x0004));
+        Time_AlarmLevel = 0;
       }
     }
     TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0000)), ((uint16_t)0x0001));
@@ -19110,42 +19302,58 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     HospitalNumber_File[7] = 'O';
     
     
-    ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
+    ret = f_open(&file_O, HospitalNumber_File, 0x02 | 0x08);
     if (ret) 
     {
       fault_err(ret);
     } 
     else 
     {  
-      ret = f_write(&file, "Hospital Number : ", 20, &bw);
-      ret = f_lseek(&file,((&file)->fsize));
-      ret = f_write(&file, HospitalNumber_File, 30, &bw);
-      ret = f_lseek(&file,((&file)->fsize));
-      ret = f_write(&file, "\r\nFile: Oxygen Saturation\r\n", 32, &bw);
-      ret = f_close(&file);
+      ret = f_write(&file_O, "Hospital Number : ", 20, &bw);
+      ret = f_lseek(&file_O,((&file_O)->fsize));
+      ret = f_write(&file_O, HospitalNumber_File, 13, &bw);
+      ret = f_lseek(&file_O,((&file_O)->fsize));
+      ret = f_write(&file_O, "\r\nFile: Oxygen Saturation\r\n", 27, &bw);
+      ret = f_close(&file_O);
     }  
   }
   else if (File_Type == 1)
   {
     HospitalNumber_File[7] = 'F';
     
-    ret = f_open(&file, HospitalNumber_File, 0x02 | 0x08);
+    ret = f_open(&file_F, HospitalNumber_File, 0x02 | 0x08);
     if (ret) 
     {
       fault_err(ret);
     } 
     else 
     {
-      ret = f_write(&file, "Hospital Number : ", 20, &bw);
-      ret = f_lseek(&file,((&file)->fsize));
-      ret = f_write(&file, HospitalNumber_File, 30, &bw);
-      ret = f_lseek(&file,((&file)->fsize));
-      ret = f_write(&file, "\r\nFile: FiO2\r\n", 15, &bw);
-      ret = f_close(&file);
+      ret = f_write(&file_F, "Hospital Number : ", 20, &bw);
+      ret = f_lseek(&file_F,((&file_F)->fsize));
+      ret = f_write(&file_F, HospitalNumber_File, 13, &bw);
+      ret = f_lseek(&file_F,((&file_F)->fsize));
+      ret = f_write(&file_F, "\r\nFile: FiO2\r\n", 15, &bw);
+      ret = f_close(&file_F);
     }  
 
   }
 }
+
+
+void ConvertInttoString(uint8_t DataInt[])
+{
+  uint8_t i,j;
+  for(i = 0; i < 10; i++)
+  {
+    j = i*5;
+    SD_String[j] = '0' + (DataInt[i]/100);
+    SD_String[j+1] = '0' + ((DataInt[i]%100)/10);
+    SD_String[j+2] = '0' + ((DataInt[i]%10)/1);
+    SD_String[j+3] = '\r';
+    SD_String[j+4] = '\n';
+  }
+}
+
 
 void SD_Write(char FileName[], char SD_Data[], UINT Data_size)
 {
@@ -19160,6 +19368,24 @@ void SD_Write(char FileName[], char SD_Data[], UINT Data_size)
     ret = f_write(&file, SD_Data, Data_size, &bw);
     ret = f_close(&file);
   }  
+}
+
+static void fault_err (FRESULT rc)
+{
+  const char *str =
+                    "OK\0" "DISK_ERR\0" "INT_ERR\0" "NOT_READY\0" "NO_FILE\0" "NO_PATH\0"
+                    "INVALID_NAME\0" "DENIED\0" "EXIST\0" "INVALID_OBJECT\0" "WRITE_PROTECTED\0"
+                    "INVALID_DRIVE\0" "NOT_ENABLED\0" "NO_FILE_SYSTEM\0" "MKFS_ABORTED\0" "TIMEOUT\0"
+                    "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
+  FRESULT i;
+
+  for (i = (FRESULT)0; i != rc && *str; i++) 
+  {
+    while (*str++) ;
+  }
+  printf("rc=%u FR_%s\n\r", (UINT)rc, str);
+  STM_EVAL_LEDOff(LED6);
+  while(1);
 }
 
 

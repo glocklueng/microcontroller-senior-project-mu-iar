@@ -14636,6 +14636,20 @@ SD_Error SD_WaitWriteOperation(void);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
@@ -17973,8 +17987,14 @@ uint8_t Current_OyxgenSat;
 uint8_t SD_Card_index = 0;
 uint8_t tx_index_OPM = 0;
 uint8_t rx_index_OPM = 0;
-uint8_t OxygenSat_buffer[100];                                                  
+uint8_t OxygenSat_buffer[10];                                                   
 
+
+
+
+
+
+ 
 void Oxygen_PM_Setup(void)
 {
   
@@ -18087,6 +18107,13 @@ void USART6_IRQHandler(void)
   }
 }
 
+
+
+
+
+
+
+ 
 
 int Get_OxygenSat(void)
 {
