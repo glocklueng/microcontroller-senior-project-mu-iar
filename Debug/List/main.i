@@ -17969,6 +17969,51 @@ void EXTILine0_Config(void);
 
 
 
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
 void SentData_DAC (uint16_t DAC_real, uint8_t channel);
@@ -18015,13 +18060,76 @@ int Get_OxygenSat(void);
 
 
 
-void OxygenSensor_Config(void);
-float Oxygen_convert(void);
-void timer_setting (void);
-void FiO2_Check_Timer_Config(void);
-void Calibrate_OxygenSensor(void);
-void Timer6_SetUp (void);
-float Convert_FiO2 (float FiO2_ADC);
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -18058,6 +18166,7 @@ float Convert_FiO2 (float FiO2_ADC);
 
 
  
+
 
 
 
@@ -18092,6 +18201,7 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
  
+
 
 
 
@@ -18289,55 +18399,11 @@ static const unsigned char FontLookup [][5] =
 
 
 
-
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void USART_GUI_Connect (void);
+void CRC_CALCULATE_TX(void);
+unsigned int TX_CRC(unsigned int crc, unsigned int data);
+void connect_command(void);
+void Update_Rule(void);
 
 
 
@@ -18345,76 +18411,14 @@ static const unsigned char FontLookup [][5] =
  
 
 
-
-
-
-
- 
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void OxygenSensor_Config(void);
+float Oxygen_convert(void);
+void timer_setting (void);
+void FiO2_Check_Timer_Config(void);
+void Calibrate_OxygenSensor(void);
+void Timer6_SetUp (void);
+float Convert_FiO2 (float FiO2_ADC);
+void TestControlValve (void);
 
 
 
@@ -18451,6 +18455,7 @@ static const unsigned char FontLookup [][5] =
 
 
  
+
 
 
 
@@ -18485,6 +18490,795 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
  
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+void USART_GUI_Connect (void);
+void CRC_CALCULATE_TX(void);
+unsigned int TX_CRC(unsigned int crc, unsigned int data);
+void connect_command(void);
+void Update_Rule(void);
+
+
+
+
+ 
+
+uint16_t Convert_Voltage_to_Hex (uint8_t voltage);
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+void Button_EXTI_Config (void);
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+ 
+ 
+
+
+
+
+
+
+ 
+
+void Oxygen_PM_Setup(void);
+
+int Get_OxygenSat(void);
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+void USART_GUI_Connect (void);
+void CRC_CALCULATE_TX(void);
+unsigned int TX_CRC(unsigned int crc, unsigned int data);
+void connect_command(void);
+void Update_Rule(void);
+
+
+
+
+ 
+
+
+void OxygenSensor_Config(void);
+float Oxygen_convert(void);
+void timer_setting (void);
+void FiO2_Check_Timer_Config(void);
+void Calibrate_OxygenSensor(void);
+void Timer6_SetUp (void);
+float Convert_FiO2 (float FiO2_ADC);
+void TestControlValve (void);
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
 
 
 
@@ -18553,7 +19347,8 @@ void Button_EXTI_Config(void);
 void Timer3_Config(void);
 
  
-void ConvertInttoString(uint8_t DataInt[]);
+void Convert_SaO2_InttoString(uint8_t DataInt[]);
+void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer);
 void USART_HyperTermianl_Connect(void);
 void Create_file(char Hospital_Number[], uint8_t File_Type);
 
@@ -18569,12 +19364,17 @@ char SD_String[50];
 uint8_t index = 0;                                                                  
 char DataFromOPM_TEST[3];
 
-float FiO2_Current[60];
+float FiO2_Current;
+float FiO2_Buffer[10];
+char FiO2_Buffer_String[50];
+char FiO2_Test_String[120];
+uint8_t FiO2_index;
 
 extern uint8_t OxygenSat_buffer[10];
 extern uint8_t SD_Card_index;
 extern uint8_t rx_index_OPM;
 extern uint8_t Current_OyxgenSat;
+extern float FiO2_DataTest[24];
 
 
 
@@ -18600,6 +19400,7 @@ int main()
   
   System_Init();
   lcdString (1,1,"Please Upload Profile");
+  ret = f_open(&file, "TEST.TXT", 0x02 | 0x08);
   
   Profile_Status = 0;
  
@@ -18621,6 +19422,7 @@ int main()
       Create_file(Hospital_Number, 0);                      
       Create_file(Hospital_Number, 1);                                  
       Profile_Status = 1;
+      TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ENABLE);
       
       NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -18695,11 +19497,12 @@ int main()
         }
       }
       
+      
       if (SD_Card_index >= sizeof(OxygenSat_buffer))
       {
         HospitalNumber_File[7] = 'O';
         SD_Card_index = 0;
-        ConvertInttoString(OxygenSat_buffer);
+        Convert_SaO2_InttoString(OxygenSat_buffer);
         ret = f_open(&file_O, HospitalNumber_File, 0x02);
         if (ret) 
         {
@@ -18712,6 +19515,43 @@ int main()
           ret = f_close(&file_O);
         }  
       }
+      
+      
+      if (FiO2_index >= sizeof(FiO2_Buffer))
+      {
+        HospitalNumber_File[7] = 'F';
+        FiO2_index = 0;
+        Convert_FiO2_FloattoString(FiO2_Buffer,10);
+        ret = f_open(&file_F, HospitalNumber_File, 0x02);
+        if (ret) 
+        {
+          fault_err(ret);
+        } 
+        else 
+        {  
+          ret = f_lseek(&file_F,((&file_F)->fsize));
+          ret = f_write(&file_F, FiO2_Buffer_String, 50, &bw);
+          ret = f_close(&file_F);
+        } 
+      }
+    }
+    if (Profile_Status == 5)
+    {
+      Convert_FiO2_FloattoString(FiO2_DataTest,24);
+      ret = f_open(&file, "TEST.TXT", 0x02);
+      if (ret) 
+      {
+        fault_err(ret);
+      } 
+      else 
+      {  
+        ret = f_lseek(&file,((&file)->fsize));
+        ret = f_write(&file, "File: Test Contorl Valve\r\n", 27, &bw);
+        ret = f_lseek(&file,((&file)->fsize));
+        ret = f_write(&file, FiO2_Test_String, 120, &bw);
+        ret = f_close(&file);
+      }
+      Profile_Status = 0;
     }
   }
   
@@ -18894,98 +19734,6 @@ void EXTILine0_Config(void)
 }
 
 
-void Button_EXTI_Config (void)
-{
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
-
-  
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
-   
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0002) | ((uint16_t)0x0010) | ((uint16_t)0x0020) | ((uint16_t)0x0001);
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
-
-   
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0004);
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
-
-   
-  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x00));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x01));
-
-   
-  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00002);
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-   
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-   
-  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x04));
-
-   
-  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00010);
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-   
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-   
-  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x05));
-
-   
-  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00020);
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-   
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
 
 
 
@@ -19016,10 +19764,12 @@ void EXTI1_IRQHandler(void)
     if (Profile_Status == 1)
     {
       Profile_Status = 3;
+      TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ENABLE);
     }
     else if (Profile_Status == 3)
     {
       Profile_Status = 1;
+      TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), DISABLE);
     }
      
     EXTI_ClearITPendingBit(((uint32_t)0x00002));
@@ -19065,7 +19815,9 @@ void TIM3_IRQHandler (void)
   if (TIM_GetITStatus (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001)) != RESET)
   {
     STM_EVAL_LEDOff(LED5);
-    FiO2_Current[time] = Oxygen_convert();
+    FiO2_Current = Oxygen_convert();
+    FiO2_Buffer[FiO2_index] = FiO2_Current;
+    FiO2_index++;
   }
   STM_EVAL_LEDOn(LED5);
   TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001));
@@ -19340,7 +20092,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
 }
 
 
-void ConvertInttoString(uint8_t DataInt[])
+void Convert_SaO2_InttoString(uint8_t DataInt[])
 {
   uint8_t i,j;
   for(i = 0; i < 10; i++)
@@ -19351,6 +20103,31 @@ void ConvertInttoString(uint8_t DataInt[])
     SD_String[j+2] = '0' + ((DataInt[i]%10)/1);
     SD_String[j+3] = '\r';
     SD_String[j+4] = '\n';
+  }
+}
+
+
+void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer)
+{
+  uint8_t i,j;
+  for(i = 0; i < Size_Buffer; i++)
+  {
+    j = i*5;
+
+
+
+
+
+
+
+    
+    FiO2_Test_String[j] = '0'+(uint32_t)FiO2_float/100;
+    FiO2_Test_String[j+1] = '0'+((uint32_t)FiO2_float%100)/10;
+    FiO2_Test_String[j+2] = '0'+((uint32_t)FiO2_float%10)/1;
+    
+    
+    FiO2_Test_String[j+3] = '\r';
+    FiO2_Test_String[j+4] = '\n';
   }
 }
 

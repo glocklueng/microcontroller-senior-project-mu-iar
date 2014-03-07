@@ -1999,7 +1999,13 @@
   <group>
     <name>User</name>
     <file>
+      <name>$PROJ_DIR$\Application\Config_Button.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\Application\Connect_GUI.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Application\Control_valve.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\Application\DAC_LTC1661.c</name>
