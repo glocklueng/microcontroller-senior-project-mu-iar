@@ -17963,48 +17963,6 @@ void EXTILine0_Config(void);
 
 
 
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
 
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
@@ -18020,6 +17978,15 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
 
+ 
+
+
+
+
+
+
+
+
 
 
 
@@ -18036,6 +18003,42 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
 
  
+
+
+
+
+
+void SPI2_SetUp(void);
+void LTC1661_Setup(void);
+void SentData_DAC (uint16_t DAC_real, uint8_t channel);
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
 
 
 

@@ -8,6 +8,8 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "DAC_LTC1661.h"
+#include "Control_valve.h"
+#include "Config_Button.h"
 #include "Oxygen_Pulse_Meter.h"
 #include "Oxygen_sensor.h"
 #include "GLCD5110.h"
@@ -48,7 +50,8 @@ void Button_EXTI_Config(void);
 void Timer3_Config(void);
 
 /* Private function prototypes -----------------------------------------------*/
-void ConvertInttoString(uint8_t DataInt[]);
+void Convert_SaO2_InttoString(uint8_t DataInt[]);
+void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer);
 void USART_HyperTermianl_Connect(void);
 void Create_file(char Hospital_Number[], uint8_t File_Type);
 
@@ -64,12 +67,17 @@ char SD_String[50];
 uint8_t index = 0;                                                                  //for count receving Data form Hyperterminal for controling Drive Circuit
 char DataFromOPM_TEST[3];
 
-float FiO2_Current[60];
+float FiO2_Current;
+float FiO2_Buffer[10];
+char FiO2_Buffer_String[50];
+char FiO2_Test_String[120];
+uint8_t FiO2_index;
 
 extern uint8_t OxygenSat_buffer[10];
 extern uint8_t SD_Card_index;
 extern uint8_t rx_index_OPM;
 extern uint8_t Current_OyxgenSat;
+extern float FiO2_DataTest[24];
 
 // Status ----------------------------------------------------------------------
 #define ALARM_DISABLE         0
@@ -102,6 +110,7 @@ int main()
  /* Set Up config System*/
   System_Init();
   lcdString (1,1,"Please Upload Profile");
+  ret = f_open(&file, "TEST.TXT", FA_WRITE | FA_CREATE_ALWAYS);
   
   Profile_Status = PROFILE_NOTUPLOAD;
  
@@ -123,6 +132,7 @@ int main()
       Create_file(Hospital_Number, OxygenSaturation_file);                      // Create Oxygen Saturation file
       Create_file(Hospital_Number, FiO2_file);                                  // Create FiO2 file
       Profile_Status = PROFILE_SETTING_COMPLETE;
+      TIM_Cmd(TIM3, ENABLE);
       
       NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -197,11 +207,12 @@ int main()
         }
       }
       
+      // Store OxygenSat_buffer in SD Card
       if (SD_Card_index >= sizeof(OxygenSat_buffer))
       {
         HospitalNumber_File[7] = 'O';
         SD_Card_index = 0;
-        ConvertInttoString(OxygenSat_buffer);
+        Convert_SaO2_InttoString(OxygenSat_buffer);
         ret = f_open(&file_O, HospitalNumber_File, FA_WRITE);
         if (ret) 
         {
@@ -214,6 +225,43 @@ int main()
           ret = f_close(&file_O);
         }  
       }
+      
+      // Store FiO2_Buffer in SD Card
+      if (FiO2_index >= sizeof(FiO2_Buffer))
+      {
+        HospitalNumber_File[7] = 'F';
+        FiO2_index = 0;
+        Convert_FiO2_FloattoString(FiO2_Buffer,10);
+        ret = f_open(&file_F, HospitalNumber_File, FA_WRITE);
+        if (ret) 
+        {
+          fault_err(ret);
+        } 
+        else 
+        {  
+          ret = f_lseek(&file_F,f_size(&file_F));
+          ret = f_write(&file_F, FiO2_Buffer_String, 50, &bw);
+          ret = f_close(&file_F);
+        } 
+      }
+    }
+    if (Profile_Status == TEST_COMPLETE)
+    {
+      Convert_FiO2_FloattoString(FiO2_DataTest,24);
+      ret = f_open(&file, "TEST.TXT", FA_WRITE);
+      if (ret) 
+      {
+        fault_err(ret);
+      } 
+      else 
+      {  
+        ret = f_lseek(&file,f_size(&file));
+        ret = f_write(&file, "File: Test Contorl Valve\r\n", 27, &bw);
+        ret = f_lseek(&file,f_size(&file));
+        ret = f_write(&file, FiO2_Test_String, 120, &bw);
+        ret = f_close(&file);
+      }
+      Profile_Status = PROFILE_NOTUPLOAD;
     }
   }
   
@@ -399,99 +447,7 @@ void EXTILine0_Config(void)
   NVIC_Init(&NVIC_InitStructure);
 }
 
-//-------------------------------------------------------------------------------------
-void Button_EXTI_Config (void)
-{
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
 
-  // Button Set Up
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-  /* Configure PB0, PB1, PB4, PB5 pin as Input */
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = Run_Button_Pin | Alarm_Button_Pin | Button_Up_Pin | Button_Down_Pin;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-  /* Configure Alarm_Set_Pin (PB2) */
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = Alarm_Set_Pin;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-  /* Connect EXTI Line0 to PB0 pin (Button Down) */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource0);
-
-//  /* Configure EXTI Line0 (Button Down) */
-//  EXTI_InitStructure.EXTI_Line = Button_Down_EXTI_Line;
-//  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-//  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-//  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-//  EXTI_Init(&EXTI_InitStructure);
-//
-//  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
-//  NVIC_InitStructure.NVIC_IRQChannel = Button_Down_IRQn;
-//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-//  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-//  NVIC_Init(&NVIC_InitStructure);
-
-  /* Connect Run_Button_EXTI Line to PB1 pin (Run Button) */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource1);
-
-  /* Configure Run_Button_EXTI_Line */
-  EXTI_InitStructure.EXTI_Line = Run_Button_EXTI_Line;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-  /* Disable Run_Button_EXTI Line Interrupt to the lowest priority */
-  NVIC_InitStructure.NVIC_IRQChannel = Run_Button_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-  /* Connect Alarm_Button_EXTI_Line to PB4 pin (Alarm Button) */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource4);
-
-  /* Configure Alarm_Button_EXTI_Line */
-  EXTI_InitStructure.EXTI_Line = Alarm_Button_EXTI_Line;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-  /* Disable Alarm_Button_EXTI_Line Interrupt to the lowest priority */
-  NVIC_InitStructure.NVIC_IRQChannel = Alarm_Button_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-  /* Connect Button_Up_EXTI Line to PB5 pin (Button Up) */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource5);
-
-  /* Configure Button_Up_EXTI Line */
-  EXTI_InitStructure.EXTI_Line = Button_Up_EXTI_Line;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-  /* Disable Button_Up_EXTI Line Interrupt to the lowest priority */
-  NVIC_InitStructure.NVIC_IRQChannel = Button_Up_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
 
 //----------------- GPIO Interrupt Service Routine -------------------------
 // Button Down IRQHandler --------------------------------------------------
@@ -522,10 +478,12 @@ void Run_Button_IRQHandler(void)
     if (Profile_Status == PROFILE_SETTING_COMPLETE)
     {
       Profile_Status = RUN_BUTTON_SET;
+      TIM_Cmd(TIM3, ENABLE);
     }
     else if (Profile_Status == RUN_BUTTON_SET)
     {
       Profile_Status = PROFILE_SETTING_COMPLETE;
+      TIM_Cmd(TIM3, DISABLE);
     }
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Run_Button_EXTI_Line);
@@ -571,7 +529,9 @@ void TIM3_IRQHandler (void)
   if (TIM_GetITStatus (TIM3, TIM_IT_Update) != RESET)
   {
     STM_EVAL_LEDOff(LED5);
-    FiO2_Current[time] = Oxygen_convert();
+    FiO2_Current = Oxygen_convert();
+    FiO2_Buffer[FiO2_index] = FiO2_Current;
+    FiO2_index++;
   }
   STM_EVAL_LEDOn(LED5);
   TIM_ClearITPendingBit (TIM3, TIM_IT_Update);
@@ -846,7 +806,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
 }
 
 //------------------------------------------------------------------------------
-void ConvertInttoString(uint8_t DataInt[])
+void Convert_SaO2_InttoString(uint8_t DataInt[])
 {
   uint8_t i,j;
   for(i = 0; i < 10; i++)
@@ -857,6 +817,31 @@ void ConvertInttoString(uint8_t DataInt[])
     SD_String[j+2] = '0' + ((DataInt[i]%10)/1);
     SD_String[j+3] = '\r';
     SD_String[j+4] = '\n';
+  }
+}
+
+//------------------------------------------------------------------------------
+void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer)
+{
+  uint8_t i,j;
+  for(i = 0; i < Size_Buffer; i++)
+  {
+    j = i*5;
+//    FiO2_Buffer_String[j] = '0'+(uint32_t)FiO2_float/100;
+//    FiO2_Buffer_String[j+1] = '0'+((uint32_t)FiO2_float%100)/10;
+//    FiO2_Buffer_String[j+2] = '0'+((uint32_t)FiO2_float%10)/1;
+//    //FiO2_Buffer_String[j+3] = '.';
+//    //FiO2_Buffer_String[j+4] = '0'+((uint32_t)((FiO2_float)*10.0))%10;
+//    FiO2_Buffer_String[j+3] = '\r';
+//    FiO2_Buffer_String[j+4] = '\n';
+    
+    FiO2_Test_String[j] = '0'+(uint32_t)FiO2_float/100;
+    FiO2_Test_String[j+1] = '0'+((uint32_t)FiO2_float%100)/10;
+    FiO2_Test_String[j+2] = '0'+((uint32_t)FiO2_float%10)/1;
+    //FiO2_Buffer_String[j+3] = '.';
+    //FiO2_Buffer_String[j+4] = '0'+((uint32_t)((FiO2_float)*10.0))%10;
+    FiO2_Test_String[j+3] = '\r';
+    FiO2_Test_String[j+4] = '\n';
   }
 }
 

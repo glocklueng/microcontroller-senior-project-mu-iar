@@ -14,7 +14,6 @@
 
 
 
-
   
   
  
@@ -17951,20 +17950,10 @@ void EXTILine0_Config(void);
 
 
 
-
  
 
 
-
-
-
-
-
- 
-
-
-
-
+void Button_EXTI_Config (void);
 
 
 
@@ -17972,1061 +17961,99 @@ void EXTILine0_Config(void);
  
 
 
-
-
-
-
-
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
- 
-
-
-
- 
-    
-
-
-
- 
-
-  
-
- 
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
- 
- 
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
- 
-
-
-
- 
-typedef enum
+void Button_EXTI_Config (void)
 {
-    LCD_CMD  = 0,
-    LCD_DATA = 1
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
 
-} LcdCmdData;
-
-
- 
-void lcdInit(void);
-void lcdClear(void);
-void lcdUpdate(void);
-void lcdGotoXY(unsigned char x,unsigned char y);
-void lcdChar(char ch);
-void lcdString(unsigned char _x,unsigned char _y,char *dataPtr);
-void lcdPixel(unsigned char x, unsigned char y, unsigned char mode);
-void lcdLine(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2, unsigned char mode);
-void lcdProgBar(    unsigned char _x, 
-				    unsigned char _y, 
-				    unsigned char width, 
-				    unsigned char high, 
-				    unsigned char percentage);
-void configGlcd(void);
-void lcdBackLight(char set);
-
-
- 
-
-
-static void lcdSend(unsigned char Data_Send, LcdCmdData cd);
-void delay_ms(volatile unsigned long ms);
-
-
-
-
- 
-static const unsigned char FontLookup [][5] =
-{
-    { 0x00, 0x00, 0x00, 0x00, 0x00 },  
-    { 0x00, 0x00, 0x2f, 0x00, 0x00 },   
-    { 0x00, 0x07, 0x00, 0x07, 0x00 },   
-    { 0x14, 0x7f, 0x14, 0x7f, 0x14 },   
-    { 0x24, 0x2a, 0x7f, 0x2a, 0x12 },   
-    { 0x23, 0x13, 0x08, 0x64, 0x62 },   
-    { 0x36, 0x49, 0x55, 0x22, 0x50 },   
-    { 0x00, 0x05, 0x03, 0x00, 0x00 },   
-    { 0x00, 0x1c, 0x22, 0x41, 0x00 },   
-    { 0x00, 0x41, 0x22, 0x1c, 0x00 },   
-    { 0x14, 0x08, 0x3E, 0x08, 0x14 },   
-    { 0x08, 0x08, 0x3E, 0x08, 0x08 },   
-    { 0x00, 0x00, 0x50, 0x30, 0x00 },   
-    { 0x10, 0x10, 0x10, 0x10, 0x10 },   
-    { 0x00, 0x60, 0x60, 0x00, 0x00 },   
-    { 0x20, 0x10, 0x08, 0x04, 0x02 },   
-    { 0x3E, 0x51, 0x49, 0x45, 0x3E },   
-    { 0x00, 0x42, 0x7F, 0x40, 0x00 },   
-    { 0x42, 0x61, 0x51, 0x49, 0x46 },   
-    { 0x21, 0x41, 0x45, 0x4B, 0x31 },   
-    { 0x18, 0x14, 0x12, 0x7F, 0x10 },   
-    { 0x27, 0x45, 0x45, 0x45, 0x39 },   
-    { 0x3C, 0x4A, 0x49, 0x49, 0x30 },   
-    { 0x01, 0x71, 0x09, 0x05, 0x03 },   
-    { 0x36, 0x49, 0x49, 0x49, 0x36 },   
-    { 0x06, 0x49, 0x49, 0x29, 0x1E },   
-    { 0x00, 0x36, 0x36, 0x00, 0x00 },   
-    { 0x00, 0x56, 0x36, 0x00, 0x00 },   
-    { 0x08, 0x14, 0x22, 0x41, 0x00 },   
-    { 0x14, 0x14, 0x14, 0x14, 0x14 },   
-    { 0x00, 0x41, 0x22, 0x14, 0x08 },   
-    { 0x02, 0x01, 0x51, 0x09, 0x06 },   
-    { 0x32, 0x49, 0x59, 0x51, 0x3E },   
-    { 0x7E, 0x11, 0x11, 0x11, 0x7E },   
-    { 0x7F, 0x49, 0x49, 0x49, 0x36 },   
-    { 0x3E, 0x41, 0x41, 0x41, 0x22 },   
-    { 0x7F, 0x41, 0x41, 0x22, 0x1C },   
-    { 0x7F, 0x49, 0x49, 0x49, 0x41 },   
-    { 0x7F, 0x09, 0x09, 0x09, 0x01 },   
-    { 0x3E, 0x41, 0x49, 0x49, 0x7A },   
-    { 0x7F, 0x08, 0x08, 0x08, 0x7F },   
-    { 0x00, 0x41, 0x7F, 0x41, 0x00 },   
-    { 0x20, 0x40, 0x41, 0x3F, 0x01 },   
-    { 0x7F, 0x08, 0x14, 0x22, 0x41 },   
-    { 0x7F, 0x40, 0x40, 0x40, 0x40 },   
-    { 0x7F, 0x02, 0x0C, 0x02, 0x7F },   
-    { 0x7F, 0x04, 0x08, 0x10, 0x7F },   
-    { 0x3E, 0x41, 0x41, 0x41, 0x3E },   
-    { 0x7F, 0x09, 0x09, 0x09, 0x06 },   
-    { 0x3E, 0x41, 0x51, 0x21, 0x5E },   
-    { 0x7F, 0x09, 0x19, 0x29, 0x46 },   
-    { 0x46, 0x49, 0x49, 0x49, 0x31 },   
-    { 0x01, 0x01, 0x7F, 0x01, 0x01 },   
-    { 0x3F, 0x40, 0x40, 0x40, 0x3F },   
-    { 0x1F, 0x20, 0x40, 0x20, 0x1F },   
-    { 0x3F, 0x40, 0x38, 0x40, 0x3F },   
-    { 0x63, 0x14, 0x08, 0x14, 0x63 },   
-    { 0x07, 0x08, 0x70, 0x08, 0x07 },   
-    { 0x61, 0x51, 0x49, 0x45, 0x43 },   
-    { 0x00, 0x7F, 0x41, 0x41, 0x00 },   
-    { 0x02, 0x04, 0x08, 0x10, 0x20 },   
-    { 0x00, 0x41, 0x41, 0x7F, 0x00 },   
-    { 0x04, 0x02, 0x01, 0x02, 0x04 },   
-    { 0x40, 0x40, 0x40, 0x40, 0x40 },   
-    { 0x00, 0x01, 0x02, 0x04, 0x00 },   
-    { 0x20, 0x54, 0x54, 0x54, 0x78 },   
-    { 0x7F, 0x48, 0x44, 0x44, 0x38 },   
-    { 0x38, 0x44, 0x44, 0x44, 0x20 },   
-    { 0x38, 0x44, 0x44, 0x48, 0x7F },   
-    { 0x38, 0x54, 0x54, 0x54, 0x18 },   
-    { 0x08, 0x7E, 0x09, 0x01, 0x02 },   
-    { 0x0C, 0x52, 0x52, 0x52, 0x3E },   
-    { 0x7F, 0x08, 0x04, 0x04, 0x78 },   
-    { 0x00, 0x44, 0x7D, 0x40, 0x00 },   
-    { 0x20, 0x40, 0x44, 0x3D, 0x00 },   
-    { 0x7F, 0x10, 0x28, 0x44, 0x00 },   
-    { 0x00, 0x41, 0x7F, 0x40, 0x00 },   
-    { 0x7C, 0x04, 0x18, 0x04, 0x78 },   
-    { 0x7C, 0x08, 0x04, 0x04, 0x78 },   
-    { 0x38, 0x44, 0x44, 0x44, 0x38 },   
-    { 0x7C, 0x14, 0x14, 0x14, 0x08 },   
-    { 0x08, 0x14, 0x14, 0x18, 0x7C },   
-    { 0x7C, 0x08, 0x04, 0x04, 0x08 },   
-    { 0x48, 0x54, 0x54, 0x54, 0x20 },   
-    { 0x04, 0x3F, 0x44, 0x40, 0x20 },   
-    { 0x3C, 0x40, 0x40, 0x20, 0x7C },   
-    { 0x1C, 0x20, 0x40, 0x20, 0x1C },   
-    { 0x3C, 0x40, 0x30, 0x40, 0x3C },   
-    { 0x44, 0x28, 0x10, 0x28, 0x44 },   
-    { 0x0C, 0x50, 0x50, 0x50, 0x3C },   
-    { 0x44, 0x64, 0x54, 0x4C, 0x44 }    
-};
-
-
- 
-
-
- 
-
-
-
-
-
-
-void USART_GUI_Connect (void);
-void CRC_CALCULATE_TX(void);
-unsigned int TX_CRC(unsigned int crc, unsigned int data);
-void connect_command(void);
-void Update_Rule(void);
-
-
-
-
- 
-
-
-void OxygenSensor_Config(void);
-float Oxygen_convert(void);
-void timer_setting (void);
-void FiO2_Check_Timer_Config(void);
-void Calibrate_OxygenSensor(void);
-void Timer6_SetUp (void);
-float Convert_FiO2 (float FiO2_ADC);
-void TestControlValve (void);
-
-
-
- 
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-
- 
-
-
-
-
-
-
-void USART_GUI_Connect (void);
-void CRC_CALCULATE_TX(void);
-unsigned int TX_CRC(unsigned int crc, unsigned int data);
-void connect_command(void);
-void Update_Rule(void);
-
-
-
-
- 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-void SPI2_SetUp(void);
-void LTC1661_Setup(void);
-void SentData_DAC (uint16_t DAC_real, uint8_t channel);
-
-
-
- 
-
-
-uint16_t volatile time = 0;
-
-
-float FiO2_PureOxygen[60], FiO2_PureAir[60];
-float FiO2_Upper, FiO2_Lower;
-float FiO2_Percent;
-float FiO2_DataTest[24];
-float ADC_Voltage;
-float AVG_FiO2;
-uint16_t ADC_Value;
-float current_FiO2[5];
-
-extern uint8_t Profile_Status;
-
-
-
-
-
-
- 
-void OxygenSensor_Config(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  ADC_InitTypeDef ADC_InitStruct;
-  ADC_CommonInitTypeDef ADC_CommonInitStruct;
   
+  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
+   
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0002) | ((uint16_t)0x0010) | ((uint16_t)0x0020) | ((uint16_t)0x0001);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
 
- 
-  RCC_APB2PeriphClockCmd(((uint32_t)0x00000100), ENABLE); 
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE); 
-	
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0008);
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
-	
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0004);
+  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)), &GPIO_InitStructure);
+
    
-   
-  ADC_InitStruct.ADC_Resolution = ((uint32_t)0x01000000);
-   
-  ADC_InitStruct.ADC_ScanConvMode = DISABLE;
-   
-  ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;
-   
-  ADC_InitStruct.ADC_ExternalTrigConvEdge = ((uint32_t)0x00000000);
-   
-  ADC_InitStruct.ADC_ExternalTrigConv = ((uint32_t)0x00000000);
-   
-  ADC_InitStruct.ADC_DataAlign = ((uint32_t)0x00000000);
-   
-  ADC_InitStruct.ADC_NbrOfConversion = 1;
-  ADC_Init(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)),&ADC_InitStruct);
-	
-  
-  ADC_Cmd(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ENABLE);
-  
-   
-    
-  ADC_CommonInitStruct.ADC_Mode = ((uint32_t)0x00000000);
-   
-  ADC_CommonInitStruct.ADC_Prescaler = ((uint32_t)0x00000000);
-   
-  ADC_CommonInitStruct.ADC_DMAAccessMode = ((uint32_t)0x00000000);
-   
-  ADC_CommonInitStruct.ADC_TwoSamplingDelay = ((uint32_t)0x00000000);
-  ADC_CommonInit(&ADC_CommonInitStruct);
-  
-  ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x03), 1,((uint8_t)0x02));
-}
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x00));
 
 
-void Timer6_SetUp(void)
-{
-  
 
 
- 
+
+
+
+
+
+
+
+
+
+
+
    
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x01));
+
    
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  NVIC_InitTypeDef NVIC_InitStructure;
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00002);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
    
-  NVIC_InitStructure.NVIC_IRQChannel = TIM6_DAC_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
   NVIC_Init(&NVIC_InitStructure);
-   
-   
-  RCC_APB1PeriphClockCmd(((uint32_t)0x00000010), ENABLE);
-   
-  TIM_TimeBaseStructure.TIM_Period = 2000; 
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000; 
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = ((uint16_t)0x0000);
-  TIM_TimeBaseInit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), &TIM_TimeBaseStructure);
-   
-  TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001), DISABLE);
-   
-  
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), DISABLE);
-}
-
-
-
-
-
-
-
- 
-void FiO2_Check_Timer_Config(void)
-{
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  NVIC_InitTypeDef NVIC_InitStructure;
 
    
-  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x04));
+
+   
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00010);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+   
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
   NVIC_Init(&NVIC_InitStructure);
+
    
+  SYSCFG_EXTILineConfig(((uint8_t)0x01), ((uint8_t)0x05));
+
    
-  RCC_APB1PeriphClockCmd(((uint32_t)0x00000002), ENABLE);
+  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00020);
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
    
-  TIM_TimeBaseStructure.TIM_Period = 2000; 
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000; 
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = ((uint16_t)0x0000);
-  TIM_TimeBaseInit(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), &TIM_TimeBaseStructure);
-   
-  TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), DISABLE);
-   
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), DISABLE);
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+  NVIC_Init(&NVIC_InitStructure);
 }
 
-
-
-
-
-
-
- 
-float Oxygen_convert(void)
-{
-  
-  
-  
-  ADC_SoftwareStartConv(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
-  while(ADC_GetFlagStatus(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x02)) == RESET);
-   
-  ADC_Value = ADC_GetConversionValue(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)));
-  
-  ADC_Voltage = '\0';
-  ADC_Voltage = (ADC_Value*2.91)/1023;                                          
-  
-  
-
-
-
-
-  
-  return ADC_Value;
-}
-
-
-void Calibrate_OxygenSensor(void)
-{
-  
-  lcdClear();
-  lcdString(3,1,"Waitting....");
-  lcdString(3,3,"Set  Up...");
-  lcdString(1,4,"Oxygen Sensor");
-
-  
-  STM_EVAL_LEDOff(LED6);
-  
-  
-  SentData_DAC(0x03FF, 1);
-  SentData_DAC(0x0000, 2);
-  time = 0;
-  
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
-
-  while(time <= 60)                                                             
-  {
-    if(TIM_GetFlagStatus(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001)) != RESET)
-    {
-      FiO2_PureOxygen[time] = Oxygen_convert();
-      FiO2_Percent = Convert_FiO2(FiO2_PureOxygen[time]);
-      time = time + 1;
-      TIM_ClearFlag(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
-    }
-  }
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), DISABLE);
-  
-  
-  FiO2_Upper = (FiO2_PureOxygen[55] + FiO2_PureOxygen[56] +FiO2_PureOxygen[57] +FiO2_PureOxygen[58] +FiO2_PureOxygen[59])/5;
-  
-  
-  time = 0;
-  SentData_DAC(0x0000, 1);
-  SentData_DAC(0x03FF, 2);
-  
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
-  while(time <= 60)
-  {  
-    if(TIM_GetFlagStatus(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001)) != RESET)
-    {      
-      FiO2_PureAir[time] = Oxygen_convert();
-      FiO2_Percent = Convert_FiO2(FiO2_PureAir[time]);
-      time = time + 1;
-      TIM_ClearFlag(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
-    }
-  } 
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), DISABLE);
-  time = 0;
-  
-  
-  FiO2_Lower = (FiO2_PureAir[55] + FiO2_PureAir[56] +FiO2_PureAir[57] +FiO2_PureAir[58] +FiO2_PureAir[59])/5;
-  
-  
-  SentData_DAC(0x0000, 3);
-  
-  
-  STM_EVAL_LEDOn(LED6);
-  lcdClear();
-  lcdUpdate();
-}
-
-
-
-void EXTI0_IRQHandler(void)
-{
-  if (EXTI_GetFlagStatus(((uint32_t)0x00001)) == SET)
-  {
-    TestControlValve();
-    
-    
-    
-  }
-  
-  
-  EXTI_ClearITPendingBit(((uint32_t)0x00001));
-}
-
-
-void TIM6_DAC_IRQHandler(void)
-{
-  if (TIM_GetITStatus (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001)) != RESET)
-  {
-    time = time + 1;
-    
-    STM_EVAL_LEDOff(LED5);
-  }
-  TIM_ClearITPendingBit (((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
-}
-
-
-
-
-
-
-
- 
-float Convert_FiO2 (float FiO2_ADC)
-{
-  uint8_t x;
-  char FiO2_Percent_Ch[14];
-  float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-1.5)/25;
-  FiO2_Percent = FiO2_mv*21/0.012;
-
-  FiO2_Percent_Ch[0] = '0'+(uint32_t)FiO2_Percent/100;
-  FiO2_Percent_Ch[1] = '0'+((uint32_t)FiO2_Percent%100)/10;
-  FiO2_Percent_Ch[2] = '0'+((uint32_t)FiO2_Percent%10)/1;
-  FiO2_Percent_Ch[3] = '.';
-  FiO2_Percent_Ch[4] = '0'+((uint32_t)((FiO2_Percent)*10.0))%10;
-  FiO2_Percent_Ch[5] = '%';
-  FiO2_Percent_Ch[6] = ' ';
-  FiO2_Percent_Ch[7] = '0'+((uint32_t)ADC_Voltage%10)/1;
-  FiO2_Percent_Ch[8] = '.';
-  FiO2_Percent_Ch[9] = '0'+((uint32_t)((ADC_Voltage)*10.0))%10;
-  FiO2_Percent_Ch[10] = '0' + ((uint32_t)((ADC_Voltage)*100.0))%10;
-  FiO2_Percent_Ch[11] = '0' + ((uint32_t)((ADC_Voltage)*1000.0))%10;
-  FiO2_Percent_Ch[12] = '\n';
-  FiO2_Percent_Ch[13] = '\r';
-  lcdString(1,3,"FiO2: ");
-  lcdString(7,3,FiO2_Percent_Ch);
-  for(x=0 ; x<14 ; x++)
-  {
-    while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0080)) == RESET);
-    USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), FiO2_Percent_Ch[x]); 
-    while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0040)) == RESET);
-  }
-  
-  return FiO2_Percent;
-}
-
-
-void TestControlValve (void)
-{
-  uint16_t Air_Drive, Oxygen_Drive;
-  uint8_t count = 0, i;
-
-
-  lcdClear();
-  lcdUpdate();
-  lcdString(1,1,"Test Control Valve");
-  time = 0;
-  Air_Drive = 0x01C2;                                                               
-  Oxygen_Drive = 0x03AD;                                                            
-
-  SentData_DAC(Air_Drive, 2);
-  SentData_DAC(Oxygen_Drive, 1);
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
-
-  while(count <= 24)
-  {
-    while(time <= 15)
-    {  
-      if(TIM_GetFlagStatus(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001)) != RESET)
-      {
-        if (time >= 15)
-        {
-          for(i = 0; i < 5 ; i++)
-          {
-            current_FiO2[i] = Oxygen_convert();
-            
-            if(i == 4)
-            {
-              AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
-              AVG_FiO2 = AVG_FiO2*2.91/1023;
-              FiO2_DataTest[count] = Convert_FiO2(AVG_FiO2);
-            }
-          }
-        }
-        time = time + 1;
-        TIM_ClearFlag(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
-      }
-    }
-    time = 0;
-    Air_Drive = Air_Drive + 0x0014;
-    Oxygen_Drive = Oxygen_Drive - 0x0014;
-
-    SentData_DAC(Air_Drive, 2);
-    SentData_DAC(Oxygen_Drive, 1);
-
-    count++;
-  }
-  Profile_Status = 5;
-  TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), DISABLE);
-
-}
 
 
 

@@ -10,17 +10,24 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 //------------------------------------------------------------------------------
 #include "main.h"
 #include "Oxygen_sensor.h"
+#include "Connect_GUI.h"
 #include "GLCD5110.h"
 #include "DAC_LTC1661.h"
 //------------------------------------------------------------------------------
 // Define Variable -------------------------------------------------------------
 uint16_t volatile time = 0;
-uint16_t ADC_Voltage;
-float ADC_fValue;
+//uint16_t ADC_Voltage;
+//float ADC_fValue;
 float FiO2_PureOxygen[60], FiO2_PureAir[60];
 float FiO2_Upper, FiO2_Lower;
 float FiO2_Percent;
+float FiO2_DataTest[24];
+float ADC_Voltage;
+float AVG_FiO2;
+uint16_t ADC_Value;
+float current_FiO2[5];
 
+extern uint8_t Profile_Status;
 // Function --------------------------------------------------------------------
 /*
   Funciton : OxygenSensor_Config
@@ -78,7 +85,7 @@ void OxygenSensor_Config(void)
   ADC_CommonInitStruct.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
   ADC_CommonInit(&ADC_CommonInitStruct);
   
-  ADC_RegularChannelConfig(OxygenSensor, ADC_Channel_3, 1,ADC_SampleTime_3Cycles);
+  ADC_RegularChannelConfig(OxygenSensor, ADC_Channel_3, 1,ADC_SampleTime_28Cycles);
 }
 
 //------------------------------------------------------------------------------
@@ -156,8 +163,8 @@ void FiO2_Check_Timer_Config(void)
 */
 float Oxygen_convert(void)
 {
-  float ADC_Voltage;
-  uint16_t ADC_Value;
+  //float ADC_Voltage;
+  //uint16_t ADC_Value;
   
   ADC_SoftwareStartConv(OxygenSensor);
   while(ADC_GetFlagStatus(OxygenSensor, ADC_FLAG_EOC) == RESET);
@@ -165,18 +172,15 @@ float Oxygen_convert(void)
   ADC_Value = ADC_GetConversionValue(OxygenSensor);
   
   ADC_Voltage = '\0';
-  if(ADC_Value > 348)
-  {
-    ADC_Voltage = (ADC_Value*2.94)/1023;                                          //VDD is vary (time1 = 3.02, time2 = 2.94)
-  }
+  ADC_Voltage = (ADC_Value*2.91)/1023;                                          //VDD is vary (time1 = 3.02, time2 = 2.94)
   
   //Convert int to float
-  ADC_fValue = ADC_Voltage/1000;
-  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 1000)/100) * 0.1);
-  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 100)/10) * 0.01);
-  ADC_fValue = ADC_fValue + (float)(((uint32_t)ADC_Voltage % 10/1) * 0.001);
+//  ADC_fValue = ADC_Voltage/1000;
+//  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 1000)/100) * 0.1);
+//  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 100)/10) * 0.01);
+//  ADC_fValue = ADC_fValue + (float)(((uint32_t)ADC_Voltage % 10/1) * 0.001);
   
-  return ADC_Voltage;
+  return ADC_Value;
 }
 
 //------------------------------------------------------------------------------
@@ -250,9 +254,12 @@ void EXTI0_IRQHandler(void)
 {
   if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
   {
-    TIM_Cmd(TIM3, DISABLE);
-    Calibrate_OxygenSensor();
-    TIM_Cmd(TIM3, ENABLE);
+    STM_EVAL_LEDOff(LED5);
+    TestControlValve();
+    //TIM_Cmd(TIM3, DISABLE);
+    //Calibrate_OxygenSensor();
+    //TIM_Cmd(TIM3, ENABLE);
+     STM_EVAL_LEDOn(LED5);
   }
   
   // Clear Flag Interrupt
@@ -280,9 +287,10 @@ void TIM6_DAC_IRQHandler(void)
 */
 float Convert_FiO2 (float FiO2_ADC)
 {
-  char FiO2_Percent_Ch[7];
+  uint8_t x;
+  char FiO2_Percent_Ch[15];
   float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-1.8)/25;
+  FiO2_mv = ((FiO2_ADC)-1.5)/25;
   FiO2_Percent = FiO2_mv*21/0.012;
 
   FiO2_Percent_Ch[0] = '0'+(uint32_t)FiO2_Percent/100;
@@ -291,12 +299,81 @@ float Convert_FiO2 (float FiO2_ADC)
   FiO2_Percent_Ch[3] = '.';
   FiO2_Percent_Ch[4] = '0'+((uint32_t)((FiO2_Percent)*10.0))%10;
   FiO2_Percent_Ch[5] = '%';
-  FiO2_Percent_Ch[6] = '\0';
-
+  FiO2_Percent_Ch[6] = ' ';
+  FiO2_Percent_Ch[7] = '0'+((uint32_t)ADC_Voltage%10)/1;
+  FiO2_Percent_Ch[8] = '.';
+  FiO2_Percent_Ch[9] = '0'+((uint32_t)((ADC_Voltage)*10.0))%10;
+  FiO2_Percent_Ch[10] = '0' + ((uint32_t)((ADC_Voltage)*100.0))%10;
+  FiO2_Percent_Ch[11] = '0' + ((uint32_t)((ADC_Voltage)*1000.0))%10;
+  FiO2_Percent_Ch[12] = 'V';
+  FiO2_Percent_Ch[13] = '\n';
+  FiO2_Percent_Ch[14] = '\r';
   lcdString(1,3,"FiO2: ");
   lcdString(7,3,FiO2_Percent_Ch);
+  for(x=0 ; x<15 ; x++)
+  {
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+    USART_SendData(USART3, FiO2_Percent_Ch[x]); 
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+  }
   
   return FiO2_Percent;
+}
+
+//--------------------------------------------------------------------------------
+void TestControlValve (void)
+{
+  uint16_t Air_Drive, Oxygen_Drive;
+  uint8_t count = 0, i;
+
+
+  lcdClear();
+  lcdUpdate();
+  lcdString(1,1,"Test Control Valve");
+  time = 0;
+  Air_Drive = 0x01C2;                                                               // 0x01C2 = 450 (2.2V)
+  Oxygen_Drive = 0x03AD;                                                            // 0x03AD = 941 (4.6V)
+
+  SentData_DAC(Air_Drive, Oxygen_Valve);
+  SentData_DAC(Oxygen_Drive, Air_Valve);
+  TIM_Cmd(TIM6, ENABLE);
+
+  while(count <= 24)
+  {
+    while(time <= 15)
+    {  
+      if(TIM_GetFlagStatus(TIM6, TIM_FLAG_Update) != RESET)
+      {
+        if (time >= 15)
+        {
+          for(i = 0; i < 5 ; i++)
+          {
+            current_FiO2[i] = Oxygen_convert();
+            //FiO2_DataTest[count] = Convert_FiO2(current_FiO2);
+            if(i == 4)
+            {
+              AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
+              AVG_FiO2 = AVG_FiO2*2.91/1023;
+              FiO2_DataTest[count] = Convert_FiO2(AVG_FiO2);
+            }
+          }
+        }
+        time = time + 1;
+        TIM_ClearFlag(TIM6, TIM_FLAG_Update);
+      }
+    }
+    time = 0;
+    Air_Drive = Air_Drive + 0x0014;
+    Oxygen_Drive = Oxygen_Drive - 0x0014;
+
+    SentData_DAC(Air_Drive, Oxygen_Valve);
+    SentData_DAC(Oxygen_Drive, Air_Valve);
+
+    count++;
+  }
+  Profile_Status = TEST_COMPLETE;
+  TIM_Cmd(TIM6, DISABLE);
+
 }
 
 /*--------------------------------------------------------------------------------------------------

@@ -130,8 +130,8 @@ void LTC1661_Setup(void)
 /*
     uint16_t DAC_data   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
     uint8_t Channel     : Select Channel 
-                          1 - Channel 1
-                          2 - Channel 2
+                          Air Valve - Channel 1
+                          Oxygen Valve - Channel 2
                           3 - Channel 1 and 2
 */
 
@@ -146,12 +146,12 @@ void SentData_DAC (uint16_t DAC_data, uint8_t channel)
   }
  
   /* Select Channel */
-  if(channel == 1)
+  if(channel == Air_Valve)
   {
     DAC_data = DAC_data;
     DAC_sent = (DAC_data << 2) | 0x9000;
   }
-  else if(channel == 2)
+  else if(channel == Oxygen_Valve)
   {
     DAC_data = DAC_data;
     DAC_sent = (DAC_data << 2) | 0xA000;    
