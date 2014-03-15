@@ -157,8 +157,8 @@ int main()
       SentData_DAC(0x00,3);                                                     // Close air and oxygen valve
     }
 
-    //if (Profile_Status == RUN_BUTTON_SET)
-    if (Profile_Status == PROFILE_SETTING_COMPLETE)
+    if (Profile_Status == RUN_BUTTON_SET)
+    //if (Profile_Status == PROFILE_SETTING_COMPLETE)
     {
       // Check Oxygen Saturation condition
       if (Current_OxygenSat < OxygenSaturation_Minimum)
@@ -388,7 +388,7 @@ void System_Init(void)
   // Button Set Up ---------------------------------------------------------
   // Button Config (Interrupt)
   Button_EXTI_Config();
-  EXTILine0_Config();
+  //EXTILine0_Config();
 
   //SD Card : Check Mount Card8
   if (f_mount(0, &filesystem) != FR_OK)
@@ -415,56 +415,55 @@ void System_Init(void)
   * @param  None
   * @retval None
   */
-void EXTILine0_Config(void)
-{
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
-
-  /* Enable GPIOA clock */
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-  /* Enable SYSCFG clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-  
-  /* Configure PA0 pin as input floating */
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-  /* Connect EXTI Line0 to PA0 pin */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
-
-  /* Configure EXTI Line0 */
-  EXTI_InitStructure.EXTI_Line = EXTI_Line0;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
+//void EXTILine0_Config(void)
+//{
+//  EXTI_InitTypeDef   EXTI_InitStructure;
+//  GPIO_InitTypeDef   GPIO_InitStructure;
+//  NVIC_InitTypeDef   NVIC_InitStructure;
+//
+//  /* Enable GPIOA clock */
+//  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+//  /* Enable SYSCFG clock */
+//  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+//  
+//  /* Configure PA0 pin as input floating */
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+//  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+//  GPIO_Init(GPIOA, &GPIO_InitStructure);
+//
+//  /* Connect EXTI Line0 to PA0 pin */
+//  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+//
+//  /* Configure EXTI Line0 */
+//  EXTI_InitStructure.EXTI_Line = EXTI_Line0;
+//  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+//  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+//  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+//  EXTI_Init(&EXTI_InitStructure);
+//
+//  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+//  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//  NVIC_Init(&NVIC_InitStructure);
+//}
 
 
 
 //----------------- GPIO Interrupt Service Routine -------------------------
-// Button Down IRQHandler --------------------------------------------------
-//void Button_Down_IRQHandler(void)
-//{
-//  if(EXTI_GetITStatus(Button_Down_EXTI_Line) != RESET)
-//  {
-//    Drive_FiO2 = Drive_FiO2 - 5;
-//    FiO2_Range(Drive_FiO2);
-//    /* Clear the EXTI line pending bit */
-//    EXTI_ClearITPendingBit(Button_Down_EXTI_Line);
-//  }
-//}
-
+//Button Down IRQHandler --------------------------------------------------
+void Button_Down_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(Button_Down_EXTI_Line) != RESET)
+  {
+    Drive_FiO2 = Drive_FiO2 - 5;
+    FiO2_Range(Drive_FiO2);
+    /* Clear the EXTI line pending bit */
+    EXTI_ClearITPendingBit(Button_Down_EXTI_Line);
+  }
+}
 // Button Up IRQHandler ------------------------------------------------------
 void Button_Up_IRQHandler(void)
 {
@@ -485,12 +484,18 @@ void Run_Button_IRQHandler(void)
     if (Profile_Status == PROFILE_SETTING_COMPLETE)
     {
       Profile_Status = RUN_BUTTON_SET;
+     USART_Cmd(OPM_USART, ENABLE);    
+      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
       TIM_Cmd(TIM3, ENABLE);
+      FiO2_Range(Prefered_FiO2);
     }
     else if (Profile_Status == RUN_BUTTON_SET)
     {
       Profile_Status = PROFILE_SETTING_COMPLETE;
+      USART_Cmd(OPM_USART, DISABLE);    
+      TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
       TIM_Cmd(TIM3, DISABLE);
+      FiO2_Range(21);
     }
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Run_Button_EXTI_Line);

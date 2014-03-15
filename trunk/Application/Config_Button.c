@@ -21,7 +21,7 @@ void Button_EXTI_Config (void)
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   /* Configure PB0, PB1, PB4, PB5 pin as Input */
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_InitStructure.GPIO_Pin = Run_Button_Pin | Alarm_Button_Pin | Button_Up_Pin | Button_Down_Pin;
@@ -42,19 +42,19 @@ void Button_EXTI_Config (void)
   /* Connect EXTI Line0 to PB0 pin (Button Down) */
   SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource0);
 
-//  /* Configure EXTI Line0 (Button Down) */
-//  EXTI_InitStructure.EXTI_Line = Button_Down_EXTI_Line;
-//  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-//  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-//  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-//  EXTI_Init(&EXTI_InitStructure);
-//
-//  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
-//  NVIC_InitStructure.NVIC_IRQChannel = Button_Down_IRQn;
-//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-//  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-//  NVIC_Init(&NVIC_InitStructure);
+  /* Configure EXTI Line0 (Button Down) */
+  EXTI_InitStructure.EXTI_Line = Button_Down_EXTI_Line;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = Button_Down_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+  NVIC_Init(&NVIC_InitStructure);
 
   /* Connect Run_Button_EXTI Line to PB1 pin (Run Button) */
   SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource1);

@@ -18864,7 +18864,7 @@ void FiO2_Range (uint8_t FiO2_Value)
     DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.0);
     SentData_DAC(DAC_Voltage_Oxygen, 2);
   }
-  else if (FiO2_Value >= 56 & FiO2_Value < 61)
+  else if (FiO2_Value >= 55 & FiO2_Value < 61)
   {
     DAC_Voltage_Air = Convert_Voltage_to_Hex(3.2);
     SentData_DAC(DAC_Voltage_Air, 1);
@@ -18873,33 +18873,33 @@ void FiO2_Range (uint8_t FiO2_Value)
   }
   else if (FiO2_Value >= 61 & FiO2_Value < 68)
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.1);
+    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.6);
     SentData_DAC(DAC_Voltage_Air, 1);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.7);
+    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.2);
     SentData_DAC(DAC_Voltage_Oxygen, 2);
   }
-  else if (FiO2_Value >= 68 & FiO2_Value < 78)
+  else if (FiO2_Value >= 68 & FiO2_Value < 80)
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.0);
+    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.4);
     SentData_DAC(DAC_Voltage_Air, 1);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.8);
+    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.4);
     SentData_DAC(DAC_Voltage_Oxygen, 2);
   }
-  else if (FiO2_Value >= 78 & FiO2_Value < 85)
+  else if (FiO2_Value >= 80 & FiO2_Value < 85)
+  {
+    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.2);
+    SentData_DAC(DAC_Voltage_Air, 1);
+    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.6);
+    SentData_DAC(DAC_Voltage_Oxygen, 2);
+  }
+  else if (FiO2_Value >= 85 & FiO2_Value < 93)
   {
     DAC_Voltage_Air = Convert_Voltage_to_Hex(2.9);
     SentData_DAC(DAC_Voltage_Air, 1);
     DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.9);
     SentData_DAC(DAC_Voltage_Oxygen, 2);
   }
-  else if (FiO2_Value >= 85 & FiO2_Value < 90)
-  {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(2.8);
-    SentData_DAC(DAC_Voltage_Air, 1);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(4.0);
-    SentData_DAC(DAC_Voltage_Oxygen, 2);
-  }
-  else if (FiO2_Value >= 90 & FiO2_Value < 95)
+  else if (FiO2_Value >= 93 & FiO2_Value < 95)
   {
     DAC_Voltage_Air = Convert_Voltage_to_Hex(2.7);
     SentData_DAC(DAC_Voltage_Air, 1);

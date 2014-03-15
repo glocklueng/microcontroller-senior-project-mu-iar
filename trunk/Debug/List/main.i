@@ -19449,8 +19449,8 @@ int main()
       SentData_DAC(0x00,3);                                                     
     }
 
+    if (Profile_Status == 3)
     
-    if (Profile_Status == 1)
     {
       
       if (Current_OxygenSat < OxygenSaturation_Minimum)
@@ -19680,7 +19680,7 @@ void System_Init(void)
   
   
   Button_EXTI_Config();
-  EXTILine0_Config();
+  
 
   
   if (f_mount(0, &filesystem) != FR_OK)
@@ -19703,56 +19703,55 @@ void System_Init(void)
 
 
  
-void EXTILine0_Config(void)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void EXTI0_IRQHandler(void)
 {
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
-
-   
-  RCC_AHB1PeriphClockCmd(((uint32_t)0x00000001), ENABLE);
-   
-  RCC_APB2PeriphClockCmd(((uint32_t)0x00004000), ENABLE);
-  
-   
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0001);
-  GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStructure);
-
-   
-  SYSCFG_EXTILineConfig(((uint8_t)0x00), ((uint8_t)0x00));
-
-   
-  EXTI_InitStructure.EXTI_Line = ((uint32_t)0x00001);
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-   
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+  if(EXTI_GetITStatus(((uint32_t)0x00001)) != RESET)
+  {
+    Drive_FiO2 = Drive_FiO2 - 5;
+    FiO2_Range(Drive_FiO2);
+     
+    EXTI_ClearITPendingBit(((uint32_t)0x00001));
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void EXTI9_5_IRQHandler(void)
 {
@@ -19773,12 +19772,18 @@ void EXTI1_IRQHandler(void)
     if (Profile_Status == 1)
     {
       Profile_Status = 3;
+     USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);    
+      TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), ENABLE);
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ENABLE);
+      FiO2_Range(Prefered_FiO2);
     }
     else if (Profile_Status == 3)
     {
       Profile_Status = 1;
+      USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), DISABLE);    
+      TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), DISABLE);
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), DISABLE);
+      FiO2_Range(21);
     }
      
     EXTI_ClearITPendingBit(((uint32_t)0x00002));
