@@ -18582,6 +18582,15 @@ extern uint16_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
 extern uint8_t Profile_Status;
 
+
+
+
+
+
+
+
+
+ 
 void USART_GUI_Connect(void)
 {  
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -18664,6 +18673,7 @@ void USART_GUI_Connect(void)
 
 
 }
+
 
 
 
@@ -18776,6 +18786,12 @@ void USART1_IRQHandler (void)
 }
 
 
+
+
+
+
+
+ 
 void Update_Rule(void)
 {
   uint8_t HN_index;

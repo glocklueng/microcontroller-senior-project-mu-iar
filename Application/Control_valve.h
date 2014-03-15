@@ -16,6 +16,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "Connect_GUI.h"
 //------------------------------------------------------------------------------
 uint16_t Convert_Voltage_to_Hex (uint8_t voltage);
+void FiO2_Range (uint8_t FiO2_Value);
 
 
 

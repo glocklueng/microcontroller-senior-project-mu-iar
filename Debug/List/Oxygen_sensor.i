@@ -18371,6 +18371,7 @@ void Calibrate_OxygenSensor(void);
 void Timer6_SetUp (void);
 float Convert_FiO2 (float FiO2_ADC);
 void TestControlValve (void);
+void FiO2_LCD_Display (float FiO2_Current_Percent);
 
 
 
@@ -18682,6 +18683,7 @@ float AVG_FiO2;
 uint16_t ADC_Value;
 float current_FiO2[5];
 
+char FiO2_Percent_Ch[7];
 extern uint8_t Profile_Status;
 
 
@@ -18705,7 +18707,6 @@ void OxygenSensor_Config(void)
   GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0008);
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0000)), &GPIO_InitStruct);
 	
@@ -18726,9 +18727,6 @@ void OxygenSensor_Config(void)
   ADC_InitStruct.ADC_NbrOfConversion = 1;
   ADC_Init(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)),&ADC_InitStruct);
 	
-  
-  ADC_Cmd(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ENABLE);
-  
    
     
   ADC_CommonInitStruct.ADC_Mode = ((uint32_t)0x00000000);
@@ -18741,6 +18739,9 @@ void OxygenSensor_Config(void)
   ADC_CommonInit(&ADC_CommonInitStruct);
   
   ADC_RegularChannelConfig(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ((uint8_t)0x03), 1,((uint8_t)0x02));
+  
+  
+  ADC_Cmd(((ADC_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x2000)), ENABLE);
 }
 
 
@@ -18835,7 +18836,7 @@ float Oxygen_convert(void)
 
 
   
-  return ADC_Value;
+  return ADC_Voltage;
 }
 
 
@@ -18909,10 +18910,12 @@ void EXTI0_IRQHandler(void)
 {
   if (EXTI_GetFlagStatus(((uint32_t)0x00001)) == SET)
   {
+    STM_EVAL_LEDOff(LED5);
     TestControlValve();
     
     
     
+     STM_EVAL_LEDOn(LED5);
   }
   
   
@@ -18940,45 +18943,39 @@ void TIM6_DAC_IRQHandler(void)
  
 float Convert_FiO2 (float FiO2_ADC)
 {
-  uint8_t x;
-  char FiO2_Percent_Ch[14];
+  
   float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-1.5)/25;
+  FiO2_mv = ((FiO2_ADC)-1.469)/25;
   FiO2_Percent = FiO2_mv*21/0.012;
-
-  FiO2_Percent_Ch[0] = '0'+(uint32_t)FiO2_Percent/100;
-  FiO2_Percent_Ch[1] = '0'+((uint32_t)FiO2_Percent%100)/10;
-  FiO2_Percent_Ch[2] = '0'+((uint32_t)FiO2_Percent%10)/1;
-  FiO2_Percent_Ch[3] = '.';
-  FiO2_Percent_Ch[4] = '0'+((uint32_t)((FiO2_Percent)*10.0))%10;
-  FiO2_Percent_Ch[5] = '%';
-  FiO2_Percent_Ch[6] = ' ';
-  FiO2_Percent_Ch[7] = '0'+((uint32_t)ADC_Voltage%10)/1;
-  FiO2_Percent_Ch[8] = '.';
-  FiO2_Percent_Ch[9] = '0'+((uint32_t)((ADC_Voltage)*10.0))%10;
-  FiO2_Percent_Ch[10] = '0' + ((uint32_t)((ADC_Voltage)*100.0))%10;
-  FiO2_Percent_Ch[11] = '0' + ((uint32_t)((ADC_Voltage)*1000.0))%10;
-  FiO2_Percent_Ch[12] = '\n';
-  FiO2_Percent_Ch[13] = '\r';
-  lcdString(1,3,"FiO2: ");
-  lcdString(7,3,FiO2_Percent_Ch);
-  for(x=0 ; x<14 ; x++)
-  {
-    while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0080)) == RESET);
-    USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), FiO2_Percent_Ch[x]); 
-    while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0040)) == RESET);
-  }
   
   return FiO2_Percent;
+}
+
+
+void FiO2_LCD_Display (float FiO2_Current_Percent)
+{
+  
+  FiO2_Percent_Ch[0] = '0'+((uint32_t)FiO2_Current_Percent/100);
+  FiO2_Percent_Ch[1] = '0'+((uint32_t)FiO2_Current_Percent%100)/10;
+  FiO2_Percent_Ch[2] = '0'+((uint32_t)FiO2_Current_Percent%10)/1;
+  FiO2_Percent_Ch[3] = '.';
+  FiO2_Percent_Ch[4] = '0'+((uint32_t)((FiO2_Current_Percent)*10.0))%10;
+  FiO2_Percent_Ch[5] = '%';
+  FiO2_Percent_Ch[6] = '\0';
+
+  lcdString(1,3,"FiO2: ");
+  lcdString(7,3,FiO2_Percent_Ch);
 }
 
 
 void TestControlValve (void)
 {
   uint16_t Air_Drive, Oxygen_Drive;
-  uint8_t count = 0, i;
-
-
+  uint8_t count = 0, i,x;
+  float current_FiO2[5];
+  float FiO2_P;
+  char FiO2_Percent_Ch_TEST[15];
+  
   lcdClear();
   lcdUpdate();
   lcdString(1,1,"Test Control Valve");
@@ -18986,8 +18983,8 @@ void TestControlValve (void)
   Air_Drive = 0x01C2;                                                               
   Oxygen_Drive = 0x03AD;                                                            
 
-  SentData_DAC(Air_Drive, 2);
-  SentData_DAC(Oxygen_Drive, 1);
+  SentData_DAC(Air_Drive, 1);
+  SentData_DAC(Oxygen_Drive, 2);
   TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ENABLE);
 
   while(count <= 24)
@@ -19000,26 +18997,54 @@ void TestControlValve (void)
         {
           for(i = 0; i < 5 ; i++)
           {
+            current_FiO2[i] = '\0';
             current_FiO2[i] = Oxygen_convert();
             
             if(i == 4)
             {
               AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
-              AVG_FiO2 = AVG_FiO2*2.91/1023;
+              
               FiO2_DataTest[count] = Convert_FiO2(AVG_FiO2);
+              FiO2_P = Convert_FiO2(AVG_FiO2);
+              FiO2_LCD_Display (FiO2_P);
+              
+              FiO2_Percent_Ch_TEST[0] = '0'+((uint32_t)FiO2_P/100);
+              FiO2_Percent_Ch_TEST[1] = '0'+((uint32_t)FiO2_P%100)/10;
+              FiO2_Percent_Ch_TEST[2] = '0'+((uint32_t)FiO2_P%10)/1;
+              FiO2_Percent_Ch_TEST[3] = '.';
+              FiO2_Percent_Ch_TEST[4] = '0'+((uint32_t)((FiO2_P)*10.0))%10;
+              FiO2_Percent_Ch_TEST[5] = '%';
+              FiO2_Percent_Ch_TEST[6] = ' ';
+              FiO2_Percent_Ch_TEST[7] = '0'+((uint32_t)AVG_FiO2/100);
+              FiO2_Percent_Ch_TEST[8] = '0'+((uint32_t)AVG_FiO2%100)/10;
+              FiO2_Percent_Ch_TEST[9] = '0'+((uint32_t)AVG_FiO2%10)/1;
+              FiO2_Percent_Ch_TEST[10] = '.';
+              FiO2_Percent_Ch_TEST[11] = '0'+((uint32_t)((AVG_FiO2)*10.0))%10;
+              FiO2_Percent_Ch_TEST[12] = 'V';
+              FiO2_Percent_Ch_TEST[13] = '\n';
+              FiO2_Percent_Ch_TEST[14] = '\r';
+              
+              for(x = 0 ; x < 15 ; x++)
+              {
+                while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0080)) == RESET);
+                USART_SendData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), FiO2_Percent_Ch_TEST[x]); 
+                while(USART_GetFlagStatus(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0040)) == RESET);
+              }
             }
           }
+          
+          
         }
         time = time + 1;
         TIM_ClearFlag(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x1000)), ((uint16_t)0x0001));
       }
     }
     time = 0;
-    Air_Drive = Air_Drive + 0x0014;
     Oxygen_Drive = Oxygen_Drive - 0x0014;
+    Air_Drive = Air_Drive + 0x0014;
 
-    SentData_DAC(Air_Drive, 2);
-    SentData_DAC(Oxygen_Drive, 1);
+    SentData_DAC(Air_Drive, 1);
+    SentData_DAC(Oxygen_Drive, 2);
 
     count++;
   }

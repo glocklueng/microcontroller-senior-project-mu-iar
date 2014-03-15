@@ -37,8 +37,8 @@ LTC 1661
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_tim.h"
 //------------------------------------------------------------------------------
-uint16_t  DAC_data,DAC_sent;
-uint8_t channel;
+//uint16_t  DAC_data,DAC_sent;
+//uint8_t channel;
 
 // Function --------------------------------------------------------------------
 void SPI2_SetUp(void)
@@ -61,7 +61,7 @@ void SPI2_SetUp(void)
   RCC_AHB1PeriphClockCmd(SPI2_PortC_CLK, ENABLE);
     
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_10;                    //Set for SCK Pin
+  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_10;                                      //Set for SCK Pin
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -69,7 +69,7 @@ void SPI2_SetUp(void)
   GPIO_Init(GPIOB , &GPIO_InitStruct);
   
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_3;                    //Set for MOSI Pin
+  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_3;                                       //Set for MOSI Pin
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -81,9 +81,9 @@ void SPI2_SetUp(void)
   GPIO_PinAFConfig(GPIOC ,GPIO_PinSource3 ,GPIO_AF_SPI2);
 
   //Config SPI                        
-  SPI_InitStruct.SPI_Direction = SPI_Direction_1Line_Tx;      // Tx Only
+  SPI_InitStruct.SPI_Direction = SPI_Direction_1Line_Tx;                        // Tx Only
   SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
-  SPI_InitStruct.SPI_DataSize = SPI_DataSize_16b;       //Data size is 16 bits for transfer data 10 bits to DAC IC
+  SPI_InitStruct.SPI_DataSize = SPI_DataSize_16b;                               //Data size is 16 bits for transfer data 10 bits to DAC IC
   SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
   SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
   SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
@@ -97,7 +97,12 @@ void SPI2_SetUp(void)
   //Enable SPI2
   SPI_Cmd(SPI2,ENABLE);
 }
-
+/*
+  Function : LTC1661_Setup
+  Input : None
+  Return: None
+  Description : Configuration the NSS pin for DAC (LTC1661). It use Port B Pin 12
+*/
 void LTC1661_Setup(void)
 {
   /*use SPI2 for Transfer data to DAC IC (LTC 1661)*/
@@ -130,13 +135,14 @@ void LTC1661_Setup(void)
 /*
     uint16_t DAC_data   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
     uint8_t Channel     : Select Channel 
-                          Air Valve - Channel 1
-                          Oxygen Valve - Channel 2
+                          Air Valve - Channel 1 (Pin8)
+                          Oxygen Valve - Channel 2 (Pin 5)
                           3 - Channel 1 and 2
 */
 
 void SentData_DAC (uint16_t DAC_data, uint8_t channel)
 {
+  uint16_t DAC_sent;
   //Check Datasize config is 8 bits or 16 bits
   if ((SPI2->CR1 & 0x0800) == 0x0000)
   {

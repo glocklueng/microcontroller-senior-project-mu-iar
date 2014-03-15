@@ -17993,8 +17993,8 @@ void SentData_DAC (uint16_t DAC_real, uint8_t channel);
 
  
 
-uint16_t  DAC_data,DAC_sent;
-uint8_t channel;
+
+
 
 
 void SPI2_SetUp(void)
@@ -18017,7 +18017,7 @@ void SPI2_SetUp(void)
   RCC_AHB1PeriphClockCmd(((uint32_t)0x00000004), ENABLE);
     
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0400);                    
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0400);                                      
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -18025,7 +18025,7 @@ void SPI2_SetUp(void)
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0400)) , &GPIO_InitStruct);
   
    
-  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0008);                    
+  GPIO_InitStruct.GPIO_Pin  = ((uint16_t)0x0008);                                       
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -18037,9 +18037,9 @@ void SPI2_SetUp(void)
   GPIO_PinAFConfig(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)) ,((uint8_t)0x03) ,((uint8_t)0x05));
 
   
-  SPI_InitStruct.SPI_Direction = ((uint16_t)0xC000);      
+  SPI_InitStruct.SPI_Direction = ((uint16_t)0xC000);                        
   SPI_InitStruct.SPI_Mode = ((uint16_t)0x0104);
-  SPI_InitStruct.SPI_DataSize = ((uint16_t)0x0800);       
+  SPI_InitStruct.SPI_DataSize = ((uint16_t)0x0800);                               
   SPI_InitStruct.SPI_CPOL = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_CPHA = ((uint16_t)0x0000);
   SPI_InitStruct.SPI_NSS = ((uint16_t)0x0200);
@@ -18054,6 +18054,11 @@ void SPI2_SetUp(void)
   SPI_Cmd(((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800)),ENABLE);
 }
 
+
+
+
+
+ 
 void LTC1661_Setup(void)
 {
    
@@ -18093,6 +18098,7 @@ void LTC1661_Setup(void)
 
 void SentData_DAC (uint16_t DAC_data, uint8_t channel)
 {
+  uint16_t DAC_sent;
   
   if ((((SPI_TypeDef *) (((uint32_t)0x40000000) + 0x3800))->CR1 & 0x0800) == 0x0000)
   {

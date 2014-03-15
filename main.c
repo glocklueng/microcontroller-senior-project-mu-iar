@@ -3,7 +3,7 @@ Project : Programmable Control of Airflow System for Maintaining Oxygen Saturati
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : main.c
 Deverloper : Phattaradanai Kiratiwudhikul
-Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+Reseach & Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -46,7 +46,6 @@ void INTTIM_Config(void);
 void EXTILine0_Config(void);
 void Alarm_Timer_SetUp (void);
 void Alarm_Function(uint8_t Command);
-void Button_EXTI_Config(void);
 void Timer3_Config(void);
 
 /* Private function prototypes -----------------------------------------------*/
@@ -72,11 +71,15 @@ float FiO2_Buffer[10];
 char FiO2_Buffer_String[50];
 char FiO2_Test_String[120];
 uint8_t FiO2_index;
+uint8_t Purpose_FiO2, Drive_FiO2;
+float FiO2_percentage;
+
+uint8_t Sampling_time;
 
 extern uint8_t OxygenSat_buffer[10];
 extern uint8_t SD_Card_index;
 extern uint8_t rx_index_OPM;
-extern uint8_t Current_OyxgenSat;
+extern uint8_t Current_OxygenSat;
 extern float FiO2_DataTest[24];
 
 // Status ----------------------------------------------------------------------
@@ -88,6 +91,7 @@ extern float FiO2_DataTest[24];
 #define Status_OxygenSat_Below_L2             2
 #define Status_OxygenSat_Behigh_L1            3
 #define Status_OxygenSat_Behigh_L2            4
+#define Status_Alarm                          5
 
 uint8_t Current_Status;
 uint8_t Time_AlarmLevel = 0;
@@ -110,9 +114,10 @@ int main()
  /* Set Up config System*/
   System_Init();
   lcdString (1,1,"Please Upload Profile");
-  ret = f_open(&file, "TEST.TXT", FA_WRITE | FA_CREATE_ALWAYS);
   
   Profile_Status = PROFILE_NOTUPLOAD;
+//  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+//  TIM_Cmd(TIM3, ENABLE);
  
   
 //  Test Transfer Data to SD Card
@@ -132,6 +137,7 @@ int main()
       Create_file(Hospital_Number, OxygenSaturation_file);                      // Create Oxygen Saturation file
       Create_file(Hospital_Number, FiO2_file);                                  // Create FiO2 file
       Profile_Status = PROFILE_SETTING_COMPLETE;
+      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
       TIM_Cmd(TIM3, ENABLE);
       
       NVIC_InitTypeDef   NVIC_InitStructure;
@@ -142,6 +148,8 @@ int main()
       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
       NVIC_Init(&NVIC_InitStructure);
+
+      FiO2_Range(Prefered_FiO2);
     }
     else if (Profile_Status == PROFILE_NOTUPLOAD)
     {
@@ -153,53 +161,105 @@ int main()
     if (Profile_Status == PROFILE_SETTING_COMPLETE)
     {
       // Check Oxygen Saturation condition
-      if (Current_OyxgenSat < OxygenSaturation_Minimum)
+      if (Current_OxygenSat < OxygenSaturation_Minimum)
       {
         // Current Oxygen Saturation less than Minimum Oxygen Saturation
-        if (Current_Status != Status_OxygenSat_Below_L1 & Current_Status != Status_OxygenSat_Below_L2)
+        if ((Current_Status != Status_OxygenSat_Below_L1) & (Current_Status != Status_OxygenSat_Below_L2) & (Current_Status != Status_Alarm))
         {
+          Alarm_Function(ALARM_DISABLE);
           Current_Status = Status_OxygenSat_Below_L1;
-          Alarm_Function(ALARM_ENABLE);
-          lcdString(1,5,"Status: Below");
-          lcdString(1,6,"Alarm Level 1");
+          Purpose_FiO2 = Prefered_FiO2 + 15;
+          if(Purpose_FiO2 > FiO2_Maximum)
+          {
+            Drive_FiO2 = FiO2_Maximum;
+            FiO2_Range(Drive_FiO2);
+          }
+          else
+          {
+            Drive_FiO2 = Purpose_FiO2;
+            FiO2_Range(Drive_FiO2);
+          }
+            
+          if(Current_Status != Status_Alarm)
+          {
+            Alarm_Function(ALARM_ENABLE);
+            lcdString(1,5,"Status: Below ");
+            lcdString(1,6,"Alarm Level 1");
+          }
         }      
       }
-      else if (Current_OyxgenSat > OxygenSaturaiton_Maximum)
+      else if (Current_OxygenSat > OxygenSaturaiton_Maximum)
       {
         // Current Oxygen Saturation more than maximum Oxygen Saturation
-        if (Current_Status != Status_OxygenSat_Behigh_L1 & Current_Status != Status_OxygenSat_Behigh_L2)
+        if (Current_Status != Status_OxygenSat_Behigh_L1 & Current_Status != Status_OxygenSat_Behigh_L2 & Current_Status != Status_Alarm)
         {
+          Alarm_Function(ALARM_DISABLE);
           Current_Status = Status_OxygenSat_Behigh_L1;
+          Purpose_FiO2 = Prefered_FiO2 - 15;
+          if (Purpose_FiO2 < FiO2_Minimum)
+          {
+            Drive_FiO2 = FiO2_Minimum;
+            FiO2_Range(Drive_FiO2);
+          }
+          else
+          {
+            Drive_FiO2 = Purpose_FiO2;
+            FiO2_Range(Drive_FiO2);
+          }
           Alarm_Function(ALARM_ENABLE);
           lcdString(1,5,"Status: Behigh");
           lcdString(1,6,"Alarm Level 1");
         }
       }
-      else if (Current_OyxgenSat - OxygenSaturation_Minimum <= 1)
+      else if (Current_OxygenSat - OxygenSaturation_Minimum == 1)
       {
-        if (Current_Status!= Status_Normal)
+        if (Current_Status != Status_Normal)
         {
           Current_Status = Status_Normal;
+          Purpose_FiO2 = Prefered_FiO2 + 5;
+          if(Purpose_FiO2 > FiO2_Maximum)
+          {
+            Drive_FiO2 = FiO2_Maximum;
+            FiO2_Range(Drive_FiO2);
+          }
+          else
+          {
+            Drive_FiO2 = Purpose_FiO2;
+            FiO2_Range(Drive_FiO2);
+          }
           lcdString(1,5,"Status: Normal");
           lcdString(1,6,"              ");
           Alarm_Function(ALARM_DISABLE);  
         }
       }
-      else if (OxygenSaturaiton_Maximum - Current_OyxgenSat >= 1)
+      else if (OxygenSaturaiton_Maximum - Current_OxygenSat == 1)
       {
         if (Current_Status!= Status_Normal)
         {
           Current_Status = Status_Normal;
+          Purpose_FiO2 = Prefered_FiO2 - 5;
+          if(Purpose_FiO2 < FiO2_Minimum)
+          {
+            Drive_FiO2 = FiO2_Minimum;
+            FiO2_Range(Drive_FiO2);
+          }
+          else
+          {
+            Drive_FiO2 = Purpose_FiO2;
+            FiO2_Range(Drive_FiO2);
+          }
           lcdString(1,5,"Status: Normal");
           lcdString(1,6,"              ");
           Alarm_Function(ALARM_DISABLE); 
         }
       }
-      else if (Current_OyxgenSat >= OxygenSaturation_Minimum & Current_OyxgenSat <= OxygenSaturaiton_Maximum)
+      else if (Current_OxygenSat >= OxygenSaturation_Minimum & Current_OxygenSat <= OxygenSaturaiton_Maximum)
       {
         // Current Oxygen Saturaiton is between Maximum Oxygen Saturation and Minimum Oxygen Saturation
         if (Current_Status!= Status_Normal)
         {
+          Drive_FiO2 = Prefered_FiO2;
+          FiO2_Range(Drive_FiO2);
           lcdString(1,5,"Status: Normal");
           lcdString(1,6,"              ");
           Current_Status = Status_Normal;
@@ -227,17 +287,17 @@ int main()
       }
       
       // Store FiO2_Buffer in SD Card
-      if (FiO2_index >= sizeof(FiO2_Buffer))
+      if ((FiO2_index*4) >= sizeof(FiO2_Buffer))
       {
         HospitalNumber_File[7] = 'F';
         FiO2_index = 0;
         Convert_FiO2_FloattoString(FiO2_Buffer,10);
         ret = f_open(&file_F, HospitalNumber_File, FA_WRITE);
-        if (ret) 
+        if (ret)
         {
           fault_err(ret);
         } 
-        else 
+        else
         {  
           ret = f_lseek(&file_F,f_size(&file_F));
           ret = f_write(&file_F, FiO2_Buffer_String, 50, &bw);
@@ -245,26 +305,7 @@ int main()
         } 
       }
     }
-    if (Profile_Status == TEST_COMPLETE)
-    {
-      Convert_FiO2_FloattoString(FiO2_DataTest,24);
-      ret = f_open(&file, "TEST.TXT", FA_WRITE);
-      if (ret) 
-      {
-        fault_err(ret);
-      } 
-      else 
-      {  
-        ret = f_lseek(&file,f_size(&file));
-        ret = f_write(&file, "File: Test Contorl Valve\r\n", 27, &bw);
-        ret = f_lseek(&file,f_size(&file));
-        ret = f_write(&file, FiO2_Test_String, 120, &bw);
-        ret = f_close(&file);
-      }
-      Profile_Status = PROFILE_NOTUPLOAD;
-    }
   }
-  
 }
 
 // Alarm Function --------------------------------------------------------------
@@ -369,44 +410,6 @@ void System_Init(void)
 }
 
 //------------------------------------------------------------------------------
-//void INTTIM_Config(void)
-//{
-//  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-//  NVIC_InitTypeDef NVIC_InitStructure;
-//  /* Enable the TIM2 gloabal Interrupt */
-//  NVIC_InitStructure.NVIC_IRQChannel = TIM6_DAC_IRQn;
-//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//  NVIC_Init(&NVIC_InitStructure);
-//   
-//  /* TIM2 clock enable */
-//  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-//  /* Time base configuration */
-//  TIM_TimeBaseStructure.TIM_Period = 2000; // 1 MHz down to 1 KHz (1 ms)
-//  TIM_TimeBaseStructure.TIM_Prescaler = 42000; // 24 MHz Clock down to 1 MHz (adjust per your clock)
-//  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-//  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-//  TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);
-//  /* TIM IT enable */
-//  TIM_ITConfig(TIM6, TIM_IT_Update, ENABLE);
-//  /* TIM2 enable counter */
-//  TIM_Cmd(TIM6, ENABLE);
-//  TIM_Cmd(TIM6, DISABLE);
-//}
-//void TIM6_DAC_IRQHandler(void)
-//{
-//  if (TIM_GetITStatus (TIM6, TIM_IT_Update) != RESET)
-//  {
-//    time = time + 1;
-//    STM_EVAL_LEDOff(LED5);
-//    TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
-//  }
-//}
-
-
-
-//------------------------------------------------------------------------------
 /**
   * @brief  Configures EXTI Line0 (connected to PA0 pin) in interrupt mode
   * @param  None
@@ -455,6 +458,8 @@ void EXTILine0_Config(void)
 //{
 //  if(EXTI_GetITStatus(Button_Down_EXTI_Line) != RESET)
 //  {
+//    Drive_FiO2 = Drive_FiO2 - 5;
+//    FiO2_Range(Drive_FiO2);
 //    /* Clear the EXTI line pending bit */
 //    EXTI_ClearITPendingBit(Button_Down_EXTI_Line);
 //  }
@@ -465,6 +470,8 @@ void Button_Up_IRQHandler(void)
 {
   if (EXTI_GetITStatus(Button_Up_EXTI_Line) != RESET)
   {
+    Drive_FiO2 = Drive_FiO2 + 5;
+    FiO2_Range(Drive_FiO2);
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Button_Up_EXTI_Line);
   }
@@ -511,7 +518,7 @@ void Alarm_Button_IRQHandler(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    GPIO_ResetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
+    //GPIO_ResetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
 
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Alarm_Button_EXTI_Line);
@@ -522,16 +529,35 @@ void Alarm_Button_IRQHandler(void)
   Function : TIM3_IRQHandler
   Input : None
   Return: None
-  Description : Timer 3 Interrupt Sevice Routine
+  Description : Timer 3 Interrupt Sevice Routine 
+                FiO2 Analog to Digital Converter every 1 second.
 */
 void TIM3_IRQHandler (void)
 {
+  uint8_t j;
+  float current_FiO2_Sampling[5], AVG_FiO2_Current;
+  
   if (TIM_GetITStatus (TIM3, TIM_IT_Update) != RESET)
   {
-    STM_EVAL_LEDOff(LED5);
-    FiO2_Current = Oxygen_convert();
-    FiO2_Buffer[FiO2_index] = FiO2_Current;
-    FiO2_index++;
+    if(Sampling_time >= 5)
+    {
+      STM_EVAL_LEDOff(LED5);
+      for(j = 0; j < 5 ; j++)
+      {
+        current_FiO2_Sampling[j] = '\0';
+        current_FiO2_Sampling[j] = Oxygen_convert();
+        if(j == 4)
+        {
+          AVG_FiO2_Current = ((current_FiO2_Sampling[0] + current_FiO2_Sampling[1] + current_FiO2_Sampling[2] + current_FiO2_Sampling[3] + current_FiO2_Sampling[4])/5);
+          FiO2_percentage = Convert_FiO2(AVG_FiO2_Current);
+          FiO2_LCD_Display (FiO2_percentage);
+          FiO2_Buffer[FiO2_index] = FiO2_percentage;
+          FiO2_index++;
+        }
+      }
+      Sampling_time = 0;
+    }
+    Sampling_time++;
   }
   STM_EVAL_LEDOn(LED5);
   TIM_ClearITPendingBit (TIM3, TIM_IT_Update);
@@ -558,7 +584,6 @@ void USART_HyperTermianl_Connect(void)
   
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-  
   /*
     Use Port B Pin PD6 
     Use Port B Pin PD7 
@@ -586,11 +611,11 @@ void USART_HyperTermianl_Connect(void)
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
   USART_Init(USART3, &USART_InitStruct);
   
-   /*USART Interrupt*/
+  /*USART Interrupt*/
   /* Set interrupt: NVIC_Setup */
   NVIC_InitTypeDef NVIC_InitStruct;
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-  //ENABLE USART1 Interruper
+  //ENABLE USART3 Interruper
   NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
@@ -601,7 +626,7 @@ void USART_HyperTermianl_Connect(void)
   //ENABLE the USART Receive Interrupt
   USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
 
-  //Enable USART1
+  //Enable USART3
   USART_Cmd(USART3, ENABLE);
 }
 //------------------------------------------------------------------------------
@@ -643,7 +668,7 @@ void USART_HyperTermianl_Connect(void)
   Function : USART3_IRQHandler
   Input : None
   Return: None
-  Description : 
+  Description : Simulate as Oxygen Pulse Meter. It will send Oxygen Saturation value.
 */
 //------------------------------------------------------------------------------
 void USART3_IRQHandler(void)
@@ -658,12 +683,42 @@ void USART3_IRQHandler(void)
     if(rx_index_OPM >= 3)
     {  
       rx_index_OPM = 0;
-      Current_OyxgenSat = atoi(DataFromOPM_TEST);
-      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      Current_OxygenSat = atoi(DataFromOPM_TEST);
+      OxygenSat_buffer[SD_Card_index] = Current_OxygenSat;
       SD_Card_index++;
-      lcdString(6,2,DataFromOPM_TEST);
-      lcdString(9,2,"%");
+      if(Current_Status != Status_Alarm)
+      {
+        lcdString(7,2,DataFromOPM_TEST);
+        lcdString(10,2,"%  ");
+      }
+      
     }
+    
+    if((Current_Status == Status_Alarm) & (Current_OxygenSat >= OxygenSaturation_Minimum) & (Current_OxygenSat <= OxygenSaturaiton_Maximum))
+    {
+      Current_Status = Status_Normal;
+      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+      TIM_Cmd(TIM3, ENABLE);
+      lcdClear();
+      lcdUpdate();
+      lcdString (1,1,Hospital_Number);
+      lcdString (1,2,"SaO2 : ");
+      lcdString (7,2,DataFromOPM_TEST);
+      lcdString (10,2, "%");
+      lcdString (1,5,"Status: Normal ");
+      lcdString (1,6,"               ");
+      if (Mode == 0xB7)
+      {
+        //Select Range Mode
+        lcdString(1,4,"Mode: Range");
+      }
+      else if (Mode == 0xA2)
+      {
+        //Selecte Auto Mode
+        lcdString(1,4,"Mode: Auto");
+      }
+    }
+    
   }
   USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 }
@@ -688,8 +743,8 @@ void Alarm_Timer_SetUp (void)
   /* TIM2 clock enable */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 2000; // 1 MHz down to 1 KHz (1 ms)
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000; // 24 MHz Clock down to 1 MHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_Period = 2000;                                      // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
@@ -714,12 +769,34 @@ void TIM2_IRQHandler(void)
         if (Current_Status == Status_OxygenSat_Below_L1)
         {
           Current_Status = Status_OxygenSat_Below_L2;
-          lcdString(1,5,"Status: Below");
+          Purpose_FiO2 = Prefered_FiO2 + 25;
+          if (Purpose_FiO2 > FiO2_Maximum)
+          {
+            Drive_FiO2 = FiO2_Maximum;
+            FiO2_Range(Drive_FiO2);
+          }
+          else
+          {
+            Drive_FiO2 = Purpose_FiO2;
+            FiO2_Range(Drive_FiO2);
+          }
+          lcdString(1,5,"Status: Below ");
           lcdString(1,6,"Alarm Level 2");
         }
         else if (Current_Status == Status_OxygenSat_Behigh_L1)
         {
           Current_Status = Status_OxygenSat_Behigh_L2;
+          Purpose_FiO2 = Prefered_FiO2 - 25;
+          if (Purpose_FiO2 < FiO2_Minimum)
+          {
+            Drive_FiO2 = FiO2_Minimum;
+            FiO2_Range(Drive_FiO2);
+          }
+          else
+          {
+            Drive_FiO2 = Purpose_FiO2;
+            FiO2_Range(Drive_FiO2);
+          }
           lcdString(1,5,"Status: Behigh");
           lcdString(1,6,"Alarm Level 2");
         }
@@ -727,8 +804,15 @@ void TIM2_IRQHandler(void)
     }
     if (Current_Status == Status_OxygenSat_Below_L2 | Current_Status == Status_OxygenSat_Behigh_L2)
     {
+      /* Alarm Level 2 */
       if (Time_AlarmLevel >= Alarm_Level2)
       {
+        GPIO_SetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
+        Current_Status = Status_Alarm;
+        USART_Cmd(OPM_USART, DISABLE);                                          // ENABLE Oxygen Pulse Meter USART
+        TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
+        TIM_Cmd(TIM3, DISABLE);
+      
         NVIC_InitTypeDef   NVIC_InitStructure;
         
         /* Enable and set Alarm_Button_EXTI Line Interrupt to the lowest priority */
@@ -738,12 +822,16 @@ void TIM2_IRQHandler(void)
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
         NVIC_Init(&NVIC_InitStructure);
 
+
+        //Time_AlarmLevel = 0;
+
         /* Notification Alarm Board (Toggle Pin to Alarm Circuit) */
         lcdClear();
-        lcdString(2,3,"Alram !!!");
+        lcdUpdate();
+        lcdString(3,1,"ALARM !!!");
+        lcdString(1,2,"PLEASE PUSH");
+        lcdString(1,3,"ALARM BUTTON");
         Alarm_Function(ALARM_DISABLE);
-        GPIO_SetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
-        Time_AlarmLevel = 0;
       }
     }
     TIM_ClearITPendingBit (TIM2, TIM_IT_Update);
@@ -827,26 +915,22 @@ void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer)
   for(i = 0; i < Size_Buffer; i++)
   {
     j = i*5;
-//    FiO2_Buffer_String[j] = '0'+(uint32_t)FiO2_float/100;
-//    FiO2_Buffer_String[j+1] = '0'+((uint32_t)FiO2_float%100)/10;
-//    FiO2_Buffer_String[j+2] = '0'+((uint32_t)FiO2_float%10)/1;
-//    //FiO2_Buffer_String[j+3] = '.';
-//    //FiO2_Buffer_String[j+4] = '0'+((uint32_t)((FiO2_float)*10.0))%10;
-//    FiO2_Buffer_String[j+3] = '\r';
-//    FiO2_Buffer_String[j+4] = '\n';
+    FiO2_Buffer_String[j] = '0'+(uint32_t)FiO2_float[i]/100;
+    FiO2_Buffer_String[j+1] = '0'+((uint32_t)FiO2_float[i]%100)/10;
+    FiO2_Buffer_String[j+2] = '0'+((uint32_t)FiO2_float[i]%10)/1;
+    FiO2_Buffer_String[j+3] = '\r';
+    FiO2_Buffer_String[j+4] = '\n';
     
-    FiO2_Test_String[j] = '0'+(uint32_t)FiO2_float/100;
-    FiO2_Test_String[j+1] = '0'+((uint32_t)FiO2_float%100)/10;
-    FiO2_Test_String[j+2] = '0'+((uint32_t)FiO2_float%10)/1;
-    //FiO2_Buffer_String[j+3] = '.';
-    //FiO2_Buffer_String[j+4] = '0'+((uint32_t)((FiO2_float)*10.0))%10;
-    FiO2_Test_String[j+3] = '\r';
-    FiO2_Test_String[j+4] = '\n';
+//    FiO2_Test_String[j] = '0'+(uint32_t)FiO2_float/100;
+//    FiO2_Test_String[j+1] = '0'+((uint32_t)FiO2_float%100)/10;
+//    FiO2_Test_String[j+2] = '0'+((uint32_t)FiO2_float%10)/1;
+//    FiO2_Test_String[j+3] = '\r';
+//    FiO2_Test_String[j+4] = '\n';
   }
 }
 
 //------------------------------------------------------------------------------
-void SD_Write(char FileName[], char SD_Data[], UINT Data_size)
+void SD_Write(char FileName[], char SD_Data[], unsigned int Data_size)
 {
   ret = f_open(&file, FileName, FA_WRITE);
   if (ret) 
