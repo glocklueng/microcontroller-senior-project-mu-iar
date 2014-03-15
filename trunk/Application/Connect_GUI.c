@@ -81,6 +81,15 @@ extern uint16_t Alarm_Level1, Alarm_Level2;
 extern uint8_t Mode;
 extern uint8_t Profile_Status;
 //------------------------------------------------------------------------------
+/*
+  Function : USART_GUI_Connect
+  Input : None
+  Output: None
+  Description : Configuration USART1 for connecting with GUI
+                Baud Rate = 115200
+                Tx Pin : PB6
+                Rx Pin : PB7
+*/
 void USART_GUI_Connect(void)
 {  
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -167,8 +176,9 @@ void USART_GUI_Connect(void)
 // CRC Calculate ---------------------------------------------------------------
 /*
     CRC 16 - ModBus 
-    Length : 16 bits (2 Bytes - CRC_High, CRC_Low)
-    Polynomial : 0xA001
+    Input : None
+    Output: None
+    Description : Calculate CRC-16 (ModBus Standard), Length 2 Bytes (CRC-High, CRC-Low), Polynomial(0xA001)
 */
 void CRC_CALCULATE_TX(void)
 {  
@@ -275,6 +285,12 @@ void GUI_IRQHandler (void)
 }
 
 // Update Rule -----------------------------------------------------------------
+/*
+  Function : Update_Rule
+  Input : None
+  Output: None
+  Description : 
+*/
 void Update_Rule(void)
 {
   uint8_t HN_index;

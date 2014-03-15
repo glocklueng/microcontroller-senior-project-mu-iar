@@ -17983,7 +17983,7 @@ int Get_OxygenSat(void);
 
 unsigned char DataFromOPM[133]; 
 
-uint8_t Current_OyxgenSat;
+uint8_t Current_OxygenSat;
 uint8_t SD_Card_index = 0;
 uint8_t tx_index_OPM = 0;
 uint8_t rx_index_OPM = 0;
@@ -18021,7 +18021,8 @@ void Oxygen_PM_Setup(void)
   GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), &GPIO_InitStruct);
   
    
-  USART_InitStruct.USART_BaudRate = 4800;
+  
+  USART_InitStruct.USART_BaudRate = 115200;
   USART_InitStruct.USART_WordLength = ((uint16_t)0x0000);
   USART_InitStruct.USART_StopBits = ((uint16_t)0x0000);
   USART_InitStruct.USART_Parity = ((uint16_t)0x0000) ;
@@ -18096,8 +18097,8 @@ void USART6_IRQHandler(void)
     {  
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0800)), DISABLE);
       rx_index_OPM = 0;
-      Current_OyxgenSat = Get_OxygenSat();
-      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      Current_OxygenSat = Get_OxygenSat();
+      OxygenSat_buffer[SD_Card_index] = Current_OxygenSat;
       SD_Card_index++;
     }
   }
@@ -18134,7 +18135,7 @@ int Get_OxygenSat(void)
       OxygenSat_string[i] = DataFromOPM[37+i];
     }
     OxygenSat_Percent = atoi(OxygenSat_string);                                             
-    Current_OyxgenSat = OxygenSat_Percent;
+    Current_OxygenSat = OxygenSat_Percent;
   }
   else
   {
@@ -18149,103 +18150,7 @@ int Get_OxygenSat(void)
   }
   
   return OxygenSat_Percent;
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
 
 
 void TIM4_IRQHandler (void)

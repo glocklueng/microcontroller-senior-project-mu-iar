@@ -27,13 +27,17 @@ void Button_EXTI_Config (void)
   GPIO_InitStructure.GPIO_Pin = Run_Button_Pin | Alarm_Button_Pin | Button_Up_Pin | Button_Down_Pin;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-  /* Configure Alarm_Set_Pin (PB2) */
+  /* Configure Alarm_Set_Pin (PC2) */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+  
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_InitStructure.GPIO_Pin = Alarm_Set_Pin;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(GPIOC, &GPIO_InitStructure);
+  
+  GPIO_ResetBits(GPIOC, GPIO_Pin_2);
 
   /* Connect EXTI Line0 to PB0 pin (Button Down) */
   SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource0);
@@ -102,6 +106,7 @@ void Button_EXTI_Config (void)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
   NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
   NVIC_Init(&NVIC_InitStructure);
+
 }
 
 // End of File -------------------------------------------------------------------

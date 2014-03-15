@@ -14,7 +14,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
 unsigned char DataFromOPM[133]; 
 //------------------------------------------------------------------------------
-uint8_t Current_OyxgenSat;
+uint8_t Current_OxygenSat;
 uint8_t SD_Card_index = 0;
 uint8_t tx_index_OPM = 0;
 uint8_t rx_index_OPM = 0;
@@ -52,7 +52,8 @@ void Oxygen_PM_Setup(void)
   GPIO_Init(OPM_Port, &GPIO_InitStruct);
   
   /* USART_InitStruct members default value */
-  USART_InitStruct.USART_BaudRate = 4800;
+  //USART_InitStruct.USART_BaudRate = 4800;
+  USART_InitStruct.USART_BaudRate = 115200;
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No ;
@@ -77,7 +78,7 @@ void Oxygen_PM_Setup(void)
   //DISABLE the USART Transmit and Receive Interrupt
   USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);
   
-  //Enable USART2
+  //DIsable OPM_USART (USART6)
   USART_Cmd(OPM_USART, DISABLE);
 
   //Set Up Timer 4
@@ -127,8 +128,8 @@ void OPM_IRQHandler(void)
     {  
       TIM_Cmd(TIM4, DISABLE);
       rx_index_OPM = 0;
-      Current_OyxgenSat = Get_OxygenSat();
-      OxygenSat_buffer[SD_Card_index] = Current_OyxgenSat;
+      Current_OxygenSat = Get_OxygenSat();
+      OxygenSat_buffer[SD_Card_index] = Current_OxygenSat;
       SD_Card_index++;
     }
   }
@@ -165,7 +166,7 @@ int Get_OxygenSat(void)
       OxygenSat_string[i] = DataFromOPM[37+i];
     }
     OxygenSat_Percent = atoi(OxygenSat_string);                                             // atoi is function convert from String to Int 
-    Current_OyxgenSat = OxygenSat_Percent;
+    Current_OxygenSat = OxygenSat_Percent;
   }
   else
   {
@@ -180,103 +181,7 @@ int Get_OxygenSat(void)
   }
   
   return OxygenSat_Percent;
-  
-//  if(DataFromOPM[37] == '1')
-//  {
-//    OxygenSat_Percent = 100;
-//  }
-//  else if(DataFromOPM[37] == '0')
-//  {
-//    switch DataFromOPM[38]
-//    {
-//      case '1':
-//      OxygenSat_Percent = 10;
-//      break;
-//
-//      case '2':
-//      OxygenSat_Percent = 20;
-//      break;
-//
-//      case '3':
-//      OxygenSat_Percent = 30;
-//      break;
-//
-//      case '4':
-//      OxygenSat_Percent = 40;
-//      break;
-//
-//      case '5':
-//      OxygenSat_Percent = 50;
-//      break;
-//
-//      case '6':
-//      OxygenSat_Percent = 60;
-//      break
-//
-//      case '7':
-//      OxygenSat_Percent = 70;
-//      break;
-//
-//      case '8':
-//      OxygenSat_Percent = 80;
-//      break;
-//
-//      case '9':
-//      OxygenSat_Percent = 90;
-//      break;
-//
-//      case '0':
-//      OxygenSat_Percent = 0;
-//      break;
-//    }
-//
-//    switch DataFromOPM[39]
-//    {
-//      case '1':
-//      OxygenSat_Percent = OxygenSat_Percent + 1;
-//      break;
-//
-//      case '2':
-//      OxygenSat_Percent = OxygenSat_Percent + 2;
-//      break;
-//
-//      case '3':
-//      OxygenSat_Percent = OxygenSat_Percent + 3;
-//      break;
-//
-//      case '4':
-//      OxygenSat_Percent = OxygenSat_Percent + 4;
-//      break;
-//
-//      case '5':
-//      OxygenSat_Percent = OxygenSat_Percent + 5;
-//      break;
-//
-//      case '6':
-//      OxygenSat_Percent = OxygenSat_Percent + 6;
-//      break
-//
-//      case '7':
-//      OxygenSat_Percent = OxygenSat_Percent + 7;
-//      break;
-//
-//      case '8':
-//      OxygenSat_Percent = OxygenSat_Percent + 8;
-//      break;
-//
-//      case '9':
-//      OxygenSat_Percent = OxygenSat_Percent + 9;
-//      break;
-//
-//      case '0':
-//      OxygenSat_Percent = OxygenSat_Percent + 0;
-//      break;
-//    }
-//  }
-//
-//  return OxygenSat_Percent; 
 }
-
 //------------------------------------------------------------------------------------
 //Timer 4 Check Timer Out of Receving data from Oxygen Pulse Meter?
 void TIM4_IRQHandler (void)

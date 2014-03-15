@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-1486325268
+Checksum=2133328305
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -51,16 +51,24 @@ Fmt0=uint8_t[50]	3	0
 [watch_formats]
 Fmt0={W}42:ADC_Value	3	0
 Fmt1={W}42:Alarm_Level1	3	0
-Fmt2={W}42:Current_OyxgenSat	3	0
-Fmt3={W}42:Current_Status	3	0
-Fmt4={W}42:DAC_data	4	4
-Fmt5={W}42:DAC_data_1	4	0
-Fmt6={W}42:DAC_real	0	4
-Fmt7={W}42:DAC_sent	4	0
-Fmt8={W}42:LCD_DATA	3	0
-Fmt9={W}42:Time_AlarmLevel	3	0
-Fmt10={W}42:bitset	3	0
-Fmt11={W}42:dac_data	4	0
+Fmt2={W}42:Current_FiO2	3	0
+Fmt3={W}42:Current_OyxgenSat	3	0
+Fmt4={W}42:Current_Status	3	0
+Fmt5={W}42:DAC_data	4	4
+Fmt6={W}42:DAC_data_1	4	0
+Fmt7={W}42:DAC_real	0	4
+Fmt8={W}42:DAC_sent	4	0
+Fmt9={W}42:Drive_FiO2	3	0
+Fmt10={W}42:FiO2_Maximum	3	0
+Fmt11={W}42:FiO2_Minimum	3	0
+Fmt12={W}42:FiO2_index	3	0
+Fmt13={W}42:Hospital_Number	5	2
+Fmt14={W}42:LCD_DATA	3	0
+Fmt15={W}42:Prefered_FiO2	3	0
+Fmt16={W}42:Purpose_FiO2	3	0
+Fmt17={W}42:Time_AlarmLevel	3	0
+Fmt18={W}42:bitset	3	0
+Fmt19={W}42:dac_data	4	0
 [DataLog]
 LogEnabled=0
 SumEnabled=0
@@ -83,9 +91,7 @@ Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\Application\SD_Card.c}.124.7" 0 0 1 "" 0 "" 0
-Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Application\Oxygen_sensor.c}.353.15" 0 0 1 "" 0 "" 0
-Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Application\Oxygen_sensor.c}.348.31" 0 0 1 "" 0 "" 0
-Count=8
+Count=6
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

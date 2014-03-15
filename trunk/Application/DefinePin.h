@@ -75,7 +75,7 @@ Credit:
 #define  GLCD_LED_Port				GPIOA
 //------------------------------------------------------------------------------
 //Define Oxygen Sensor (ADC)
-#define  OxygenSensor 				ADC1 
+#define  OxygenSensor 				ADC1
 #define  OxygenSensor_ADC_CLK		RCC_APB2Periph_ADC1
 #define  OxygenSensor_Pin_CLK		RCC_AHB1Periph_GPIOA
 
@@ -126,9 +126,6 @@ Credit:
 #define Alarm_Set_GPIO_Port			GPIOC
 #define Alarm_Set_GPIO_CLK			RCC_AHB1Periph_GPIOC
 
-#define Alarm_Set_EXTI_Line			EXTI_Line2
-#define Alarm_Set_IRQn				EXTI2_IRQn
-#define Alarm_Set_IRQHandler		EXTI2_IRQHandler
 
 // Alarm Button ------------------------------------------------------------------
 #define Alarm_Button_Pin			GPIO_Pin_4
