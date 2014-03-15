@@ -18906,21 +18906,21 @@ void Calibrate_OxygenSensor(void)
 
 
 
-void EXTI0_IRQHandler(void)
-{
-  if (EXTI_GetFlagStatus(((uint32_t)0x00001)) == SET)
-  {
-    STM_EVAL_LEDOff(LED5);
-    TestControlValve();
-    
-    
-    
-     STM_EVAL_LEDOn(LED5);
-  }
-  
-  
-  EXTI_ClearITPendingBit(((uint32_t)0x00001));
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void TIM6_DAC_IRQHandler(void)

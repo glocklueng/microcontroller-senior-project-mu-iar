@@ -250,21 +250,21 @@ void Calibrate_OxygenSensor(void)
 
 //------------------------------------------------------------------------------
 // Interrupt Push Botton User (Blue Botton)
-void EXTI0_IRQHandler(void)
-{
-  if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
-  {
-    STM_EVAL_LEDOff(LED5);
-    TestControlValve();
-    //TIM_Cmd(TIM3, DISABLE);
-    //Calibrate_OxygenSensor();
-    //TIM_Cmd(TIM3, ENABLE);
-     STM_EVAL_LEDOn(LED5);
-  }
-  
-  // Clear Flag Interrupt
-  EXTI_ClearITPendingBit(EXTI_Line0);
-}
+//void EXTI0_IRQHandler(void)
+//{
+//  if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
+//  {
+//    STM_EVAL_LEDOff(LED5);
+//    TestControlValve();
+//    //TIM_Cmd(TIM3, DISABLE);
+//    //Calibrate_OxygenSensor();
+//    //TIM_Cmd(TIM3, ENABLE);
+//     STM_EVAL_LEDOn(LED5);
+//  }
+//  
+//  // Clear Flag Interrupt
+//  EXTI_ClearITPendingBit(EXTI_Line0);
+//}
 //------------------------------------------------------------------------------
 
 void TIM6_DAC_IRQHandler(void)
