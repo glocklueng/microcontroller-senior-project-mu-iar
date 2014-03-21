@@ -19406,7 +19406,7 @@ int main()
   
   System_Init();
   lcdString (1,1,"Please Upload Profile");
-  
+
   Profile_Status = 0;
 
 
@@ -19425,12 +19425,15 @@ int main()
   {
     if (Profile_Status == 2)
     {
-      USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);                                             
+
       Create_file(Hospital_Number, 0);                      
       Create_file(Hospital_Number, 1);                                  
       Profile_Status = 1;
-      TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), ENABLE);
-      TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ENABLE);
+
+
+      
+      SentData_DAC(0x0000, 2);
+      SentData_DAC(0x0000, 1);
       
       NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -19441,7 +19444,6 @@ int main()
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
       NVIC_Init(&NVIC_InitStructure);
 
-      FiO2_Range(Prefered_FiO2);
     }
     else if (Profile_Status == 0)
     {
@@ -19748,6 +19750,8 @@ void EXTI0_IRQHandler(void)
   {
     Drive_FiO2 = Drive_FiO2 - 5;
     FiO2_Range(Drive_FiO2);
+    
+    delay_ms(80);
      
     EXTI_ClearITPendingBit(((uint32_t)0x00001));
   }
@@ -19759,6 +19763,8 @@ void EXTI9_5_IRQHandler(void)
   {
     Drive_FiO2 = Drive_FiO2 + 5;
     FiO2_Range(Drive_FiO2);
+    
+    delay_ms(80);
      
     EXTI_ClearITPendingBit(((uint32_t)0x00020));
   }
@@ -19772,7 +19778,7 @@ void EXTI1_IRQHandler(void)
     if (Profile_Status == 1)
     {
       Profile_Status = 3;
-     USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);    
+      USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE); 
       TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), ENABLE);
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ENABLE);
       FiO2_Range(Prefered_FiO2);
@@ -19783,8 +19789,12 @@ void EXTI1_IRQHandler(void)
       USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), DISABLE);    
       TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), DISABLE);
       TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), DISABLE);
+      Alarm_Function(0);
       FiO2_Range(21);
+      SentData_DAC(0, 2);
+      SentData_DAC(0, 1);
     }
+    delay_ms(80);
      
     EXTI_ClearITPendingBit(((uint32_t)0x00002));
   }
@@ -19795,6 +19805,8 @@ void EXTI4_IRQHandler(void)
 {
   if (EXTI_GetITStatus(((uint32_t)0x00010)) != RESET)
   {
+    lcdClear();
+    lcdUpdate();
     NVIC_InitTypeDef   NVIC_InitStructure;
     
      
@@ -19811,8 +19823,13 @@ void EXTI4_IRQHandler(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
+    TIM_ITConfig(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ((uint16_t)0x0001), ENABLE);
+    TIM_Cmd(((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0400)), ENABLE);
+    USART_Cmd(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x00010000) + 0x1400)), ENABLE);
     
-
+    GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x00020000) + 0x0800)), ((uint16_t)0x0004));
+    
+    delay_ms(60);
      
     EXTI_ClearITPendingBit(((uint32_t)0x00010));
   }
@@ -20122,8 +20139,8 @@ void TIM2_IRQHandler(void)
         lcdClear();
         lcdUpdate();
         lcdString(3,1,"ALARM !!!");
-        lcdString(1,2,"PLEASE PUSH");
-        lcdString(1,3,"ALARM BUTTON");
+        lcdString(2,2,"PLEASE PUSH");
+        lcdString(2,3,"ALARM BUTTON");
         Alarm_Function(0);
       }
     }

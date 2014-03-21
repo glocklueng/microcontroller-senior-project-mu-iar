@@ -38,7 +38,7 @@ unsigned char glcd_ini=0;
 //------------------------------------------------------------------------------
 //--------------------------- Function delay -----------------------------------
 //------------------------------------------------------------------------------
-void delay_ms(unsigned long ms)  // delay 1 ms per count @ Crystal 8.0 MHz and PLL9x or SYSCLK = 72 MHz
+void delay_ms(unsigned long ms)                                                 // delay 1 ms per count @ Crystal 8.0 MHz and PLL9x or SYSCLK = 72 MHz
 {
    __IO unsigned long i,j;
 	for (i = 0; i < ms; i++ )

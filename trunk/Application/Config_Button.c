@@ -23,7 +23,7 @@ void Button_EXTI_Config (void)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
   GPIO_InitStructure.GPIO_Pin = Run_Button_Pin | Alarm_Button_Pin | Button_Up_Pin | Button_Down_Pin;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
 
