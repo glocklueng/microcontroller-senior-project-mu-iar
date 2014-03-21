@@ -114,7 +114,7 @@ int main()
  /* Set Up config System*/
   System_Init();
   lcdString (1,1,"Please Upload Profile");
-  
+
   Profile_Status = PROFILE_NOTUPLOAD;
 //  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 //  TIM_Cmd(TIM3, ENABLE);
@@ -133,12 +133,15 @@ int main()
   {
     if (Profile_Status == PROFILE_JUST_UPLOAD)
     {
-      USART_Cmd(OPM_USART, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
+//      USART_Cmd(OPM_USART, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
       Create_file(Hospital_Number, OxygenSaturation_file);                      // Create Oxygen Saturation file
       Create_file(Hospital_Number, FiO2_file);                                  // Create FiO2 file
       Profile_Status = PROFILE_SETTING_COMPLETE;
-      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-      TIM_Cmd(TIM3, ENABLE);
+//      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+//      TIM_Cmd(TIM3, ENABLE);
+      
+      SentData_DAC(0x0000, Oxygen_Valve);
+      SentData_DAC(0x0000, Air_Valve);
       
       NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -149,7 +152,6 @@ int main()
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
       NVIC_Init(&NVIC_InitStructure);
 
-      FiO2_Range(Prefered_FiO2);
     }
     else if (Profile_Status == PROFILE_NOTUPLOAD)
     {
@@ -460,6 +462,8 @@ void Button_Down_IRQHandler(void)
   {
     Drive_FiO2 = Drive_FiO2 - 5;
     FiO2_Range(Drive_FiO2);
+    
+    delay_ms(80);
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Button_Down_EXTI_Line);
   }
@@ -471,6 +475,8 @@ void Button_Up_IRQHandler(void)
   {
     Drive_FiO2 = Drive_FiO2 + 5;
     FiO2_Range(Drive_FiO2);
+    
+    delay_ms(80);
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Button_Up_EXTI_Line);
   }
@@ -484,7 +490,7 @@ void Run_Button_IRQHandler(void)
     if (Profile_Status == PROFILE_SETTING_COMPLETE)
     {
       Profile_Status = RUN_BUTTON_SET;
-     USART_Cmd(OPM_USART, ENABLE);    
+      USART_Cmd(OPM_USART, ENABLE); 
       TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
       TIM_Cmd(TIM3, ENABLE);
       FiO2_Range(Prefered_FiO2);
@@ -495,8 +501,12 @@ void Run_Button_IRQHandler(void)
       USART_Cmd(OPM_USART, DISABLE);    
       TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
       TIM_Cmd(TIM3, DISABLE);
+      Alarm_Function(ALARM_DISABLE);
       FiO2_Range(21);
+      SentData_DAC(0, Oxygen_Valve);
+      SentData_DAC(0, Air_Valve);
     }
+    delay_ms(80);
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Run_Button_EXTI_Line);
   }
@@ -507,6 +517,8 @@ void Alarm_Button_IRQHandler(void)
 {
   if (EXTI_GetITStatus(Alarm_Button_EXTI_Line) != RESET)
   {
+    lcdClear();
+    lcdUpdate();
     NVIC_InitTypeDef   NVIC_InitStructure;
     
     /* Enable and set Button_Up_EXTI Line Interrupt to the lowest priority */
@@ -523,8 +535,13 @@ void Alarm_Button_IRQHandler(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    //GPIO_ResetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
-
+    TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+    TIM_Cmd(TIM3, ENABLE);
+    USART_Cmd(OPM_USART, ENABLE);
+    
+    GPIO_ResetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
+    
+    delay_ms(60);
     /* Clear the EXTI line pending bit */
     EXTI_ClearITPendingBit(Alarm_Button_EXTI_Line);
   }
@@ -834,8 +851,8 @@ void TIM2_IRQHandler(void)
         lcdClear();
         lcdUpdate();
         lcdString(3,1,"ALARM !!!");
-        lcdString(1,2,"PLEASE PUSH");
-        lcdString(1,3,"ALARM BUTTON");
+        lcdString(2,2,"PLEASE PUSH");
+        lcdString(2,3,"ALARM BUTTON");
         Alarm_Function(ALARM_DISABLE);
       }
     }

@@ -18245,7 +18245,7 @@ unsigned char glcd_ini=0;
 
 
 
-void delay_ms(unsigned long ms)  
+void delay_ms(unsigned long ms)                                                 
 {
    volatile unsigned long i,j;
 	for (i = 0; i < ms; i++ )

@@ -512,34 +512,10 @@
 			}
 		},
 		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
-			"settings":
-			{
-				"buffer_size": 11429,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 			"settings":
 			{
-				"buffer_size": 32127,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
-			"settings":
-			{
-				"buffer_size": 7884,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Config_Button.c",
-			"settings":
-			{
-				"buffer_size": 4937,
+				"buffer_size": 32522,
 				"line_ending": "Windows"
 			}
 		}
@@ -572,6 +548,9 @@
 	},
 	"file_history":
 	[
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Config_Button.c",
+		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.h",
 		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/USART/u1puts.c",
 		"/C/Program Files/Microchip/mplabc18/v3.46/src/pmc_common/USART/uputs.c",
@@ -599,8 +578,6 @@
 		"/C/Program Files/Microchip/xc8/v1.20/include/plib/io.h",
 		"/C/Program Files/Microchip/xc8/v1.20/include/plib/spi.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/DefinePin.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Control_valve.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Control_valve.c",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.h",
@@ -608,7 +585,6 @@
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/sublime/Programmable Control of Airflow System.sublime-project",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_sensor.h",
 		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/stm32f4xx.h",
-		"/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Config_Button.c",
 		"/E/My document/TESA Top Gun/top-gun2013/131022_2041_STM32F4xx_PowerMeter_OLED/STM32F4xx_PowerMeter_OLED/Project/STM32F4xx_StdPeriph_Templates/main_abEvalTest.c",
 		"/E/My document/Microcontroller OR Embedded System/STM32F4/stm32f4_dsp_stdperiph_lib/STM32F4xx_DSP_StdPeriph_Lib_V1.0.1/Project/STM32F4xx_StdPeriph_Examples/ADC/DualADC_RegulSimu_DMAmode1/stm32f4xx_it.c",
 		"/C/Users/Phattaradanai/AppData/Local/Temp/MyProject.c",
@@ -788,7 +764,7 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -898,7 +874,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1620.0,
+						"translation.y": 1920.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -915,8 +891,8 @@
 						"selection":
 						[
 							[
-								6207,
-								6207
+								4876,
+								4876
 							]
 						],
 						"settings":
@@ -926,185 +902,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3060.0,
+						"translation.y": 1547.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Connect_GUI.c",
-					"settings":
-					{
-						"buffer_size": 11429,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3679,
-								3679
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1714.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
 					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/main.c",
 					"settings":
 					{
-						"buffer_size": 32127,
+						"buffer_size": 32522,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12940,
-								12940
-							],
-							[
-								12970,
-								12970
-							],
-							[
-								12974,
-								12974
-							],
-							[
-								13017,
-								13017
-							],
-							[
-								13060,
-								13060
-							],
-							[
-								13103,
-								13103
-							],
-							[
-								13106,
-								13106
-							],
-							[
-								13135,
-								13135
-							],
-							[
-								13193,
-								13193
-							],
-							[
-								13223,
-								13223
-							],
-							[
-								13282,
-								13282
-							],
-							[
-								13287,
-								13287
-							],
-							[
-								13333,
-								13333
-							],
-							[
-								13382,
-								13382
-							],
-							[
-								13435,
-								13435
-							],
-							[
-								13481,
-								13481
-							],
-							[
-								13524,
-								13524
-							],
-							[
-								13527,
-								13527
-							],
-							[
-								13567,
-								13567
-							],
-							[
-								13633,
-								13633
-							],
-							[
-								13636,
-								13636
-							],
-							[
-								13667,
-								13667
-							],
-							[
-								13714,
-								13714
-							],
-							[
-								13770,
-								13770
-							],
-							[
-								13831,
-								13831
-							],
-							[
-								13877,
-								13877
-							],
-							[
-								13913,
-								13913
-							],
-							[
-								13916,
-								13916
-							],
-							[
-								13985,
-								13985
-							],
-							[
-								14038,
-								14038
-							],
-							[
-								14103,
-								14103
-							],
-							[
-								14161,
-								14161
-							],
-							[
-								14213,
-								14213
-							],
-							[
-								14249,
-								14249
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1114,111 +930,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8300.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Oxygen_Pulse_Meter.c",
-					"settings":
-					{
-						"buffer_size": 7884,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5092,
-								5092
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2919.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "/E/My document/Programmable Feedback Control of Airflow (Pre-term) Project/microcontroller-senior-project-mu-iar/Application/Config_Button.c",
-					"settings":
-					{
-						"buffer_size": 4937,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1694,
-								1694
-							],
-							[
-								1737,
-								1737
-							],
-							[
-								1793,
-								1793
-							],
-							[
-								1847,
-								1847
-							],
-							[
-								1906,
-								1906
-							],
-							[
-								1950,
-								1950
-							],
-							[
-								1984,
-								1984
-							],
-							[
-								1985,
-								1985
-							],
-							[
-								2052,
-								2052
-							],
-							[
-								2109,
-								2109
-							],
-							[
-								2172,
-								2172
-							],
-							[
-								2228,
-								2228
-							],
-							[
-								2279,
-								2279
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 660.0,
+						"translation.y": 2960.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
