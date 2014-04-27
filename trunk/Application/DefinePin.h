@@ -37,8 +37,10 @@ Credit:
 
 //------------------------------------------------------------------------------
 //Define SPI2
+#define  SPI2_PortA                             GPIOA
 #define  SPI2_PortB 				GPIOB
 #define  SPI2_PortC 				GPIOC
+#define  SPI2_PortA_CLK                         RCC_AHB1Periph_GPIOA
 #define  SPI2_PortB_CLK				RCC_AHB1Periph_GPIOB
 #define  SPI2_PortC_CLK				RCC_AHB1Periph_GPIOC
 
@@ -46,6 +48,11 @@ Credit:
 #define  SPI2_CLK_Port				GPIOB
 #define  SPI2_CLK_Source			GPIO_PinSource10
 #define  SPI2_CLK_AF				GPIO_AF_SPI2	
+
+#define  SPI2_MISO_Pin                          GPIO_Pin_2
+#define  SPI2_MISO_Port                         GPIOC
+#define  SPI2_MISO_Source                       GPIO_PinSource2
+#define  SPI2_MISO_AF                           GPIO_AF_SPI2
 
 #define  SPI2_MOSI_Pin				GPIO_Pin_3
 #define  SPI2_MOSI_Port				GPIOC	
@@ -57,27 +64,32 @@ Credit:
 #define  DAC_NSS_Pin				GPIO_Pin_12
 #define  DAC_NSS_Port				GPIOB
 
+//------------------------------------------------------------------------------
+//Define ADC_MCP3202
+#define  ADC_MCP_NSS_Pin                        GPIO_Pin_15
+#define  ADC_MCP_NSS_Port                       GPIOA
+
 //-------------------------------------------------------------------------------
 //Define GLCD5110
-#define  GLCD_CLK					RCC_AHB1Periph_GPIOA
-#define  GLCD_Port 					GPIOA
+#define  GLCD_CLK				RCC_AHB1Periph_GPIOB
+#define  GLCD_Port 				GPIOB
 
-#define  GLCD_NSS_Pin				GPIO_Pin_8
-#define  GLCD_NSS_Port				GPIOA
+#define  GLCD_NSS_Pin				GPIO_Pin_4
+#define  GLCD_NSS_Port				GPIOB
 
-#define  GLCD_RES_Pin				GPIO_Pin_10
-#define  GLCD_RES_Port				GPIOA
+#define  GLCD_RES_Pin				GPIO_Pin_5
+#define  GLCD_RES_Port				GPIOB
 
-#define  GLCD_DC_Pin				GPIO_Pin_15
-#define  GLCD_DC_Port				GPIOA
+#define  GLCD_DC_Pin				GPIO_Pin_0
+#define  GLCD_DC_Port				GPIOB
 
-#define  GLCD_LED_Pin				GPIO_Pin_5
-#define  GLCD_LED_Port				GPIOA
+#define  GLCD_LED_Pin				GPIO_Pin_1
+#define  GLCD_LED_Port				GPIOB
 //------------------------------------------------------------------------------
 //Define Oxygen Sensor (ADC)
 #define  OxygenSensor 				ADC1
-#define  OxygenSensor_ADC_CLK		RCC_APB2Periph_ADC1
-#define  OxygenSensor_Pin_CLK		RCC_AHB1Periph_GPIOA
+#define  OxygenSensor_ADC_CLK		        RCC_APB2Periph_ADC1
+#define  OxygenSensor_Pin_CLK		        RCC_AHB1Periph_GPIOA
 
 #define  OxygenSensor_Pin 			GPIO_Pin_3
 #define  OxygenSensor_Port			GPIOA
@@ -104,13 +116,13 @@ Credit:
 #define  GUI_RX_AF					GPIO_AF_USART1
 
 // Button Down -------------------------------------------------------------------
-#define Button_Down_Pin				GPIO_Pin_0
-#define Button_Down_GPIO_Port		GPIOB
-#define Button_Down_GPIO_CLK		RCC_AHB1Periph_GPIOB
-
-#define Button_Down_EXTI_Line		EXTI_Line0
-#define Button_Down_IRQn			EXTI0_IRQn
-#define Button_Down_IRQHandler      EXTI0_IRQHandler
+//#define Button_Down_Pin				GPIO_Pin_0
+//#define Button_Down_GPIO_Port		GPIOB
+//#define Button_Down_GPIO_CLK		RCC_AHB1Periph_GPIOB
+//
+//#define Button_Down_EXTI_Line		EXTI_Line0
+//#define Button_Down_IRQn			EXTI0_IRQn
+//#define Button_Down_IRQHandler      EXTI0_IRQHandler
 
 // Run Button --------------------------------------------------------------------
 #define Run_Button_Pin				GPIO_Pin_1
@@ -128,22 +140,22 @@ Credit:
 
 
 // Alarm Button ------------------------------------------------------------------
-#define Alarm_Button_Pin			GPIO_Pin_4
-#define Alarm_Button_GPIO_Port		GPIOB
-#define Alarm_Button_GPIO_CLK		RCC_AHB1Periph_GPIOB
-
-#define Alarm_Button_EXTI_Line		EXTI_Line4
-#define Alarm_Button_IRQn			EXTI4_IRQn
-#define Alarm_Button_IRQHandler		EXTI4_IRQHandler
-
-// Button UP ---------------------------------------------------------------------
-#define Button_Up_Pin				GPIO_Pin_5	
-#define Button_Up_GPIO_Port			GPIOB
-#define Button_Up_GPIO_CLK			RCC_AHB1Periph_GPIOB
-
-#define Button_Up_EXTI_Line			EXTI_Line5
-#define Button_Up_IRQn				EXTI9_5_IRQn
-#define Button_Up_IRQHandler		EXTI9_5_IRQHandler
+//#define Alarm_Button_Pin			GPIO_Pin_4
+//#define Alarm_Button_GPIO_Port		GPIOB
+//#define Alarm_Button_GPIO_CLK		RCC_AHB1Periph_GPIOB
+//
+//#define Alarm_Button_EXTI_Line		EXTI_Line4
+//#define Alarm_Button_IRQn			EXTI4_IRQn
+//#define Alarm_Button_IRQHandler		EXTI4_IRQHandler
+//
+//// Button UP ---------------------------------------------------------------------
+//#define Button_Up_Pin				GPIO_Pin_5	
+//#define Button_Up_GPIO_Port			GPIOB
+//#define Button_Up_GPIO_CLK			RCC_AHB1Periph_GPIOB
+//
+//#define Button_Up_EXTI_Line			EXTI_Line5
+//#define Button_Up_IRQn				EXTI9_5_IRQn
+//#define Button_Up_IRQHandler		EXTI9_5_IRQHandler
 
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

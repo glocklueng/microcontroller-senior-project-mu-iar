@@ -67,8 +67,8 @@ void port_init()
   /*
   	set output for NSS, RESET, D/C(Data/Command)
                 (3)NSS           |      PA8
-		            (4)RESET	       |	    PA10
-		            (5)D/C		       |	    PA15
+		(4)RESET	 |      PA10
+		(5)D/C           |      PA15
                 (6)LED           |      PA5
   */
 

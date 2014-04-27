@@ -42,16 +42,15 @@ LTC 1661
 
 // Function --------------------------------------------------------------------
 void SPI2_SetUp(void)
-{
-    /*use SPI2 for Transfer data to DAC IC (LTC 1661)*/
-  
+{  
   GPIO_InitTypeDef GPIO_InitStruct;
   SPI_InitTypeDef SPI_InitStruct;
+  NVIC_InitTypeDef NVIC_InitStructure;
   
   /*
     PB12 = SPI2_NSS
     PB10 = SPI2_CLK
-    PB14 = SPI2_MISO (Master in Slave out)
+    PC2 = SPI2_MISO (Master in Slave out)
     PC3  = SPI2_MOIS (Master out Slave in)
   Note : In the Master Mode and Tx Only , use MOSI and CLK 
   */
@@ -67,21 +66,30 @@ void SPI2_SetUp(void)
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOB , &GPIO_InitStruct);
-  
+
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_3;                                       //Set for MOSI Pin
+  GPIO_InitStruct.GPIO_Pin  = SPI2_MISO_Pin;                                    //Set for MISO Pin
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOC , &GPIO_InitStruct);
+  GPIO_Init(SPI2_MISO_Port , &GPIO_InitStruct);
+  
+  /* set GPIO init structure parameters values */
+  GPIO_InitStruct.GPIO_Pin  = SPI2_MOSI_Pin;                                    //Set for MOSI Pin
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(SPI2_MOSI_Port , &GPIO_InitStruct);
 
-  //Enable Altinate Function for SPI Protocal (PB10, PC3)
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource10  ,GPIO_AF_SPI2);
-  GPIO_PinAFConfig(GPIOC ,GPIO_PinSource3 ,GPIO_AF_SPI2);
+  //Enable Altinate Function for SPI Protocal (PB10, PC2, PC3)
+  GPIO_PinAFConfig(SPI2_CLK_Port, GPIO_PinSource10  ,GPIO_AF_SPI2);
+  GPIO_PinAFConfig(SPI2_MISO_Port, GPIO_PinSource2, GPIO_AF_SPI2);
+  GPIO_PinAFConfig(SPI2_MOSI_Port ,GPIO_PinSource3 ,GPIO_AF_SPI2);
 
   //Config SPI                        
-  SPI_InitStruct.SPI_Direction = SPI_Direction_1Line_Tx;                        // Tx Only
+  SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;               // Tx Only
   SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
   SPI_InitStruct.SPI_DataSize = SPI_DataSize_16b;                               //Data size is 16 bits for transfer data 10 bits to DAC IC
   SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
@@ -92,8 +100,23 @@ void SPI2_SetUp(void)
   SPI_Init(SPI2, &SPI_InitStruct);
   
   SPI_NSSInternalSoftwareConfig(SPI2, SPI_NSSInternalSoft_Set);
+  
+  /* Configure the Priority Group to 1 bit */                
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+  
+  /* Configure the SPI interrupt priority */
+  NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  /* Enable the Rx buffer not empty interrupt */
+  SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, DISABLE);
+  
   //Enable select output
-  SPI_SSOutputCmd(SPI2, ENABLE);
+  SPI_SSOutputCmd(SPI2, ENABLE);\
+    
   //Enable SPI2
   SPI_Cmd(SPI2,ENABLE);
 }
@@ -111,9 +134,9 @@ void LTC1661_Setup(void)
   
   /*
     PB12 = SPI2_NSS
-    PB13 = SPI2_CLK
-    PB14 = SPI2_MISO (Master in Slave out)
-    PB15 = SPI2_MOIS (Master out Slave in)
+    PB10 = SPI2_CLK
+    PC2 = SPI2_MISO (Master in Slave out)
+    PC3 = SPI2_MOIS (Master out Slave in)
   Note : In the Master Mode and Tx Only , use MOSI and CLK 
   */
 	
@@ -135,8 +158,8 @@ void LTC1661_Setup(void)
 /*
     uint16_t DAC_data   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
     uint8_t Channel     : Select Channel 
-                          Air Valve - Channel 1 (Pin8)
-                          Oxygen Valve - Channel 2 (Pin 5)
+                          Air Valve - Channel 2 (Pin5)
+                          Oxygen Valve - Channel 1 (Pin 8)
                           3 - Channel 1 and 2
 */
 
