@@ -250,21 +250,21 @@ void Calibrate_OxygenSensor(void)
 
 //------------------------------------------------------------------------------
 // Interrupt Push Botton User (Blue Botton)
-//void EXTI0_IRQHandler(void)
-//{
-//  if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
-//  {
-//    STM_EVAL_LEDOff(LED5);
-//    TestControlValve();
-//    //TIM_Cmd(TIM3, DISABLE);
-//    //Calibrate_OxygenSensor();
-//    //TIM_Cmd(TIM3, ENABLE);
-//     STM_EVAL_LEDOn(LED5);
-//  }
-//  
-//  // Clear Flag Interrupt
-//  EXTI_ClearITPendingBit(EXTI_Line0);
-//}
+void EXTI0_IRQHandler(void)
+{
+  if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
+  {
+    STM_EVAL_LEDOff(LED5);
+    TestControlValve();
+    //TIM_Cmd(TIM3, DISABLE);
+    //Calibrate_OxygenSensor();
+    //TIM_Cmd(TIM3, ENABLE);
+     STM_EVAL_LEDOn(LED5);
+  }
+  
+  // Clear Flag Interrupt
+  EXTI_ClearITPendingBit(EXTI_Line0);
+}
 //------------------------------------------------------------------------------
 
 void TIM6_DAC_IRQHandler(void)
@@ -289,7 +289,7 @@ float Convert_FiO2 (float FiO2_ADC)
 {
   //char FiO2_Percent_Ch[7];
   float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-1.469)/25;
+  FiO2_mv = ((FiO2_ADC)-1.4)/25;
   FiO2_Percent = FiO2_mv*21/0.012;
   
   return FiO2_Percent;
@@ -324,8 +324,8 @@ void TestControlValve (void)
   lcdUpdate();
   lcdString(1,1,"Test Control Valve");
   time = 0;
-  Air_Drive = 0x01C2;                                                               // 0x01C2 = 450 (2.2V)
-  Oxygen_Drive = 0x03AD;                                                            // 0x03AD = 941 (4.6V)
+  Air_Drive = 0x0066;                                                           // 0x01C2 = 450 (2.2V)
+  Oxygen_Drive = 0x03FF;                                                        // 0x03AD = 941 (4.6V)
 
   SentData_DAC(Air_Drive, Air_Valve);
   SentData_DAC(Oxygen_Drive, Oxygen_Valve);

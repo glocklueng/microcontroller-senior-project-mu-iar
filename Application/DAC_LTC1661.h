@@ -26,8 +26,8 @@ LTC 1661
 #include "main.h"
 
 //------------------------------------------------------------------------------
-#define Air_Valve			1
-#define Oxygen_Valve		2
+#define Oxygen_Valve 			2
+#define Air_Valve		        1
 // Define Function -------------------------------------------------------------
 void SPI2_SetUp(void);
 void LTC1661_Setup(void);
