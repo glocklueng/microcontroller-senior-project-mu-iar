@@ -330,6 +330,7 @@ int main()
   Description : If command is "ALARM_ENABLE", Timer 2 will enable.
                 If command is "ALARM_DISABLE", Timer 2 will disable and reset Timer_AlarmLevel variable.
 */
+
 void Alarm_Function(uint8_t Command)
 {
   if (Command == ALARM_ENABLE)
