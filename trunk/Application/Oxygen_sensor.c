@@ -13,6 +13,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "Connect_GUI.h"
 #include "GLCD5110.h"
 #include "DAC_LTC1661.h"
+#include "MCP3202.h"
 //------------------------------------------------------------------------------
 // Define Variable -------------------------------------------------------------
 uint16_t volatile time = 0;
@@ -26,6 +27,12 @@ float ADC_Voltage;
 float AVG_FiO2;
 uint16_t ADC_Value;
 float current_FiO2[5];
+
+// Flow Rate Variable
+float OxygenFlow, AirFlow;
+float OxygenFlow_SLM, AirFlow_SLM;
+char OxygenFlow_Text[20];
+char AirFlow_Text[20];
 
 char FiO2_Percent_Ch[7];
 extern uint8_t Profile_Status;
@@ -109,8 +116,8 @@ void Timer6_SetUp(void)
   /* TIM2 clock enable */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 2000; // 1 MHz down to 1 KHz (1 ms)
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000; // 24 MHz Clock down to 1 MHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_Period = 2000;                                      // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);
@@ -143,8 +150,8 @@ void FiO2_Check_Timer_Config(void)
   /* TIM3 clock enable */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 2000; // 1 MHz down to 1 KHz (1 ms)
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000; // 24 MHz Clock down to 1 MHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_Period = 2000;                                      // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
@@ -173,13 +180,7 @@ float Oxygen_convert(void)
   
   ADC_Voltage = '\0';
   ADC_Voltage = (ADC_Value*2.91)/1023;                                          //VDD is vary (time1 = 3.02, time2 = 2.94)
-  
-  //Convert int to float
-//  ADC_fValue = ADC_Voltage/1000;
-//  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 1000)/100) * 0.1);
-//  ADC_fValue = ADC_fValue + (float)((((uint32_t)ADC_Voltage % 100)/10) * 0.01);
-//  ADC_fValue = ADC_fValue + (float)(((uint32_t)ADC_Voltage % 10/1) * 0.001);
-  
+
   return ADC_Voltage;
 }
 
@@ -324,15 +325,17 @@ void TestControlValve (void)
   lcdUpdate();
   lcdString(1,1,"Test Control Valve");
   time = 0;
-  Air_Drive = 0x0066;                                                           // 0x01C2 = 450 (2.2V)
-  Oxygen_Drive = 0x03FF;                                                        // 0x03AD = 941 (4.6V)
+  Air_Drive = 0x0000;                                                           // 0x0000 = 0 (0V)
+  Oxygen_Drive = 0x03FF;                                                        // 0x03FF = 1024 (5V)
 
   SentData_DAC(Air_Drive, Air_Valve);
   SentData_DAC(Oxygen_Drive, Oxygen_Valve);
   TIM_Cmd(TIM6, ENABLE);
 
-  while(count <= 24)
+  // Test 50 Time
+  while(count <= 50)
   {
+    // ADC every 15 Seconds.
     while(time <= 15)
     {  
       if(TIM_GetFlagStatus(TIM6, TIM_FLAG_Update) != RESET)
@@ -340,7 +343,7 @@ void TestControlValve (void)
         if (time >= 15)
         {
           for(i = 0; i < 5 ; i++)
-          {
+          {          
             current_FiO2[i] = '\0';
             current_FiO2[i] = Oxygen_convert();
             //FiO2_DataTest[count] = Convert_FiO2(current_FiO2);
@@ -364,14 +367,74 @@ void TestControlValve (void)
               FiO2_Percent_Ch_TEST[9] = '0'+((uint32_t)AVG_FiO2%10)/1;
               FiO2_Percent_Ch_TEST[10] = '.';
               FiO2_Percent_Ch_TEST[11] = '0'+((uint32_t)((AVG_FiO2)*10.0))%10;
-              FiO2_Percent_Ch_TEST[12] = 'V';
+              FiO2_Percent_Ch_TEST[12] = 'V';            
               FiO2_Percent_Ch_TEST[13] = '\n';
               FiO2_Percent_Ch_TEST[14] = '\r';
               
+              OxygenFlow = Get_FlowRate(OxygenFlowRate);
+              OxygenFlow_SLM = (OxygenFlow*4);                                    // Convert Oxygen Flow Rate in SLM unit
+              
+              OxygenFlow_Text[0] = 'O';
+              OxygenFlow_Text[1] = '2';
+              OxygenFlow_Text[2] = ' ';
+              OxygenFlow_Text[3] = 'F';
+              OxygenFlow_Text[4] = 'l';
+              OxygenFlow_Text[5] = 'o';
+              OxygenFlow_Text[6] = 'w';
+              OxygenFlow_Text[7] = ' ';
+              OxygenFlow_Text[8] = '0'+((uint32_t)OxygenFlow_SLM/10);
+              OxygenFlow_Text[9] = '0'+((uint32_t)OxygenFlow_SLM%10)/1;
+              OxygenFlow_Text[10] = '.';
+              OxygenFlow_Text[11] = '0'+((uint32_t)(OxygenFlow_SLM*10.0)%10);
+              OxygenFlow_Text[12] = ' ';
+              OxygenFlow_Text[13] = '0'+((uint32_t)OxygenFlow%10);
+              OxygenFlow_Text[14] = '.';
+              OxygenFlow_Text[15] = '0'+((uint32_t)(OxygenFlow*10.0)%10);
+              OxygenFlow_Text[16] = '0'+((uint32_t)(OxygenFlow*100.0)%100);
+              OxygenFlow_Text[17] = 'V';
+              OxygenFlow_Text[18] = '\n';
+              OxygenFlow_Text[19] = '\r';
+              
+              AirFlow = Get_FlowRate(AirFlowRate);
+              AirFlow_SLM = (AirFlow*4);                                          // Convert Air Flow Rate in SLM unit
+              AirFlow_Text[0] = 'A';
+              AirFlow_Text[1] = 'i';
+              AirFlow_Text[2] = 'r';
+              AirFlow_Text[3] = 'F';
+              AirFlow_Text[4] = 'l';
+              AirFlow_Text[5] = 'o';
+              AirFlow_Text[6] = 'w';
+              AirFlow_Text[7] = ' ';
+              AirFlow_Text[8] = '0'+((uint32_t)AirFlow_SLM/10);
+              AirFlow_Text[9] = '0'+((uint32_t)AirFlow_SLM%10)/1;
+              AirFlow_Text[10] = '.';
+              AirFlow_Text[11] = '0'+((uint32_t)(AirFlow_SLM*10.0)%10);
+              AirFlow_Text[12] = ' ';
+              AirFlow_Text[13] = '0'+((uint32_t)AirFlow%10);
+              AirFlow_Text[14] = '.';
+              AirFlow_Text[15] = '0'+((uint32_t)(AirFlow*10.0)%10);
+              AirFlow_Text[16] = '0'+((uint32_t)(AirFlow*100.0)%100);
+              AirFlow_Text[17] = 'V';
+              AirFlow_Text[18] = '\n';
+              AirFlow_Text[19] = '\r';
               for(x = 0 ; x < 15 ; x++)
               {
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
                 USART_SendData(USART3, FiO2_Percent_Ch_TEST[x]); 
+                while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+              }
+
+              for (x = 0; x < 20; x++)
+              {
+                while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+                USART_SendData(USART3, OxygenFlow_Text[x]); 
+                while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+              }
+
+               for (x = 0; x < 20; x++)
+              {
+                while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+                USART_SendData(USART3, AirFlow_Text[x]); 
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
               }
             }

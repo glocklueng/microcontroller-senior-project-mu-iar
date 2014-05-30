@@ -9,12 +9,19 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #include "main.h"
 #include "DAC_LTC1661.h"
 //------------------------------------------------------------------------------
-// Define
+/*
+    Note:
+    OxygenFlowRate      use         CH0
+    AirFlowRate         use         CH1
+*/
+// Define-----------------------------------------------------------------------
 #define CH0             0
 #define CH1             1
+#define OxygenFlowRate  0
+#define AirFlowRate     1
 //------------------------------------------------------------------------------
 void MCP3202_SetUp(void);
-void Get_FlowRate (uint8_t channel);
+float Get_FlowRate (uint8_t channel);
 //------------------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

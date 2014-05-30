@@ -48,7 +48,7 @@ void SPI2_SetUp(void)
   NVIC_InitTypeDef NVIC_InitStructure;
   
   /*
-    PB12 = SPI2_NSS
+    PB14 = SPI2_NSS
     PB10 = SPI2_CLK
     PC2 = SPI2_MISO (Master in Slave out)
     PC3  = SPI2_MOIS (Master out Slave in)
@@ -89,7 +89,7 @@ void SPI2_SetUp(void)
   GPIO_PinAFConfig(SPI2_MOSI_Port ,GPIO_PinSource3 ,GPIO_AF_SPI2);
 
   //Config SPI                        
-  SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;               // Tx Only
+  SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;               // Full Duplex Communication : Tx and Rx
   SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
   SPI_InitStruct.SPI_DataSize = SPI_DataSize_16b;                               //Data size is 16 bits for transfer data 10 bits to DAC IC
   SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
@@ -115,7 +115,7 @@ void SPI2_SetUp(void)
   SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, DISABLE);
   
   //Enable select output
-  SPI_SSOutputCmd(SPI2, ENABLE);\
+  SPI_SSOutputCmd(SPI2, ENABLE);
     
   //Enable SPI2
   SPI_Cmd(SPI2,ENABLE);
@@ -133,7 +133,7 @@ void LTC1661_Setup(void)
   GPIO_InitTypeDef GPIO_InitStruct;
   
   /*
-    PB12 = SPI2_NSS
+    PB14 = SPI2_NSS
     PB10 = SPI2_CLK
     PC2 = SPI2_MISO (Master in Slave out)
     PC3 = SPI2_MOIS (Master out Slave in)
