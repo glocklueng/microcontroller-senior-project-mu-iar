@@ -136,7 +136,7 @@ int main()
     delay();
     delay();
     delay();
-    Get_FlowRate(CH1);
+    //Get_FlowRate(CH1);
     delay();
     delay();
     delay();
