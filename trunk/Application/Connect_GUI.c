@@ -138,7 +138,7 @@ void USART_GUI_Connect(void)
 
   /* Set Interrupt Mode*/
   //ENABLE the USART Receive Interrupt
-  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);
 
   //Enable USART1
   USART_Cmd(USART1, ENABLE);
@@ -334,9 +334,9 @@ int fputc(int ch, FILE *f)
 {
   /* Place your implementation of fputc here */
   /* e.g. write a character to the USART */
-  USART_SendData(GUI_USART, (uint8_t) ch);
+  USART_SendData(USART1, (uint8_t) ch);
   /* Loop until the end of transmission */
-  while (USART_GetFlagStatus(OPM_USART, USART_FLAG_TC) == RESET)
+  while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET)
   {}
   return ch;
 }

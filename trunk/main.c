@@ -131,17 +131,7 @@ int main()
 //  SD_Write("OXY.TXT", SD_String, 250);
 
   while(1)
-  {
-    Get_FlowRate(CH0);
-    delay();
-    delay();
-    delay();
-    //Get_FlowRate(CH1);
-    delay();
-    delay();
-    delay();
-    
-    
+  {    
     if (Profile_Status == PROFILE_JUST_UPLOAD)
     {
 //      USART_Cmd(OPM_USART, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
