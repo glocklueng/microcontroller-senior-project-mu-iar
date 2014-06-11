@@ -34,6 +34,8 @@ float OxygenFlow_SLM, AirFlow_SLM;
 char OxygenFlow_Text[20];
 char AirFlow_Text[20];
 
+float FiO2_Test_Buffer[50];
+
 char FiO2_Percent_Ch[7];
 extern uint8_t Profile_Status;
 // Function --------------------------------------------------------------------
@@ -256,11 +258,9 @@ void EXTI0_IRQHandler(void)
   if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
   {
     STM_EVAL_LEDOff(LED5);
+    USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);
     TestControlValve();
-    //TIM_Cmd(TIM3, DISABLE);
-    //Calibrate_OxygenSensor();
-    //TIM_Cmd(TIM3, ENABLE);
-     STM_EVAL_LEDOn(LED5);
+    STM_EVAL_LEDOn(LED5);
   }
   
   // Clear Flag Interrupt
@@ -290,7 +290,7 @@ float Convert_FiO2 (float FiO2_ADC)
 {
   //char FiO2_Percent_Ch[7];
   float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-1.4)/25;
+  FiO2_mv = ((FiO2_ADC)-1.5)/25;
   FiO2_Percent = FiO2_mv*21/0.012;
   
   return FiO2_Percent;
@@ -351,6 +351,8 @@ void TestControlValve (void)
             {
               AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
               //AVG_FiO2 = (AVG_FiO2*2.91)/1023;
+              FiO2_Test_Buffer[count] = AVG_FiO2;
+                  
               FiO2_DataTest[count] = Convert_FiO2(AVG_FiO2);
               FiO2_P = Convert_FiO2(AVG_FiO2);
               FiO2_LCD_Display (FiO2_P);
@@ -417,24 +419,25 @@ void TestControlValve (void)
               AirFlow_Text[17] = 'V';
               AirFlow_Text[18] = '\n';
               AirFlow_Text[19] = '\r';
+              
               for(x = 0 ; x < 15 ; x++)
               {
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                USART_SendData(USART3, FiO2_Percent_Ch_TEST[x]); 
+                USART_SendData(USART1, FiO2_Percent_Ch_TEST[x]); 
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
               }
 
               for (x = 0; x < 20; x++)
               {
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                USART_SendData(USART3, OxygenFlow_Text[x]); 
+                USART_SendData(USART1, OxygenFlow_Text[x]); 
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
               }
 
                for (x = 0; x < 20; x++)
               {
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                USART_SendData(USART3, AirFlow_Text[x]); 
+                USART_SendData(USART1, AirFlow_Text[x]); 
                 while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
               }
             }
@@ -446,6 +449,7 @@ void TestControlValve (void)
         TIM_ClearFlag(TIM6, TIM_FLAG_Update);
       }
     }
+
     time = 0;
     Oxygen_Drive = Oxygen_Drive - 0x0014;
     Air_Drive = Air_Drive + 0x0014;

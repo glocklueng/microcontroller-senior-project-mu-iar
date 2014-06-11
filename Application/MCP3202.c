@@ -50,6 +50,8 @@ void MCP3202_SetUp(void)
 float Get_FlowRate(uint8_t channel)
 {
   uint16_t DataOut;
+  uint8_t i;
+  float VoltageFlow[5];
   
   if ((SPI2->CR1 & 0x0800) == 0x0000)
   {
@@ -65,23 +67,28 @@ float Get_FlowRate(uint8_t channel)
   }
   else if (channel == CH1 | channel == AirFlowRate)
   {
-    DataOut = 0x000F;
-    DataOut = (DataOut << 12);
+    DataOut = 0xF000;
+    //DataOut = (DataOut << 12);
   }
   
-  // Send data out
-  GPIO_ResetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                            // Set NSS is Low
+  for(i=0;i<5;i++)
+  {
+    // Send data out
+    GPIO_ResetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                            // Set NSS is Low
   
-  /* Enable the Rx buffer not empty interrupt */
-  while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
-  SPI_I2S_SendData(SPI2, DataOut);                                              // Send data out
-  while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
-  FlowRate = SPI_I2S_ReceiveData(SPI2);                                         // Receive Data from MCP3202
-  FlowRate = FlowRate & 0x0FFF;
-  VoltageFlowRate = (FlowRate*5.0)/4095;                                        // Convert Digital Value to Voltage 
-  while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET);
+    /* Enable the Rx buffer not empty interrupt */
+    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI2, DataOut);                                              // Send data out
+    while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
+    FlowRate = SPI_I2S_ReceiveData(SPI2);                                         // Receive Data from MCP3202
+    FlowRate = FlowRate & 0x0FFF;
+    VoltageFlow[i] = (FlowRate*5.0)/4095;                                        // Convert Digital Value to Voltage 
+    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET);
 
-  GPIO_SetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                              // Set NSS Pin is High
+    GPIO_SetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                              // Set NSS Pin is High
+  }
+  
+  VoltageFlowRate = (VoltageFlow[0] + VoltageFlow[1] + VoltageFlow[2] + VoltageFlow[3] + VoltageFlow[4])/5.0;
   
   return VoltageFlowRate;
   
