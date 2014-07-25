@@ -11,14 +11,14 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #include "DAC_LTC1661.h"
 //------------------------------------------------------------------------------
 uint16_t FlowRate;
-uint8_t  FlowBuffer = 10;
+uint8_t  FlowBuffer = 30;
 uint8_t FlowIndex = 0;
 float VoltageFlowRate;
 //------------------------------------------------------------------------------
 /*
   Function : MCP3202_SetUp
-  Input : None
-  Return : None
+  @ Input : None
+  @ Return : None
   Description : Set Up and Configuration the NSS pin for MCP3202 (USE SPI2 Communication)
 */
 void MCP3202_SetUp(void)
@@ -42,8 +42,8 @@ void MCP3202_SetUp(void)
 //------------------------------------------------------------------------------
 /*
   Function: Get_FlowRate
-  Input : (uint8_t) channel - CH0,CH1,OxygenFlowRate,AirFlowRate
-  Return : (float) VoltageFlowRate
+  @ Input : (uint8_t) channel - CH0,CH1,OxygenFlowRate,AirFlowRate
+  @ Return : (float) VoltageFlowRate
   Description : Receiving Information form MCP3202 (Analog to Digital Converter IC). The value return is the voltage flow rate.
 */
 
@@ -51,19 +51,22 @@ float Get_FlowRate(uint8_t channel)
 {
   uint16_t DataOut;
   uint8_t i;
-  float VoltageFlow[5];
+  float VoltageFlow[10];
+  VoltageFlowRate = 0;
   
   if ((SPI2->CR1 & 0x0800) == 0x0000)
   {
-    // if Datasize is equal 8bits, then reconfig to 16 bits
-    // Reconfig Size Data for DAC 
+    /* 
+      if Datasize is equal 8bits, then reconfig to 16 bits
+      Reconfig Size Data for DAC 
+    */
     SPI_DataSizeConfig(SPI2, SPI_DataSize_16b);
   }
   
+  /* Check Channel inpit of signal of ADC IC */
   if (channel == CH0 | channel == OxygenFlowRate)
   {
     DataOut = 0xD000;
-    //DataOut = (DataOut << 12);
   }
   else if (channel == CH1 | channel == AirFlowRate)
   {
@@ -71,56 +74,48 @@ float Get_FlowRate(uint8_t channel)
     //DataOut = (DataOut << 12);
   }
   
-  for(i=0;i<5;i++)
+  /* Sampling 10 samples */
+  for(i = 0; i < 10; i++)
   {
-    // Send data out
-    GPIO_ResetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                            // Set NSS is Low
-  
+    /* Part Send data out */
+    GPIO_ResetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                          // Set NSS is Low
+    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI2, 0x01);                                               // Send Start bit (logic '1')
+//    for(uint8_t de =0;de<50;de++);
+    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET);
+    
     /* Enable the Rx buffer not empty interrupt */
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
-    SPI_I2S_SendData(SPI2, DataOut);                                              // Send data out
+    SPI_I2S_SendData(SPI2, DataOut<<1);                                         // Send data out shift left 1
     while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
-    FlowRate = SPI_I2S_ReceiveData(SPI2);                                         // Receive Data from MCP3202
-    FlowRate = FlowRate & 0x0FFF;
-    VoltageFlow[i] = (FlowRate*5.0)/4095;                                        // Convert Digital Value to Voltage 
+    FlowRate = SPI_I2S_ReceiveData(SPI2);                                       // Receive Data from MCP3202
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET);
-
-    GPIO_SetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                              // Set NSS Pin is High
+    GPIO_SetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                            // Set NSS Pin is High
+    for(uint8_t de =0;de<20;de++);
+    
+    FlowRate = FlowRate & 0x0FFF;
+    VoltageFlow[i] = (FlowRate*5.0)/4096;                                       // Convert Digital Value to Voltage 
+    
+    /* Average  value */
+    VoltageFlowRate = VoltageFlowRate + VoltageFlow[i];
   }
+  VoltageFlowRate = VoltageFlowRate/(i+1);
   
-  VoltageFlowRate = (VoltageFlow[0] + VoltageFlow[1] + VoltageFlow[2] + VoltageFlow[3] + VoltageFlow[4])/5.0;
+//  /* Average  value */
+//  for (uint8_t n = 0; n < 10; n++)
+//  {
+//    VoltageFlowRate = VoltageFlowRate + VoltageFlow[n];
+//    if (n == 9)
+//    {
+//      VoltageFlowRate = VoltageFlowRate/(n+1);
+//    }
+//  }
+
+//  VoltageFlowRate = (VoltageFlow[0] + VoltageFlow[1] + VoltageFlow[2] + VoltageFlow[3] + VoltageFlow[4] +  VoltageFlow[5] + VoltageFlow[6]+ VoltageFlow[7] + VoltageFlow[8] + VoltageFlow[9])/10;
   
   return VoltageFlowRate;
   
 }
-
-////------------------------------------------------------------------------------
-//void SPI2_IRQHandler (void)
-//{
-//  if (SPI_I2S_GetITStatus(SPI2, SPI_I2S_IT_RXNE) == SET)
-//  {
-//    if (FlowIndex < FlowBuffer)
-//    {
-//      /* Receive Transaction data */
-//      FlowRate = SPI_I2S_ReceiveData(SPI2);
-//      FlowRate = FlowRate & 0x0FFF;
-//      //FlowIndex++;
-////      if(FlowIndex >= FlowBuffer)
-////      {
-////        FlowIndex = 0;
-////      }
-//  
-//    }
-//    else
-//    {
-//      /* Disable the Rx buffer not empty interrupt */
-//      SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, DISABLE);
-//    }
-//  }
-//  SPI_I2S_ClearITPendingBit(SPI2, SPI_I2S_IT_RXNE);
-//}
-
-
 
 //------------------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------

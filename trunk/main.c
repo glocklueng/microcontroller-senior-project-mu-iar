@@ -16,6 +16,7 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #include "GLCD5110.h"
 #include "DefinePin.h"
 #include "Connect_GUI.h"
+#include "testControlValve.h"
 #include "ff.h"
 #include <stdlib.h>
 
@@ -29,6 +30,7 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 // Define ----------------------------------------------------------------------
 
 
+// variable for SD card
 /* Private typedef -----------------------------------------------------------*/
 SD_Error Status = SD_OK;
 FATFS filesystem;		                                                // volume lable
@@ -38,7 +40,6 @@ DIR dir;				                                        // Directory object
 FILINFO fno;			                                                // File information object
 UINT bw, br;
 uint8_t buff[128];
-
 
 //------------------------------------------------------------------------------
 void delay(void);
@@ -109,6 +110,9 @@ uint16_t Alarm_Level1, Alarm_Level2;
 uint8_t Mode;
 
 uint8_t Profile_Status;
+
+extern float AirFlow;
+extern float OxygenFlow;
 // Main Function ---------------------------------------------------------------
 int main()
 {  
@@ -117,6 +121,7 @@ int main()
   lcdString (1,1,"Please Upload Profile");
 
   Profile_Status = PROFILE_NOTUPLOAD;
+  
 //  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 //  TIM_Cmd(TIM3, ENABLE);
  
@@ -690,8 +695,8 @@ void USART_HyperTermianl_Connect(void)
 // USART 3: This function use for simulation Oxygen Pulse Meter
 /*
   Function : USART3_IRQHandler
-  Input : None
-  Return: None
+  @ Input : None
+  @ Return: None
   Description : Simulate as Oxygen Pulse Meter. It will send Oxygen Saturation value.
 */
 //------------------------------------------------------------------------------
@@ -866,15 +871,21 @@ void TIM2_IRQHandler(void)
 void Create_file(char Hospital_Number[], uint8_t File_Type)
 {
   //ret = f_mount(0, &filesystem);
+  /* crate text file that have 7 last digit form Hospital Number(HN) */
   for (int i = 0; i < 7; i++)
   {
     HospitalNumber_File[i] = Hospital_Number[i+6];
   }
-    HospitalNumber_File[8] = '.';
-    HospitalNumber_File[9] = 'T';
-    HospitalNumber_File[10] = 'X';
-    HospitalNumber_File[11] = 'T';
-    HospitalNumber_File[12] = '\0';
+  HospitalNumber_File[8] = '.';
+  HospitalNumber_File[9] = 'T';
+  HospitalNumber_File[10] = 'X';
+  HospitalNumber_File[11] = 'T';
+  HospitalNumber_File[12] = '\0';
+    
+  /*
+  @  File_Type = 0 : Oxygen Saturation record
+  @  File_Type = 1 : FiO2 record
+  */
   if(File_Type == 0)
   {
     HospitalNumber_File[7] = 'O';
@@ -883,6 +894,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     ret = f_open(&file_O, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
     if (ret) 
     {
+      /* ERROR */
       fault_err(ret);
     } 
     else 
@@ -902,6 +914,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     ret = f_open(&file_F, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
     if (ret) 
     {
+      /* ERROR */
       fault_err(ret);
     } 
     else 
@@ -912,8 +925,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
       ret = f_lseek(&file_F,f_size(&file_F));
       ret = f_write(&file_F, "\r\nFile: FiO2\r\n", 15, &bw);
       ret = f_close(&file_F);
-    }  
-
+    }
   }
 }
 
