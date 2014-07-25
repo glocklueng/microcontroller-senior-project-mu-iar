@@ -79,6 +79,7 @@ void TimingDelay_Decrement(void);
 void Delay(__IO uint32_t nTime);
 
 void EXTILine0_Config(void);
+void delay();
 
 
 #endif /* __MAIN_H */

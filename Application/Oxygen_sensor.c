@@ -13,30 +13,19 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "Connect_GUI.h"
 #include "GLCD5110.h"
 #include "DAC_LTC1661.h"
+#include "testControlValve.h"
 #include "MCP3202.h"
 //------------------------------------------------------------------------------
 // Define Variable -------------------------------------------------------------
-uint16_t volatile time = 0;
-//uint16_t ADC_Voltage;
-//float ADC_fValue;
+volatile uint16_t  time = 0;
 float FiO2_PureOxygen[60], FiO2_PureAir[60];
 float FiO2_Upper, FiO2_Lower;
 float FiO2_Percent;
-float FiO2_DataTest[24];
+
 float ADC_Voltage;
-float AVG_FiO2;
+
 uint16_t ADC_Value;
-float current_FiO2[5];
 
-// Flow Rate Variable
-float OxygenFlow, AirFlow;
-float OxygenFlow_SLM, AirFlow_SLM;
-char OxygenFlow_Text[20];
-char AirFlow_Text[20];
-
-float FiO2_Test_Buffer[50];
-
-char FiO2_Percent_Ch[7];
 extern uint8_t Profile_Status;
 // Function --------------------------------------------------------------------
 /*
@@ -290,7 +279,7 @@ float Convert_FiO2 (float FiO2_ADC)
 {
   //char FiO2_Percent_Ch[7];
   float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-1.5)/25;
+  FiO2_mv = ((FiO2_ADC)-0.983)/26.53;  //26.17
   FiO2_Percent = FiO2_mv*21/0.012;
   
   return FiO2_Percent;
@@ -299,7 +288,7 @@ float Convert_FiO2 (float FiO2_ADC)
 //------------------------------------------------------------------------------
 void FiO2_LCD_Display (float FiO2_Current_Percent)
 {
-  //char FiO2_Percent_Ch[7];
+  char FiO2_Percent_Ch[7];
   FiO2_Percent_Ch[0] = '0'+((uint32_t)FiO2_Current_Percent/100);
   FiO2_Percent_Ch[1] = '0'+((uint32_t)FiO2_Current_Percent%100)/10;
   FiO2_Percent_Ch[2] = '0'+((uint32_t)FiO2_Current_Percent%10)/1;
@@ -313,156 +302,7 @@ void FiO2_LCD_Display (float FiO2_Current_Percent)
 }
 
 //--------------------------------------------------------------------------------
-void TestControlValve (void)
-{
-  uint16_t Air_Drive, Oxygen_Drive;
-  uint8_t count = 0, i,x;
-  float current_FiO2[5];
-  float FiO2_P;
-  char FiO2_Percent_Ch_TEST[15];
-  
-  lcdClear();
-  lcdUpdate();
-  lcdString(1,1,"Test Control Valve");
-  time = 0;
-  Air_Drive = 0x0000;                                                           // 0x0000 = 0 (0V)
-  Oxygen_Drive = 0x03FF;                                                        // 0x03FF = 1024 (5V)
 
-  SentData_DAC(Air_Drive, Air_Valve);
-  SentData_DAC(Oxygen_Drive, Oxygen_Valve);
-  TIM_Cmd(TIM6, ENABLE);
-
-  // Test 50 Time
-  while(count <= 50)
-  {
-    // ADC every 15 Seconds.
-    while(time <= 15)
-    {  
-      if(TIM_GetFlagStatus(TIM6, TIM_FLAG_Update) != RESET)
-      {
-        if (time >= 15)
-        {
-          for(i = 0; i < 5 ; i++)
-          {          
-            current_FiO2[i] = '\0';
-            current_FiO2[i] = Oxygen_convert();
-            //FiO2_DataTest[count] = Convert_FiO2(current_FiO2);
-            if(i == 4)
-            {
-              AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
-              //AVG_FiO2 = (AVG_FiO2*2.91)/1023;
-              FiO2_Test_Buffer[count] = AVG_FiO2;
-                  
-              FiO2_DataTest[count] = Convert_FiO2(AVG_FiO2);
-              FiO2_P = Convert_FiO2(AVG_FiO2);
-              FiO2_LCD_Display (FiO2_P);
-              
-              FiO2_Percent_Ch_TEST[0] = '0'+((uint32_t)FiO2_P/100);
-              FiO2_Percent_Ch_TEST[1] = '0'+((uint32_t)FiO2_P%100)/10;
-              FiO2_Percent_Ch_TEST[2] = '0'+((uint32_t)FiO2_P%10)/1;
-              FiO2_Percent_Ch_TEST[3] = '.';
-              FiO2_Percent_Ch_TEST[4] = '0'+((uint32_t)((FiO2_P)*10.0))%10;
-              FiO2_Percent_Ch_TEST[5] = '%';
-              FiO2_Percent_Ch_TEST[6] = ' ';
-              FiO2_Percent_Ch_TEST[7] = '0'+((uint32_t)AVG_FiO2/100);
-              FiO2_Percent_Ch_TEST[8] = '0'+((uint32_t)AVG_FiO2%100)/10;
-              FiO2_Percent_Ch_TEST[9] = '0'+((uint32_t)AVG_FiO2%10)/1;
-              FiO2_Percent_Ch_TEST[10] = '.';
-              FiO2_Percent_Ch_TEST[11] = '0'+((uint32_t)((AVG_FiO2)*10.0))%10;
-              FiO2_Percent_Ch_TEST[12] = 'V';            
-              FiO2_Percent_Ch_TEST[13] = '\n';
-              FiO2_Percent_Ch_TEST[14] = '\r';
-              
-              OxygenFlow = Get_FlowRate(OxygenFlowRate);
-              OxygenFlow_SLM = (OxygenFlow*4);                                    // Convert Oxygen Flow Rate in SLM unit
-              
-              OxygenFlow_Text[0] = 'O';
-              OxygenFlow_Text[1] = '2';
-              OxygenFlow_Text[2] = ' ';
-              OxygenFlow_Text[3] = 'F';
-              OxygenFlow_Text[4] = 'l';
-              OxygenFlow_Text[5] = 'o';
-              OxygenFlow_Text[6] = 'w';
-              OxygenFlow_Text[7] = ' ';
-              OxygenFlow_Text[8] = '0'+((uint32_t)OxygenFlow_SLM/10);
-              OxygenFlow_Text[9] = '0'+((uint32_t)OxygenFlow_SLM%10)/1;
-              OxygenFlow_Text[10] = '.';
-              OxygenFlow_Text[11] = '0'+((uint32_t)(OxygenFlow_SLM*10.0)%10);
-              OxygenFlow_Text[12] = ' ';
-              OxygenFlow_Text[13] = '0'+((uint32_t)OxygenFlow%10);
-              OxygenFlow_Text[14] = '.';
-              OxygenFlow_Text[15] = '0'+((uint32_t)(OxygenFlow*10.0)%10);
-              OxygenFlow_Text[16] = '0'+((uint32_t)(OxygenFlow*100.0)%100);
-              OxygenFlow_Text[17] = 'V';
-              OxygenFlow_Text[18] = '\n';
-              OxygenFlow_Text[19] = '\r';
-              
-              AirFlow = Get_FlowRate(AirFlowRate);
-              AirFlow_SLM = (AirFlow*4);                                          // Convert Air Flow Rate in SLM unit
-              AirFlow_Text[0] = 'A';
-              AirFlow_Text[1] = 'i';
-              AirFlow_Text[2] = 'r';
-              AirFlow_Text[3] = 'F';
-              AirFlow_Text[4] = 'l';
-              AirFlow_Text[5] = 'o';
-              AirFlow_Text[6] = 'w';
-              AirFlow_Text[7] = ' ';
-              AirFlow_Text[8] = '0'+((uint32_t)AirFlow_SLM/10);
-              AirFlow_Text[9] = '0'+((uint32_t)AirFlow_SLM%10)/1;
-              AirFlow_Text[10] = '.';
-              AirFlow_Text[11] = '0'+((uint32_t)(AirFlow_SLM*10.0)%10);
-              AirFlow_Text[12] = ' ';
-              AirFlow_Text[13] = '0'+((uint32_t)AirFlow%10);
-              AirFlow_Text[14] = '.';
-              AirFlow_Text[15] = '0'+((uint32_t)(AirFlow*10.0)%10);
-              AirFlow_Text[16] = '0'+((uint32_t)(AirFlow*100.0)%100);
-              AirFlow_Text[17] = 'V';
-              AirFlow_Text[18] = '\n';
-              AirFlow_Text[19] = '\r';
-              
-              for(x = 0 ; x < 15 ; x++)
-              {
-                while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                USART_SendData(USART1, FiO2_Percent_Ch_TEST[x]); 
-                while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-              }
-
-              for (x = 0; x < 20; x++)
-              {
-                while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                USART_SendData(USART1, OxygenFlow_Text[x]); 
-                while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-              }
-
-               for (x = 0; x < 20; x++)
-              {
-                while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                USART_SendData(USART1, AirFlow_Text[x]); 
-                while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-              }
-            }
-          }
-          //AVG_FiO2 = Oxygen_convert();
-          //AVG_FiO2 = (AVG_FiO2*2.91)/1024;
-        }
-        time = time + 1;
-        TIM_ClearFlag(TIM6, TIM_FLAG_Update);
-      }
-    }
-
-    time = 0;
-    Oxygen_Drive = Oxygen_Drive - 0x0014;
-    Air_Drive = Air_Drive + 0x0014;
-
-    SentData_DAC(Air_Drive, Air_Valve);
-    SentData_DAC(Oxygen_Drive, Oxygen_Valve);
-
-    count++;
-  }
-  Profile_Status = TEST_COMPLETE;
-  TIM_Cmd(TIM6, DISABLE);
-
-}
 
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

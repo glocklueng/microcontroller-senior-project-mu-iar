@@ -95,7 +95,7 @@ void SPI2_SetUp(void)
   SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
   SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
   SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-  SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+  SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
   SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
   SPI_Init(SPI2, &SPI_InitStruct);
   
@@ -104,15 +104,15 @@ void SPI2_SetUp(void)
   /* Configure the Priority Group to 1 bit */                
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
   
-  /* Configure the SPI interrupt priority */
-  NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+//  /* Configure the SPI interrupt priority */
+//  NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
+//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//  NVIC_Init(&NVIC_InitStructure);
   
   /* Enable the Rx buffer not empty interrupt */
-  SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, DISABLE);
+//  SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, DISABLE);
   
   //Enable select output
   SPI_SSOutputCmd(SPI2, ENABLE);
