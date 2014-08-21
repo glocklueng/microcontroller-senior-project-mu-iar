@@ -15,167 +15,146 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "DefinePin.h"
 #include "Connect_GUI.h"
 //------------------------------------------------------------------------------
-extern float FiO2_Current;
-//------------------------------------------------------------------------------
 /*
   Function : Convert_Voltage_to_Hex
   Input : float voltage
-  Return: None
+  Return: uint16_t Hex_Value
   Description : This Function is convert voltage value (0-5 V) to Hex value (10 bits, 0x000-0x03FF).
 */
-uint16_t Convert_Voltage_to_Hex (float voltage)
+uint16_t Convert_Voltage_to_Hex (float fVoltage)
 {
-  uint16_t Hex_Value;
-  Hex_Value = voltage*204;
+  uint16_t uiHex_Value;
+  uiHex_Value = (uint16_t)((fVoltage * 204) / 1);                                // 0D204 = 0.1 v
   
-  return Hex_Value;
+  return uiHex_Value;
 }
-
+//-------------------------------------------------------------------------------
 /*
   Function : FiO2_Range
-  Input : uint8_t FiO2_Value
+  Input : uint8_t uiFiO2_Value
   Return: None
   Description : Select FiO2 Value. This Function is control valve follow FiO2 range.
 */
-void FiO2_Range (uint8_t FiO2_Value)
+void FiO2_Range (uint8_t uiFiO2_Value)
 {
-  uint16_t DAC_Voltage_Air, DAC_Voltage_Oxygen;
+  uint16_t uiDAC_Voltage_Air, uiDAC_Voltage_Oxygen;
 
-  if (FiO2_Value == 21)
+  if (uiFiO2_Value >= 21 & uiFiO2_Value < 23)
   {
     SentData_DAC(0x3FF, Air_Valve);
     SentData_DAC(0x000, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 22 & FiO2_Value < 25)
+  else if (uiFiO2_Value >= 23 & uiFiO2_Value < 28) // FiO2 = 25%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.6);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.2);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(0.2);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.6);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 25 & FiO2_Value < 27)
+  else if (uiFiO2_Value >= 28 & uiFiO2_Value < 33) //FiO2 = 30%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.5);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.3);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(0.2);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.2);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 27 & FiO2_Value < 30)
+  else if (uiFiO2_Value >= 33 & uiFiO2_Value < 38) //FiO2 = 35%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.4);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.4);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(1.6);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.2);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 30 & FiO2_Value < 33)
+  else if (uiFiO2_Value >= 38 & uiFiO2_Value < 43)
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.3);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.5);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(0.2); // FiO2 = 40%
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(0.6);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 33 & FiO2_Value < 35)
+  else if (uiFiO2_Value >= 43 & uiFiO2_Value < 48) //Fio2 = 45%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.2);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.6);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(0.8);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.8);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 35 & FiO2_Value < 40)
+  else if (uiFiO2_Value >= 48 & uiFiO2_Value < 53) //FiO2 = 50%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.1);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.7);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(0.6);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.0);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 40 & FiO2_Value < 43)
+  else if (uiFiO2_Value >= 53 & uiFiO2_Value < 58) //FiO2 = 55%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(4.0);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.8);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(1.8);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.4);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 43 & FiO2_Value < 45)
+  else if (uiFiO2_Value >= 58 & uiFiO2_Value < 63) // FiO2 = 60%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.9);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.9);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(2.4);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(2.4);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 45 & FiO2_Value < 47)
+  else if (uiFiO2_Value >= 63 & uiFiO2_Value < 68) // FiO2 = 65%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.8);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.0);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(2.2);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.8);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 47 & FiO2_Value < 49)
+  else if (uiFiO2_Value >= 68 & uiFiO2_Value < 73) // FiO2 = 70%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.7);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.1);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(1.6);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 49 & FiO2_Value < 55)
+  else if (uiFiO2_Value >= 73 & uiFiO2_Value < 78) //FiO2 = 75%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.8);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.2);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(2.6);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.4);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 55 & FiO2_Value < 61)
+  else if (uiFiO2_Value >= 78 & uiFiO2_Value < 83) //Fio2 = 80%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.7);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.2);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(2.2);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(0.8);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 61 & FiO2_Value < 68)
+  else if (uiFiO2_Value >= 83 & uiFiO2_Value < 88) //FiO2 = 85%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.6);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.5);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(3.6);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(1.0);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 68 & FiO2_Value < 80)
+  else if (uiFiO2_Value >= 88 & uiFiO2_Value < 93) //FiO2 = 90%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.3);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.7);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(2.8);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(0.4);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 80 & FiO2_Value < 85)
+  else if (uiFiO2_Value >= 93 & uiFiO2_Value < 97) //Fio2 = 95%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(3.2);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.6);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(3.4);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(0.2);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
-  else if (FiO2_Value >= 85 & FiO2_Value < 93)
+  else if (uiFiO2_Value >= 97 & uiFiO2_Value <= 100) //FiO2 = 100%
   {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(2.9);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(3.9);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
-  }
-  else if (FiO2_Value >= 93 & FiO2_Value < 95)
-  {
-    DAC_Voltage_Air = Convert_Voltage_to_Hex(2.7);
-    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(4.1);
-    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
-  }
-//  else if (FiO2_Value >= 94 & FiO2_Value < 97)
-//  {
-//    DAC_Voltage_Air = Convert_Voltage_to_Hex(2.7);
-//    SentData_DAC(DAC_Voltage_Air, Air_Valve);
-//    DAC_Voltage_Oxygen = Convert_Voltage_to_Hex(4.2);
-//    SentData_DAC(DAC_Voltage_Oxygen, Oxygen_Valve);
-//  }
-  else if (FiO2_Value >= 95 & FiO2_Value <=100)
-  {
-    SentData_DAC(0x3FF, Oxygen_Valve);
-    SentData_DAC(0x000, Air_Valve);
+    uiDAC_Voltage_Air = Convert_Voltage_to_Hex(3.6);
+    SentData_DAC(uiDAC_Voltage_Air, Air_Valve);
+    uiDAC_Voltage_Oxygen = Convert_Voltage_to_Hex(0);
+    SentData_DAC(uiDAC_Voltage_Oxygen, Oxygen_Valve);
   }
 }
 

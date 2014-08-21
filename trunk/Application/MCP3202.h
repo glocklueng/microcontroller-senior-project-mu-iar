@@ -21,7 +21,7 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #define AirFlowRate     1
 //------------------------------------------------------------------------------
 void MCP3202_SetUp(void);
-float Get_FlowRate (uint8_t channel);
+float Get_FlowRate (uint8_t uiChannel);
 //------------------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

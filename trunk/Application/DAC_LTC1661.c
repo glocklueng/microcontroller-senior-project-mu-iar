@@ -37,15 +37,14 @@ LTC 1661
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_tim.h"
 //------------------------------------------------------------------------------
-//uint16_t  DAC_data,DAC_sent;
-//uint8_t channel;
+//uint16_t  uiDAC_data,DAC_sent;
+//uint8_t uichannel;
 
 // Function --------------------------------------------------------------------
 void SPI2_SetUp(void)
 {  
   GPIO_InitTypeDef GPIO_InitStruct;
   SPI_InitTypeDef SPI_InitStruct;
-  NVIC_InitTypeDef NVIC_InitStructure;
   
   /*
     PB14 = SPI2_NSS
@@ -100,20 +99,7 @@ void SPI2_SetUp(void)
   SPI_Init(SPI2, &SPI_InitStruct);
   
   SPI_NSSInternalSoftwareConfig(SPI2, SPI_NSSInternalSoft_Set);
-  
-  /* Configure the Priority Group to 1 bit */                
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-  
-//  /* Configure the SPI interrupt priority */
-//  NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
-//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//  NVIC_Init(&NVIC_InitStructure);
-  
-  /* Enable the Rx buffer not empty interrupt */
-//  SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, DISABLE);
-  
+    
   //Enable select output
   SPI_SSOutputCmd(SPI2, ENABLE);
     
@@ -156,43 +142,40 @@ void LTC1661_Setup(void)
 }
 
 /*
-    uint16_t DAC_data   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
-    uint8_t Channel     : Select Channel 
+    uint16_t uiDAC_data   : Data for convert, 10 Bits, since 0x0000 to 0x03FF
+    uint8_t uiChannel     : Select uiChannel 
                           Air Valve - Channel 2 (Pin5)
                           Oxygen Valve - Channel 1 (Pin 8)
                           3 - Channel 1 and 2
 */
 
-void SentData_DAC (uint16_t DAC_data, uint8_t channel)
+void SentData_DAC (uint16_t uiDAC_data, uint8_t uichannel)
 {
   uint16_t DAC_sent;
-  //Check Datasize config is 8 bits or 16 bits
+  /* Check Datasize config is 8 bits or 16 bits */
   if ((SPI2->CR1 & 0x0800) == 0x0000)
   {
-      // if Datasize is equal 8bits, then reconfig to 16 bits
-      // Reconfig Size Data for DAC 
+      /* if Datasize is equal 8bits, then reconfig to 16 bits */
+      /* Reconfig Size Data for DAC */
       SPI_DataSizeConfig(SPI2, SPI_DataSize_16b);
   }
  
-  /* Select Channel */
-  if(channel == Air_Valve)
+  /* Select uiChannel */
+  if(uichannel == Air_Valve)
   {
-    DAC_data = DAC_data;
-    DAC_sent = (DAC_data << 2) | 0x9000;
+    DAC_sent = (uiDAC_data << 2) | 0x9000;
   }
-  else if(channel == Oxygen_Valve)
+  else if(uichannel == Oxygen_Valve)
   {
-    DAC_data = DAC_data;
-    DAC_sent = (DAC_data << 2) | 0xA000;    
+    DAC_sent = (uiDAC_data << 2) | 0xA000;    
   }
-  else if(channel == 3)
+  else if(uichannel == 3)
   {
-    DAC_data = DAC_data;
-    DAC_sent = (DAC_data << 2) | 0xF000;      
+    DAC_sent = (uiDAC_data << 2) | 0xF000;      
   }
   
   /* Sent Data */
-  uint16_t i;
+  uint16_t uiDelay;
   GPIO_ResetBits(DAC_NSS_Port, DAC_NSS_Pin);
   while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == RESET)
   {
@@ -201,7 +184,7 @@ void SentData_DAC (uint16_t DAC_data, uint8_t channel)
       SPI_I2S_SendData(SPI2, DAC_sent);
     }
   }
-  for(i=0;i<750;i++);
+  for(uiDelay = 0; uiDelay < 750; uiDelay++);
   GPIO_SetBits(DAC_NSS_Port, DAC_NSS_Pin);
 }
 
