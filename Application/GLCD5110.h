@@ -48,17 +48,17 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 //unsigned char glcd_ini=0;
 //------------------------------------------------------------------------------
 /*
-	Hardware Configuration
-		GLCD5110	|	STM32 Port
-		----------------|-----------
-		(1)VCC		|	VCC
-		(2)GND		|	GND
-		(3)SCE	(NSS)	|	PD1
-		(4)RESET	|	PD6
-		(5)D/C		|	PD5
-		(6)SDIN	(MOSI)	|	PC12
-		(7)SCK		|	PC10
-		(8)LED		|	PD2
+    Hardware Configuration
+        GLCD5110    |   STM32 Port
+        ----------------|-----------
+        (1)VCC      |   VCC
+        (2)GND      |   GND
+        (3)SCE  (NSS)   |   PD1
+        (4)RESET    |   PD6
+        (5)D/C      |   PD5
+        (6)SDIN (MOSI)  |   PC12
+        (7)SCK      |   PC10
+        (8)LED      |   PD2
 */
 //------------------------------------------------------------------------------
 /*
@@ -87,10 +87,10 @@ void lcdString(unsigned char _x,unsigned char _y,char *dataPtr);
 void lcdPixel(unsigned char x, unsigned char y, unsigned char mode);
 void lcdLine(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2, unsigned char mode);
 void lcdProgBar(    unsigned char _x, 
-				    unsigned char _y, 
-				    unsigned char width, 
-				    unsigned char high, 
-				    unsigned char percentage);
+                    unsigned char _y, 
+                    unsigned char width, 
+                    unsigned char high, 
+                    unsigned char percentage);
 void configGlcd(void);
 void lcdBackLight(char set);
 /*--------------------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ static const unsigned char FontLookup [][5] =
     { 0x36, 0x49, 0x55, 0x22, 0x50 },   // &
     { 0x00, 0x05, 0x03, 0x00, 0x00 },   // '
     { 0x00, 0x1c, 0x22, 0x41, 0x00 },   // (
-    { 0x00, 0x41, 0x22, 0x1c, 0x00 },   // )				 
+    { 0x00, 0x41, 0x22, 0x1c, 0x00 },   // )                 
     { 0x14, 0x08, 0x3E, 0x08, 0x14 },   // *
     { 0x08, 0x08, 0x3E, 0x08, 0x08 },   // +
     { 0x00, 0x00, 0x50, 0x30, 0x00 },   // ,

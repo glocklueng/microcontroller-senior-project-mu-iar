@@ -18,20 +18,19 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 //------------------------------------------------------------------------------
 // Define Variable -------------------------------------------------------------
 volatile uint16_t  time = 0;
-float FiO2_PureOxygen[60], FiO2_PureAir[60];
-float FiO2_Upper, FiO2_Lower;
-float FiO2_Percent;
+//float fFiO2_PureOxygen[60], fFiO2_PureAir[60];
+float fFiO2_Upper, fFiO2_Lower;
+float fFiO2_Percent;
+float fADC_Voltage;
 
-float ADC_Voltage;
+uint16_t uiADC_Value;
 
-uint16_t ADC_Value;
-
-extern uint8_t Profile_Status;
+//extern struct Profile SProfile;
 // Function --------------------------------------------------------------------
 /*
   Funciton : OxygenSensor_Config
-  Input : None
-  Return : None
+  @ Input : None
+  @ Return : None
   Description : Configuration ADC for FiO2, Resolution 10-bits
 */
 void OxygenSensor_Config(void)
@@ -87,12 +86,12 @@ void OxygenSensor_Config(void)
 }
 
 //------------------------------------------------------------------------------
+/*
+  Set timer for count time measure oxygen sensor
+  use timer 6, 16 bits, auto-reload, every 1 minite 
+*/
 void Timer6_SetUp(void)
 {
-  /*
-    Set timer for count time measure oxygen sensor
-    use timer 6, 16 bits, auto-reload, every 1 minite 
-  */
   /*Timer Interrupt*/
   /* Set interrupt: NVIC_Setup */
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -114,16 +113,15 @@ void Timer6_SetUp(void)
   TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);
   /* TIM IT enable */
   TIM_ITConfig(TIM6, TIM_IT_Update, DISABLE);
-  /* TIM2 enable counter */
-  //TIM_Cmd(TIM6, ENABLE);
+  /* TIM2 disable counter */
   TIM_Cmd(TIM6, DISABLE);
 }
 
 // FiO2 Check Timer Config --------------------------------------------------------------
 /*
   Function: FiO2_Check_Timer
-  Input : None
-  Return : None
+  @ Input : None
+  @ Return : None
   Description: Timer 3 will get Analog to Digital Convertor of FiO2 every 1 sec.
 */
 void FiO2_Check_Timer_Config(void)
@@ -156,28 +154,29 @@ void FiO2_Check_Timer_Config(void)
 /*
   Function: Oxygen_convert
   Input : None
-  Return: float ADC_Voltage
+  Return: float fADC_Voltage
   Description: Start ADC Voltage form Oxygen Sensor and calculate Hexdicimal to Voltage_Valve
 */
 float Oxygen_convert(void)
 {
-  //float ADC_Voltage;
-  //uint16_t ADC_Value;
+  //float fADC_Voltage;
+  //uint16_t uiADC_Value;
   
   ADC_SoftwareStartConv(OxygenSensor);
   while(ADC_GetFlagStatus(OxygenSensor, ADC_FLAG_EOC) == RESET);
   /*Store ADC Sample*/
-  ADC_Value = ADC_GetConversionValue(OxygenSensor);
+  uiADC_Value = ADC_GetConversionValue(OxygenSensor);
   
-  ADC_Voltage = '\0';
-  ADC_Voltage = (ADC_Value*2.91)/1023;                                          //VDD is vary (time1 = 3.02, time2 = 2.94)
+  fADC_Voltage = '\0';
+  fADC_Voltage = (uiADC_Value*2.91)/1023;                                          //VDD is vary (time1 = 3.02, time2 = 2.94)
 
-  return ADC_Voltage;
+  return fADC_Voltage;
 }
 
 //------------------------------------------------------------------------------
 void Calibrate_OxygenSensor(void)
 {
+  float fFiO2_PureOxygen[60], fFiO2_PureAir[60];
   //Updata LCD
   lcdClear();
   lcdString(3,1,"Waitting....");
@@ -198,8 +197,8 @@ void Calibrate_OxygenSensor(void)
   {
     if(TIM_GetFlagStatus(TIM6, TIM_FLAG_Update) != RESET)
     {
-      FiO2_PureOxygen[time] = Oxygen_convert();
-      FiO2_Percent = Convert_FiO2(FiO2_PureOxygen[time]);
+      fFiO2_PureOxygen[time] = Oxygen_convert();
+      fFiO2_Percent = Convert_FiO2(fFiO2_PureOxygen[time]);
       time = time + 1;
       TIM_ClearFlag(TIM6, TIM_FLAG_Update);
     }
@@ -207,7 +206,7 @@ void Calibrate_OxygenSensor(void)
   TIM_Cmd(TIM6, DISABLE);
   
   //Average PureAir Voltage Data
-  FiO2_Upper = (FiO2_PureOxygen[55] + FiO2_PureOxygen[56] +FiO2_PureOxygen[57] +FiO2_PureOxygen[58] +FiO2_PureOxygen[59])/5;
+  fFiO2_Upper = (fFiO2_PureOxygen[55] + fFiO2_PureOxygen[56] +fFiO2_PureOxygen[57] +fFiO2_PureOxygen[58] +fFiO2_PureOxygen[59])/5;
   
   //Calibrate Oxygen Concentration (Pure Air)
   time = 0;
@@ -219,8 +218,8 @@ void Calibrate_OxygenSensor(void)
   {  
     if(TIM_GetFlagStatus(TIM6, TIM_FLAG_Update) != RESET)
     {      
-      FiO2_PureAir[time] = Oxygen_convert();
-      FiO2_Percent = Convert_FiO2(FiO2_PureAir[time]);
+      fFiO2_PureAir[time] = Oxygen_convert();
+      fFiO2_Percent = Convert_FiO2(fFiO2_PureAir[time]);
       time = time + 1;
       TIM_ClearFlag(TIM6, TIM_FLAG_Update);
     }
@@ -229,7 +228,7 @@ void Calibrate_OxygenSensor(void)
   time = 0;
   
   //Average PureAir Voltage Data
-  FiO2_Lower = (FiO2_PureAir[55] + FiO2_PureAir[56] +FiO2_PureAir[57] +FiO2_PureAir[58] +FiO2_PureAir[59])/5;
+  fFiO2_Lower = (fFiO2_PureAir[55] + fFiO2_PureAir[56] +fFiO2_PureAir[57] +fFiO2_PureAir[58] +fFiO2_PureAir[59])/5;
   
   //Close Air and Oxygen Valve
   SentData_DAC(0x0000, 3);
@@ -241,7 +240,7 @@ void Calibrate_OxygenSensor(void)
 }
 
 //------------------------------------------------------------------------------
-// Interrupt Push Botton User (Blue Botton)
+/* Interrupt Push Botton User (Blue Botton) */ 
 void EXTI0_IRQHandler(void)
 {
   if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
@@ -256,13 +255,13 @@ void EXTI0_IRQHandler(void)
   EXTI_ClearITPendingBit(EXTI_Line0);
 }
 //------------------------------------------------------------------------------
-
+/* Timer 6 Interrupt Sevice Rountine */
 void TIM6_DAC_IRQHandler(void)
 {
   if (TIM_GetITStatus (TIM6, TIM_IT_Update) != RESET)
   {
     time = time + 1;
-    //FiO2_PureOxygen[time] = Oxygen_convert();
+    //fFiO2_PureOxygen[time] = Oxygen_convert();
     STM_EVAL_LEDOff(LED5);
   }
   TIM_ClearITPendingBit (TIM6, TIM_IT_Update);
@@ -272,35 +271,39 @@ void TIM6_DAC_IRQHandler(void)
 /*
   Function: Convert_FiO2
   Input: float FiO2_ADC
-  return: float FiO2_Percent
+  return: float fFiO2_Percent
   Description: Convert Voltage of FiO2 to Percent of FiO2 and Show on LCD Display
 */
-float Convert_FiO2 (float FiO2_ADC)
+float Convert_FiO2 (float fFiO2_ADC)
 {
-  //char FiO2_Percent_Ch[7];
-  float FiO2_mv;
-  FiO2_mv = ((FiO2_ADC)-0.983)/26.53;  //26.17
-  FiO2_Percent = FiO2_mv*21/0.012;
+  float fFiO2_mv;
+  fFiO2_mv = ((fFiO2_ADC) - 0.983) / 26.53;  //26.17
+  fFiO2_Percent = fFiO2_mv * 21 / 0.012;
   
-  return FiO2_Percent;
+  return fFiO2_Percent;
 }
 
 //------------------------------------------------------------------------------
-void FiO2_LCD_Display (float FiO2_Current_Percent)
+/*
+  @Function: FiO2_LCD_Display
+  @Input: float FiO2_Current_Percent
+  @Retrurn: None
+  @Description: convert float to string for showing on LCD display
+*/
+void FiO2_LCD_Display (float fFiO2_Current_Percent)
 {
-  char FiO2_Percent_Ch[7];
-  FiO2_Percent_Ch[0] = '0'+((uint32_t)FiO2_Current_Percent/100);
-  FiO2_Percent_Ch[1] = '0'+((uint32_t)FiO2_Current_Percent%100)/10;
-  FiO2_Percent_Ch[2] = '0'+((uint32_t)FiO2_Current_Percent%10)/1;
-  FiO2_Percent_Ch[3] = '.';
-  FiO2_Percent_Ch[4] = '0'+((uint32_t)((FiO2_Current_Percent)*10.0))%10;
-  FiO2_Percent_Ch[5] = '%';
-  FiO2_Percent_Ch[6] = '\0';
+  char cFiO2_Percent_Ch[7];
+  cFiO2_Percent_Ch[0] = '0'+((uint32_t)fFiO2_Current_Percent/100);
+  cFiO2_Percent_Ch[1] = '0'+((uint32_t)fFiO2_Current_Percent%100)/10;
+  cFiO2_Percent_Ch[2] = '0'+((uint32_t)fFiO2_Current_Percent%10)/1;
+  cFiO2_Percent_Ch[3] = '.';
+  cFiO2_Percent_Ch[4] = '0'+((uint32_t)((fFiO2_Current_Percent)*10.0))%10;
+  cFiO2_Percent_Ch[5] = '%';
+  cFiO2_Percent_Ch[6] = '\0';
 
   lcdString(1,3,"FiO2: ");
-  lcdString(7,3,FiO2_Percent_Ch);
+  lcdString(7,3,cFiO2_Percent_Ch);
 }
-
 //--------------------------------------------------------------------------------
 
 

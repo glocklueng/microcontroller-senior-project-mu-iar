@@ -51,12 +51,13 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #define ACK     0x41                                                            //Data Correct = 'A' (0x41)
 #define OxygenSaturation_file           0
 #define FiO2_file                       1
+// Define Structure ---------------------------------------------------------------
+Profile SProfile;
+//------------------------------------------------------------------------------
 
-
-uint8_t rx_index_GUI=0;
 uint8_t tx_index_GUI=0;
 
-extern uint8_t Data_GUI [28];
+static uint8_t suiData_GUI[28];
 
 
 //Define Variable for CRC ------------------------------------------------------
@@ -66,20 +67,21 @@ uint8_t Length_Data = 25;
 
 //------------------------------------------------------------------------------
 //Define Value for Data Packaging
-const uint8_t Padding = 0x91;                                                   //Padding Bytes for dummy Bytes of Data (Value = 0x23)
-const uint8_t Connect_Command = 0xE8;                                           //0xE8 is Connect Command
-const uint8_t Upload_Command = 0xD5;                                            //0xD5 is Upload Profile data Command
-const uint8_t ETX = 0x33;                                                       //End of Package Transmittion
+const uint8_t kPadding = 0x91;                                                   //Padding Bytes for dummy Bytes of Data (Value = 0x23)
+const uint8_t kConnect_Command = 0xE8;                                           //0xE8 is Connect Command
+const uint8_t kUpload_Command = 0xD5;                                            //0xD5 is Upload Profile data Command
+const uint8_t kETX = 0x33;                                                       //End of Package Transmittion
 
 // Extern Profile Variable -----------------------------------------------------
-extern char Hospital_Number[13];
-extern uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
-extern uint8_t FiO2_Maximum, FiO2_Minimum;
-extern uint8_t RespondsTime;
-extern uint8_t Prefered_FiO2;
-extern uint16_t Alarm_Level1, Alarm_Level2;
-extern uint8_t Mode;
-extern uint8_t Profile_Status;
+//extern char Hospital_Number[13];
+//extern uint8_t OxygenSaturaiton_Maximum, OxygenSaturation_Minimum;
+//extern uint8_t FiO2_Maximum, FiO2_Minimum;
+//extern uint8_t RespondsTime;
+//extern uint8_t Prefered_FiO2;
+//extern uint16_t Alarm_Level1, Alarm_Level2;
+//extern uint8_t Mode;
+//extern uint8_t Profile_Status;
+
 //------------------------------------------------------------------------------
 /*
   Function : USART_GUI_Connect
@@ -186,7 +188,7 @@ void CRC_CALCULATE_TX(void)
   Crc = 0xFFFF;
   for (i = 0; i < Length_Data; i++) 
   {
-    Crc = TX_CRC(Crc , Data_GUI[i]);
+    Crc = TX_CRC(Crc , suiData_GUI[i]);
   }
   CRC_Low = (Crc & 0x00FF);                                                     //Low byte calculation
   CRC_High = (Crc & 0xFF00)/256;                                                //High byte calculation
@@ -228,48 +230,48 @@ unsigned int TX_CRC(unsigned int crc, unsigned int data)
 */
 void GUI_IRQHandler (void)
 {
-  uint8_t Data_in;
+  uint8_t Data_in, uiRx_Index_GUI = 0;
 
   if(USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
   {
     Data_in = USART_ReceiveData(USART1);
-    Data_GUI[rx_index_GUI] = Data_in;
-    //Data_GUI[rx_index_GUI] = USART_ReceiveData(GUI_USART);
-    rx_index_GUI++;
+    suiData_GUI[uiRx_Index_GUI] = Data_in;
+    //suiData_GUI[uiRx_Index_GUI] = USART_ReceiveData(GUI_USART);
+    uiRx_Index_GUI++;
   
-    if(rx_index_GUI >= (sizeof(Data_GUI) - 1))
+    if(uiRx_Index_GUI >= (sizeof(suiData_GUI) - 1))
     {  
-      rx_index_GUI = 0;
+      uiRx_Index_GUI = 0;
 
       //Check CRC16 - ModBus
       CRC_CALCULATE_TX();
-      if (Data_GUI[25] == CRC_High & Data_GUI[26] == CRC_Low)
+      if (suiData_GUI[25] == CRC_High & suiData_GUI[26] == CRC_Low)
       {
         //CRC is Correct
         USART_SendData(USART1, ACK);                                            //Send Acknowlege to GUI
         while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
         
-        if (Data_GUI[1] == Upload_Command)
+        if (suiData_GUI[1] == kUpload_Command)
         {
           lcdClear();
           //Update Rule
           Update_Rule();
-          Profile_Status = PROFILE_JUST_UPLOAD;
+          SProfile.uiProfile_Status = PROFILE_JUST_UPLOAD;
           lcdString(1,2,"SaO2: ");
           lcdString(1,3,"FiO2:");
         }
-        else if (Data_GUI[1] == Connect_Command)
+        else if (suiData_GUI[1] == kConnect_Command)
         {
-          //Clear Data out from Buffer
-          for (uint8_t i = 0; i < 28; i++)
+          /* Clear Data out from Buffer */
+          for (uint8_t uiClear_index = 0; uiClear_index < sizeof(suiData_GUI); uiClear_index++)
           {
-            Data_GUI[i] = 0;
+            suiData_GUI[uiClear_index] = 0;
           }
         }
       }
       else
       {
-        //CRC is ERROR, Send ERROR ACK to GUI (ERROR ACK = 0xEA)
+        /* CRC is ERROR, Send ERROR ACK to GUI (ERROR ACK = 0xEA) */
         USART_SendData(USART1, ERROR);
         while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
       }
@@ -294,37 +296,37 @@ void GUI_IRQHandler (void)
 void Update_Rule(void)
 {
   uint8_t HN_index;
-  // Update Hospital Number
+  /* Update Hospital Number */
   for(HN_index = 3; HN_index < 16 ; HN_index++)
   {
-    Hospital_Number[HN_index-3] = '0' + Data_GUI[HN_index];
+    SProfile.cHospital_Number[HN_index-3] = '0' + suiData_GUI[HN_index];
   }
   //Show Hospital Number to LCD Display
-  lcdString (1,1,Hospital_Number);
+  lcdString (1,1,SProfile.cHospital_Number);
 
-  OxygenSaturaiton_Maximum = Data_GUI[16];
-  OxygenSaturation_Minimum = Data_GUI[17];
-  RespondsTime = Data_GUI[18];
-  Prefered_FiO2 = Data_GUI[19];
-  Mode = Data_GUI[20];
-  //Select Mode
-  if (Mode == 0xB7)
+  SProfile.uiOxygenSaturation_Maximum = suiData_GUI[16];
+  SProfile.uiOxygenSaturation_Minimum = suiData_GUI[17];
+  SProfile.uiRespondsTime = suiData_GUI[18];
+  SProfile.uiPrefered_FiO2 = suiData_GUI[19];
+  SProfile.uiMode = suiData_GUI[20];
+  /* Select Mode */
+  if (SProfile.uiMode == 0xB7)
   {
-    //Select Range Mode
+    /* Select Range Mode */
     lcdString(1,4,"Mode: Range");
-    FiO2_Maximum = Data_GUI[21];
-    FiO2_Minimum = Data_GUI[22];
+    SProfile.uiFiO2_Maximum = suiData_GUI[21];
+    SProfile.uiFiO2_Minimum = suiData_GUI[22];
   }
-  else if (Mode == 0xA2)
+  else if (SProfile.uiMode == 0xA2)
   {
-    //Selecte Auto Mode
+    /* Selecte Auto Mode */
     lcdString(1,4,"Mode: Auto");
-    FiO2_Maximum = 100;
-    FiO2_Minimum = 21;
+    SProfile.uiFiO2_Maximum = 100;
+    SProfile.uiFiO2_Minimum = 21;
   }
 
-  Alarm_Level1 = Data_GUI[23] * 60;
-  Alarm_Level2 = Data_GUI[24] * 60;
+  SProfile.uiAlarm_Level1 = suiData_GUI[23] * 60;
+  SProfile.uiAlarm_Level2 = suiData_GUI[24] * 60;
 
 }
 

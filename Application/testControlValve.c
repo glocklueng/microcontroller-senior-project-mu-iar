@@ -10,12 +10,13 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "main.h"
 #include "Oxygen_sensor.h"
 #include "MCP3202.h"
+#include "GLCD5110.h"
 #include "DAC_LTC1661.h"
 #include "testControlValve.h"
 //------------------------------------------------------------------------------
 float FiO2_DataTest[24];
 extern uint16_t time;
-extern uint8_t Profile_Status;
+
 //------------------------------------------------------------------------------
 void TestControlValve (void)
 {
@@ -25,11 +26,10 @@ void TestControlValve (void)
   char OxygenFlow_Text[24];
   char AirFlow_Text[27];
   float AVG_FiO2;
-  
   float FiO2_Test_Buffer[50];
-
+  
   uint16_t Air_Drive, Oxygen_Drive;
-  uint8_t count = 0, i,x;
+  uint8_t count = 0, adc_time;
   float current_FiO2[5];
   float FiO2_P;
   char FiO2_Percent_Ch_TEST[16];
@@ -58,26 +58,29 @@ void TestControlValve (void)
         {
           if (time >= 15)
           {
-            count = count+1;
-            for(i = 0; i < 5 ; i++)
+            count = count + 1;
+            //Sampling voltage 5 times
+            for(adc_time = 0; adc_time < 5 ; adc_time++)                                             
             {   
-              current_FiO2[i] = '\0';
-              current_FiO2[i] = Oxygen_convert();
+              current_FiO2[adc_time] = '\0';
+              current_FiO2[adc_time] = Oxygen_convert();
               
               /* Sampling until 5 samples*/
-              if(i == 4)
+              if(adc_time == 4)
               {
                 /* Show Number of data line*/
                 count_text[0] = '0'+((uint32_t)count/100);
                 count_text[1] = '0'+((uint32_t)count%100)/10;
                 count_text[2] = '0'+((uint32_t)count%10)/1;
                 count_text[3] = ' ';
-                for(x = 0 ; x <4 ; x++)
-                {
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                  USART_SendData(USART3, count_text[x]); 
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-                }
+                // import crate function send data via USART
+                textTransmission_USART (count_text);
+//                for(index = 0 ; index < 4 ; index++)
+//                {
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+//                  USART_SendData(USART3, count_text[index]); 
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+//                }
                 
                 AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
                 FiO2_Test_Buffer[count] = AVG_FiO2;
@@ -161,25 +164,28 @@ void TestControlValve (void)
                 AirFlow_Text[25] = '\n';
                 AirFlow_Text[26] = '\r';
             
-                for(x = 0 ; x < 16 ; x++)
-                {
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                  USART_SendData(USART3, FiO2_Percent_Ch_TEST[x]); 
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-                }
+                textTransmission_USART(FiO2_Percent_Ch_TEST);
+//                for(x = 0 ; x < 16 ; x++)
+//                {
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+//                  USART_SendData(USART3, FiO2_Percent_Ch_TEST[x]); 
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+//                }
 
-                for (x = 0; x < 24; x++)
-                {
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                  USART_SendData(USART3, OxygenFlow_Text[x]); 
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-                }
-                for (x = 0; x < 27; x++)
-                {
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-                  USART_SendData(USART3, AirFlow_Text[x]); 
-                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-                }
+                textTransmission_USART(OxygenFlow_Text);
+//                for (x = 0; x < 24; x++)
+//                {
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+//                  USART_SendData(USART3, OxygenFlow_Text[x]); 
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+//                }
+                textTransmission_USART(AirFlow_Text);
+//                for (x = 0; x < 27; x++)
+//                {
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+//                  USART_SendData(USART3, AirFlow_Text[x]); 
+//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+//                }
               }
             }
           }
@@ -196,10 +202,21 @@ void TestControlValve (void)
     Oxygen_Drive = Oxygen_Drive + 0x0028;                                       // add 0x0028 = 0.2 V
     SentData_DAC(Oxygen_Drive, Oxygen_Valve);
   }
-  Profile_Status = TEST_COMPLETE;
+  //SProfile.uiProfile_Status = TEST_COMPLETE;
   TIM_Cmd(TIM6, DISABLE);
 }
 
+//-------------------------------------------------------------------------------
+void textTransmission_USART(char cTextString[])
+{
+  uint16_t uiIndex;
+  for (uiIndex = 0; uiIndex < sizeof(cTextString); uiIndex++)
+  {
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+    USART_SendData(USART3, cTextString[uiIndex]); 
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+  }
+}
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 --------------------------------------------------------------------------------------------------*/

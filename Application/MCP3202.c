@@ -10,10 +10,8 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #include "MCP3202.h"
 #include "DAC_LTC1661.h"
 //------------------------------------------------------------------------------
-uint16_t FlowRate;
-uint8_t  FlowBuffer = 30;
-uint8_t FlowIndex = 0;
-float VoltageFlowRate;
+uint16_t uiFlowRate;
+float fVoltageFlowRate;
 //------------------------------------------------------------------------------
 /*
   Function : MCP3202_SetUp
@@ -42,17 +40,17 @@ void MCP3202_SetUp(void)
 //------------------------------------------------------------------------------
 /*
   Function: Get_FlowRate
-  @ Input : (uint8_t) channel - CH0,CH1,OxygenFlowRate,AirFlowRate
-  @ Return : (float) VoltageFlowRate
+  @ Input : (uint8_t) uiChannel - CH0,CH1,OxygenFlowRate,AirFlowRate
+  @ Return : (float) fVoltageFlowRate
   Description : Receiving Information form MCP3202 (Analog to Digital Converter IC). The value return is the voltage flow rate.
 */
 
-float Get_FlowRate(uint8_t channel)
+float Get_FlowRate(uint8_t uiChannel)
 {
-  uint16_t DataOut;
-  uint8_t i;
-  float VoltageFlow[10];
-  VoltageFlowRate = 0;
+  uint16_t uiDataOut;
+  uint8_t uiSamplingTime;
+  float fVoltageFlow[10];
+  fVoltageFlowRate = 0;
   
   if ((SPI2->CR1 & 0x0800) == 0x0000)
   {
@@ -64,56 +62,41 @@ float Get_FlowRate(uint8_t channel)
   }
   
   /* Check Channel inpit of signal of ADC IC */
-  if (channel == CH0 | channel == OxygenFlowRate)
+  if (uiChannel == CH0 | uiChannel == OxygenFlowRate)
   {
-    DataOut = 0xD000;
+    uiDataOut = 0xD000;                                                         // Command for ADC channel 0
   }
-  else if (channel == CH1 | channel == AirFlowRate)
+  else if (uiChannel == CH1 | uiChannel == AirFlowRate)
   {
-    DataOut = 0xF000;
-    //DataOut = (DataOut << 12);
+    uiDataOut = 0xF000;                                                         // Command for ADC channel 1
   }
   
   /* Sampling 10 samples */
-  for(i = 0; i < 10; i++)
+  for(uiSamplingTime = 0; uiSamplingTime < 10; uiSamplingTime++)
   {
     /* Part Send data out */
     GPIO_ResetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                          // Set NSS is Low
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
     SPI_I2S_SendData(SPI2, 0x01);                                               // Send Start bit (logic '1')
-//    for(uint8_t de =0;de<50;de++);
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET);
     
     /* Enable the Rx buffer not empty interrupt */
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
-    SPI_I2S_SendData(SPI2, DataOut<<1);                                         // Send data out shift left 1
+    SPI_I2S_SendData(SPI2, uiDataOut<<1);                                       // Send data out shift left 1
     while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
-    FlowRate = SPI_I2S_ReceiveData(SPI2);                                       // Receive Data from MCP3202
+    uiFlowRate = SPI_I2S_ReceiveData(SPI2);                                     // Receive Data from MCP3202
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET);
     GPIO_SetBits(ADC_MCP_NSS_Port, ADC_MCP_NSS_Pin);                            // Set NSS Pin is High
-    for(uint8_t de =0;de<20;de++);
     
-    FlowRate = FlowRate & 0x0FFF;
-    VoltageFlow[i] = (FlowRate*5.0)/4096;                                       // Convert Digital Value to Voltage 
+    uiFlowRate = uiFlowRate & 0x0FFF;
+    fVoltageFlow[uiSamplingTime] = (uiFlowRate * 5.0)/4096;                     // Convert Digital Value to Voltage 
     
     /* Average  value */
-    VoltageFlowRate = VoltageFlowRate + VoltageFlow[i];
+    fVoltageFlowRate = fVoltageFlowRate + fVoltageFlow[uiSamplingTime];
   }
-  VoltageFlowRate = VoltageFlowRate/(i+1);
-  
-//  /* Average  value */
-//  for (uint8_t n = 0; n < 10; n++)
-//  {
-//    VoltageFlowRate = VoltageFlowRate + VoltageFlow[n];
-//    if (n == 9)
-//    {
-//      VoltageFlowRate = VoltageFlowRate/(n+1);
-//    }
-//  }
-
-//  VoltageFlowRate = (VoltageFlow[0] + VoltageFlow[1] + VoltageFlow[2] + VoltageFlow[3] + VoltageFlow[4] +  VoltageFlow[5] + VoltageFlow[6]+ VoltageFlow[7] + VoltageFlow[8] + VoltageFlow[9])/10;
-  
-  return VoltageFlowRate;
+  fVoltageFlowRate = fVoltageFlowRate / (uiSamplingTime + 1);
+    
+  return fVoltageFlowRate;
   
 }
 

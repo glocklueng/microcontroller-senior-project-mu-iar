@@ -10,9 +10,10 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "main.h"
 #include "MCP3202.h"
 #include "DAC_LTC1661.h"
-#include "Oxygen_sensor.h"
+#include "GLCD5110.h"
 //------------------------------------------------------------------------------
 void TestControlValve (void);
+void textTransmission_USART (char cTextString[]);
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 --------------------------------------------------------------------------------------------------*/

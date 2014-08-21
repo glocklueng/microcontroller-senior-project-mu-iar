@@ -18,15 +18,37 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "DefinePin.h"
 #include "GLCD5110.h"
 
+#ifndef __CONNECT_GUI
+#define __CONNECT_GUI
+
 // Define ----------------------------------------------------------------------
-#define PROFILE_NOTUPLOAD				0
-#define PROFILE_SETTING_COMPLETE                        1
-#define PROFILE_JUST_UPLOAD				2
-#define TEST_COMPLETE					5
+#define PROFILE_NOTUPLOAD               0
+#define PROFILE_SETTING_COMPLETE				1
+#define PROFILE_JUST_UPLOAD							2
+#define TEST_COMPLETE										5
 
-#define RUN_BUTTON_SET					3
-#define RUN_BUTTON_RESET				4
+#define RUN_BUTTON_SET									3
+#define RUN_BUTTON_RESET								4
+//------------------------------------------------------------------------------
+/*
+  Define Structer for Pre-term Infants' Profile
+*/
+typedef struct
+{
+  char cHospital_Number[13];
+  uint8_t uiOxygenSaturation_Maximum;
+  uint8_t uiOxygenSaturation_Minimum; 
+  uint8_t uiFiO2_Maximum; 
+  uint8_t uiFiO2_Minimum; 
+  uint8_t uiRespondsTime; 
+  uint8_t uiPrefered_FiO2; 
+  uint16_t uiAlarm_Level1; 
+  uint16_t uiAlarm_Level2; 
+  uint8_t uiMode; 
+  uint8_t uiProfile_Status;
+}Profile;
 
+#endif 
 //------------------------------------------------------------------------------
 // Function
 void USART_GUI_Connect (void);

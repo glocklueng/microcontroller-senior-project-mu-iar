@@ -12,13 +12,12 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
-unsigned char DataFromOPM[133]; 
+unsigned char ucDataFromOPM[133]; 
 //------------------------------------------------------------------------------
-uint8_t Current_OxygenSat;
-uint8_t SD_Card_index = 0;
-uint8_t tx_index_OPM = 0;
-uint8_t rx_index_OPM = 0;
-uint8_t OxygenSat_buffer[10];                                                   // Oxygen Saturation Buffer for Store Data to SD Card
+uint8_t uiCurrent_OxygenSat;
+uint8_t uiSD_Card_index = 0;
+uint8_t uiRx_index_OPM = 0;
+uint8_t uiOxygenSat_buffer[10];                                                 // Oxygen Saturation Buffer for Store Data to SD Card
 //------------------------------------------------------------------------------
 /*
   Function : Oxygen_PM_Setup
@@ -95,10 +94,9 @@ void Oxygen_PM_Setup(void)
   NVIC_Init(&NVIC_InitStructure);
    
   /*
-
-  Pre-Scale : APB1 Prescale 4
-  System Clock 168MHz /4 = 42 MHz
-  Timer Prescale 4200
+    Pre-Scale : APB1 Prescale 4
+    System Clock 168MHz /4 = 42 MHz
+    Timer Prescale 4200
   */
   /* Time base configuration */
   TIM_TimeBaseStructure.TIM_Period = 5000;            
@@ -117,20 +115,20 @@ void OPM_IRQHandler(void)
 {
   if(USART_GetITStatus(OPM_USART, USART_IT_RXNE) != RESET)
   {
-    if (rx_index_OPM == 0)
+    if (uiRx_index_OPM == 0)
     {
       //Start Receive Data from Oxygen Pulse Meter
       TIM_Cmd(TIM4, ENABLE);
     }
-    DataFromOPM[rx_index_OPM++] = USART_ReceiveData(OPM_USART);
+    ucDataFromOPM[uiRx_index_OPM++] = USART_ReceiveData(OPM_USART);
   
-    if(rx_index_OPM >= (sizeof(DataFromOPM) - 1))
+    if(uiRx_index_OPM >= (sizeof(ucDataFromOPM) - 1))
     {  
       TIM_Cmd(TIM4, DISABLE);
-      rx_index_OPM = 0;
-      Current_OxygenSat = Get_OxygenSat();
-      OxygenSat_buffer[SD_Card_index] = Current_OxygenSat;
-      SD_Card_index++;
+      uiRx_index_OPM = 0;
+      uiCurrent_OxygenSat = Get_OxygenSat();
+      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_OxygenSat;
+      uiSD_Card_index++;
     }
   }
   if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
@@ -142,7 +140,7 @@ void OPM_IRQHandler(void)
 /*
   Function : Get_OxygenSat
   Input : None
-  Return : int OxygenSat_Percent
+  Return : int cOxygenSat_Percent
   Description : This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter
                 via RS-232 Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
 */
@@ -153,46 +151,46 @@ int Get_OxygenSat(void)
     This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter via RS-232
     Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
   */
-  char OxygenSat_string[3];
-  uint8_t OxygenSat_Percent;
-  OxygenSat_Percent = 0 ;
-  uint8_t i;
-  //check this command is getting SaO2 or Headding Command
-  if (DataFromOPM[0] == '+' && DataFromOPM[4] == 'P' && DataFromOPM[5] == 'V' && DataFromOPM[6] == 'I')
+  char cOxygenSat_string[3];
+  uint8_t cOxygenSat_Percent, uiIndexString;
+  cOxygenSat_Percent = 0 ;
+
+  /* check this command is getting SaO2 or Headding Command */
+  if (ucDataFromOPM[0] == '+' && ucDataFromOPM[4] == 'P' && ucDataFromOPM[5] == 'V' && ucDataFromOPM[6] == 'I')
   {
     // Case : Correct
-    for(i=0;i<3;i++)
+    for(uiIndexString = 0; uiIndexString < 3; uiIndexString++)
     {
-      OxygenSat_string[i] = DataFromOPM[37+i];
+      cOxygenSat_string[uiIndexString] = ucDataFromOPM[37 + uiIndexString];
     }
-    OxygenSat_Percent = atoi(OxygenSat_string);                                             // atoi is function convert from String to Int 
-    Current_OxygenSat = OxygenSat_Percent;
+    cOxygenSat_Percent = atoi(cOxygenSat_string);                               // atoi is function convert from String to Int 
+    uiCurrent_OxygenSat = cOxygenSat_Percent;
   }
   else
   {
     // Case : Error
-    for (i = 0; i < 133; i++)
+    for (uiIndexString = 0; uiIndexString < 133; uiIndexString++)
     {
-      rx_index_OPM = 0;
-      DataFromOPM[i] = '\0';
+      uiRx_index_OPM = 0;
+      ucDataFromOPM[uiIndexString] = '\0';
     }
-    OxygenSat_Percent = '\0';
+    cOxygenSat_Percent = '\0';
     
   }
   
-  return OxygenSat_Percent;
+  return cOxygenSat_Percent;
 }
 //------------------------------------------------------------------------------------
-//Timer 4 Check Timer Out of Receving data from Oxygen Pulse Meter?
+/* Timer 4 Check Timer Out of Receving data from Oxygen Pulse Meter? */
 void TIM4_IRQHandler (void)
 {
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
   {
-    uint8_t rx_index_OPM = 0;
+    uint8_t uiRx_index_OPM = 0;
     //Clear Buffer Data from Oxygen Pulse Meter (OPM)
-    for (rx_index_OPM = 0; rx_index_OPM < 133; rx_index_OPM++)
+    for (uiRx_index_OPM = 0; uiRx_index_OPM < 133; uiRx_index_OPM++)
     {
-      DataFromOPM[rx_index_OPM] = '\0';
+      ucDataFromOPM[uiRx_index_OPM] = '\0';
     }
     //Diable Timer4
     TIM_Cmd(TIM4, DISABLE);
@@ -212,7 +210,6 @@ void TIM4_IRQHandler (void)
 //  {}
 //  return ch;
 //}
-
 //------------------------------------------------------------------------------
 
 
