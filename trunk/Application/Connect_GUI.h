@@ -36,8 +36,8 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 typedef struct
 {
   char cHospital_Number[13];
-  uint8_t uiOxygenSaturation_Maximum;
-  uint8_t uiOxygenSaturation_Minimum; 
+  uint8_t uiSpO2_Maximum;
+  uint8_t uiSpO2_Minimum; 
   uint8_t uiFiO2_Maximum; 
   uint8_t uiFiO2_Minimum; 
   uint8_t uiRespondsTime; 
@@ -46,6 +46,7 @@ typedef struct
   uint16_t uiAlarm_Level2; 
   uint8_t uiMode; 
   uint8_t uiProfile_Status;
+  uint8_t uiSpO2_middleRange;
 }Profile;
 
 #endif 

@@ -1,0 +1,166 @@
+/*
+Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
+Microcontroller : STM32F4 Discovery (STM32F407VG)
+File : alarm_condition.c
+
+Deverloper : Phattaradanai Kiratiwudhikul
+Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+
+*/
+//------------------------------------------------------------------------------
+#include "main.h"
+#include "Connect_GUI.h"
+#include "Control_valve.h"
+#include "alarm_condition.h"
+//------------------------------------------------------------------------------
+extern Profile SProfile;
+extern uint8_t Time_AlarmLevel;
+extern uint8_t uiCurrent_Status;
+extern uint8_t uiPurpose_FiO2;
+extern uint8_t uiCurrent_SpO2;
+//------------------------------------------------------------------------------
+// Alarm Function --------------------------------------------------------------
+/*
+  Function : alarm_timer
+  Input : uint8_t Command
+          Command : TIMER_ENABLRE, TIMER_DISABLE
+  Return: None
+  Description : If command is "TIMER_ENABLE", Timer 2 will enable.
+                If command is "TIMER_DISABLE", Timer 2 will disable and reset Time_AlarmLevel variable.
+*/
+
+void alarm_timer(uint8_t Command)
+{
+  if (Command == TIMER_ENABLE)
+  {
+    TIM_Cmd(TIM2, ENABLE);
+  }
+  else if (Command == TIMER_DISABLE)
+  {
+    TIM_Cmd(TIM2, DISABLE);
+    Time_AlarmLevel = 0;
+  }
+}
+//------------------------------------------------------------------------------
+/*
+  Function : TIM2_IRQHandler
+  Input : None
+  Return : None
+  Description : Interrupt Service Routine of Timer for count Alarm Statu of Profile
+*/
+//------------------------------------------------------------------------------
+void TIM2_IRQHandler(void)
+{
+  if (TIM_GetITStatus (TIM2, TIM_IT_Update) != RESET)
+  {
+    Time_AlarmLevel = Time_AlarmLevel + 1;
+    STM_EVAL_LEDOff(LED5);
+
+
+    if (uiCurrent_Status == STATUS_SpO2_BELOW_L1 | uiCurrent_Status == STATUS_SpO2_BEHIGH_L1)
+    {
+      if (Time_AlarmLevel > SProfile.uiAlarm_Level1)
+      {
+        Time_AlarmLevel = 0;                                                    // Reset Time_AlarmLevel 
+
+        /* If Time alarm more than alarm level 1 set */
+        if (uiCurrent_Status == STATUS_SpO2_BELOW_L1)
+        {
+          uiCurrent_Status = STATUS_SpO2_BELOW_ALARM_L1;
+          uiPurpose_FiO2 = uiPurpose_FiO2 + 6;
+
+          if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
+          {
+            /* if uiPurpose_FiO2 more than uiFiO2_Maximum */
+            uiPurpose_FiO2 = SProfile.uiFiO2_Maximum;
+          }
+
+          FiO2_Range(uiPurpose_FiO2);
+          /* Update LCD */
+          lcdString(1,5,"Status: Below ");
+          lcdString(1,6,"Alarm Level 2");
+        }
+        else if (uiCurrent_Status == STATUS_SpO2_BEHIGH_L1)
+        {
+          uiCurrent_Status = STATUS_SpO2_BEHIGH_ALARM_L1;
+          uiPurpose_FiO2 = uiPurpose_FiO2 - 6;
+
+          if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
+          {
+            /* if uiPurpose_FiO2 more than uiFiO2_Minimum */
+            uiPurpose_FiO2 = SProfile.uiFiO2_Minimum;
+          }
+
+          FiO2_Range(uiPurpose_FiO2);
+          /* Update LCD */
+          lcdString(1,5,"Status: Behigh ");
+          lcdString(1,6,"Alarm Level 2");          
+        }
+      }
+    }
+    else if (uiCurrent_Status == STATUS_SpO2_BEHIGH_L2 | uiCurrent_Status == STATUS_SpO2_BELOW_L2)
+    {
+      /* Alarm Level 2 */
+      if (Time_AlarmLevel >= SProfile.uiAlarm_Level2)
+      {
+        GPIO_SetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
+        uiCurrent_Status = STATUS_ALARM;
+        USART_Cmd(OPM_USART, DISABLE);                                          // ENABLE Oxygen Pulse Meter USART
+        TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
+        TIM_Cmd(TIM3, DISABLE);
+      
+//        NVIC_InitTypeDef   NVIC_InitStructure;
+        
+        /* Enable and set Alarm_Button_EXTI Line Interrupt to the lowest priority */
+//        NVIC_InitStructure.NVIC_IRQChannel = Alarm_Button_IRQn;
+//        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+//        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+//        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//        NVIC_Init(&NVIC_InitStructure);
+
+
+        //Time_AlarmLevel = 0;
+
+        /* Notification Alarm Board (Toggle Pin to Alarm Circuit) */
+        lcdClear();
+        lcdUpdate();
+        lcdString(3,1,"ALARM !!!");
+        lcdString(2,2,"PLEASE PUSH");
+        lcdString(2,3,"ALARM BUTTON");
+        alarm_timer(TIMER_DISABLE);
+      }
+    }
+    else if ((uiCurrent_Status == STATUS_MIDDLE_SpO2_BELOW) | (uiCurrent_Status == STATUS_MIDDLE_SpO2_BEHIGH))
+    {
+      if (Time_AlarmLevel >= SProfile.uiRespondsTime)
+      {
+        /* if time over than Responds time, FiO2 will increse or decrease 2 percent */
+        Time_AlarmLevel = 0;                                                      // clear Time_AlarmLevel
+        
+        if (uiCurrent_SpO2 < SProfile.uiSpO2_middleRange)
+        {
+          uiPurpose_FiO2 = uiPurpose_FiO2 + 2;                                    // increase FiO2 more than present 2 percent
+          if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
+          {
+            uiPurpose_FiO2 = SProfile.uiFiO2_Maximum;
+          }
+        }
+        else if (uiCurrent_SpO2 > SProfile.uiSpO2_middleRange)
+        {
+          uiPurpose_FiO2 = uiPurpose_FiO2 - 2;                                    // decrease FiO2 more than present 2 percent
+          if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
+          {
+            uiPurpose_FiO2 = SProfile.uiFiO2_Minimum;
+          }
+        }
+      }
+    }
+
+    TIM_ClearITPendingBit (TIM2, TIM_IT_Update);
+  }
+}
+
+// End of File -----------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------
+(C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+--------------------------------------------------------------------------------------------------*/
