@@ -16,8 +16,9 @@ Credit:
 #define OxygenSaturation_file           0
 #define FiO2_file                       1
 //------------------------------------------------------------------------------
+
 static void Delay(__IO uint32_t nCount);
-static void fault_err (FRESULT rc);
+void fault_err (FRESULT rc);
 
 void Check_Mount(void);
 static void Delay(__IO uint32_t nCount);

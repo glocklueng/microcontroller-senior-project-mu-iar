@@ -73,6 +73,23 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
                                          (default: 30s) */
 #endif /* MEDIA_USB_KEY */
 
+// Status ----------------------------------------------------------------------
+#define TIMER_DISABLE         0
+#define TIMER_ENABLE          1
+
+#define STATUS_NORMAL                         0
+#define STATUS_SpO2_BELOW_L1                  1
+#define STATUS_SpO2_BELOW_L2                  2
+#define STATUS_SpO2_BEHIGH_L1                 3
+#define STATUS_SpO2_BEHIGH_L2                 4
+#define STATUS_ALARM                          5
+#define STATUS_MIDDLE_SpO2_BELOW              6
+#define STATUS_MIDDLE_SpO2_BEHIGH             7
+#define STATUS_MIDDLE_SpO2                    8
+#define STATUS_SpO2_BEHIGH_ALARM_L1           9
+#define STATUS_SpO2_BELOW_ALARM_L1            10
+
+
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void TimingDelay_Decrement(void);
@@ -80,7 +97,6 @@ void Delay(__IO uint32_t nTime);
 
 void EXTILine0_Config(void);
 void delay();
-
 
 #endif /* __MAIN_H */
 

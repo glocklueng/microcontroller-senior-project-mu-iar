@@ -54,7 +54,8 @@ extern uint32_t APP_Rx_ptr_in;    /* Increment this pointer or roll it back to
 
 /* Private function prototypes -----------------------------------------------*/
 void DISCOVERY_COM_IRQHandler(void);
-static uint16_t VCP_Init     (void);
+//static uint16_t VCP_Init     (void);
+uint16_t VCP_Init (void);
 static uint16_t VCP_DeInit   (void);
 static uint16_t VCP_Ctrl     (uint32_t Cmd, uint8_t* Buf, uint32_t Len);
 static uint16_t VCP_DataTx   (uint8_t* Buf, uint32_t Len);
@@ -81,7 +82,7 @@ extern char Character;
   * @param  None
   * @retval Result of the opeartion (USBD_OK in all cases)
   */
-static uint16_t VCP_Init(void)
+uint16_t VCP_Init(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
   

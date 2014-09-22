@@ -14,7 +14,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
 unsigned char ucDataFromOPM[133]; 
 //------------------------------------------------------------------------------
-uint8_t uiCurrent_OxygenSat;
+uint8_t uiCurrent_SpO2;
 uint8_t uiSD_Card_index = 0;
 uint8_t uiRx_index_OPM = 0;
 uint8_t uiOxygenSat_buffer[10];                                                 // Oxygen Saturation Buffer for Store Data to SD Card
@@ -126,8 +126,8 @@ void OPM_IRQHandler(void)
     {  
       TIM_Cmd(TIM4, DISABLE);
       uiRx_index_OPM = 0;
-      uiCurrent_OxygenSat = Get_OxygenSat();
-      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_OxygenSat;
+      uiCurrent_SpO2 = Get_OxygenSat();
+      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
       uiSD_Card_index++;
     }
   }
@@ -164,7 +164,7 @@ int Get_OxygenSat(void)
       cOxygenSat_string[uiIndexString] = ucDataFromOPM[37 + uiIndexString];
     }
     cOxygenSat_Percent = atoi(cOxygenSat_string);                               // atoi is function convert from String to Int 
-    uiCurrent_OxygenSat = cOxygenSat_Percent;
+    uiCurrent_SpO2 = cOxygenSat_Percent;
   }
   else
   {
