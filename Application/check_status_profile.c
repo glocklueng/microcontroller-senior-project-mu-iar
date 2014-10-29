@@ -37,7 +37,7 @@ uint8_t check_status(uint8_t uiCurrent_SpO2)
 			lcdString(1,5,"Status: Below ");
 		lcdString(1,6,"Alarm Level 2");
 
-		uiPurpose_FiO2 = uiPurpose_FiO2 + 6;                                      // increse FiO2 more than present 6 percent
+		uiPurpose_FiO2 = uiPurpose_FiO2 + 6;                                        // increse FiO2 more than present 6 percent
 		Time_AlarmLevel = 0;
 		alarm_timer(TIMER_ENABLE);
 		}

@@ -15,7 +15,7 @@ Credit:
 #include "main.h"
 //------------------------------------------------------------------------------
 //Define RS-232 for Oxygen Pulse Meter
-#define  OPM_USART							USART6
+/*#define  OPM_USART							USART6
 #define  OPM_USART_CLK					RCC_APB2Periph_USART6
 #define  OPM_UART_CLK_INIT			RCC_APB2PeriphClockCmd
 #define  OPM_IRQn								USART6_IRQn
@@ -33,7 +33,28 @@ Credit:
 #define  OPM_RX_GPIO_Port				GPIOC
 #define  OPM_RX_GPIO_CLK				RCC_AHB1Periph_GPIOC
 #define  OPM_RX_Souce						GPIO_PinSource7
-#define  OPM_RX_AF							GPIO_AF_USART6
+#define  OPM_RX_AF							GPIO_AF_USART6 */
+
+
+#define  OPM_USART							USART3
+#define  OPM_USART_CLK					RCC_APB1Periph_USART3
+#define  OPM_UART_CLK_INIT			RCC_APB1PeriphClockCmd
+#define  OPM_IRQn								USART3_IRQn
+#define  OPM_IRQHandler					USART3_IRQHandler
+#define  OPM_Port								GPIOD
+#define  OPM_Port_CLK						RCC_AHB1Periph_GPIOD
+
+#define  OPM_TX_Pin							GPIO_Pin_8
+#define  OPM_TX_GPIO_Port				GPIOD
+#define  OPM_TX_GPIO_CLK				RCC_AHB1Periph_GPIOD
+#define  OPM_TX_Souce						GPIO_PinSource8
+#define  OPM_TX_AF							GPIO_AF_USART3
+
+#define  OPM_RX_Pin							GPIO_Pin_9
+#define  OPM_RX_GPIO_Port				GPIOD
+#define  OPM_RX_GPIO_CLK				RCC_AHB1Periph_GPIOD
+#define  OPM_RX_Souce						GPIO_PinSource9
+#define  OPM_RX_AF							GPIO_AF_USART3 
 
 //------------------------------------------------------------------------------
 //Define SPI2

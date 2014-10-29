@@ -175,6 +175,16 @@ void EXTILine0_Config(void)
 //}
 
 //------------------------------------------------------------------------------
+/*
+  Function : Alarm_Timer_Setup
+  Input : None
+  Output : None
+  Description : 
+      Timer 2 use count time of Alarm Level 1 and Alarm Level 2
+      when Timer 2 is Enable. it will set TIM_CMD(TIM2, ENABLE) function. 
+      Timer 2 is count and interrupt every a second
+      interrupt servies routine : TIM2_IRQHandler
+*/
 void Alarm_Timer_SetUp (void)
 {
   /*

@@ -208,7 +208,7 @@ float Oxygen_convert(void)
 
 //------------------------------------------------------------------------------
 /*
-Function : Calibrate_OxygenSensro
+Function : Calibrate_OxygenSensor
 Input : None
 Output : None
 Description : This function use Calibrate the new Oxygen Sensor
