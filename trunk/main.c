@@ -89,10 +89,10 @@ char HospitalNumber_File[13];
 char Buffer[128];
   
 // Main Function ---------------------------------------------------------------
-int main()
+ int main()
 {  
 
-  /* Set Up config System*/
+  /* Set Up config  System*/
   system_init();
   lcdString (1,1,"Please Upload Profile");
   
@@ -100,49 +100,11 @@ int main()
    
   while(1)
   {    
-//    printf("read the file (hello.txt)\n\r");
-//    ret = f_open(&file, "2222222F.TXT", FA_READ);
-//    if (ret) 
-//    {
-//      printf("2222222F.TXT file error\n\r");
-//    } 
-//    else 
-//    {
-//      printf("Type the file content(2222222F.TXT)\n\r");
-//      for (;;) 
-//      {
-//        ret = f_read(&file, buff, sizeof(buff), &br);	/* Read a chunk of file */
-//        if (ret || !br) 
-//        {
-//          break;			/* Error or end of file */
-//        }
-//        buff[br] = 0;
-//        for(uint16_t length = 0; length < sizeof(buff); length++)
-//        {
-//          Buffer[length] = buff[length];
-//          USART_SendData(USART6, Buffer[length]);
-//          while (USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
-//        }
-////        printf("%s",Buffer);
-//        printf("\n\r");
-//      }
-//      if (ret) 
-//      {
-//        printf("Read file (2222222F.TXT) error\n\r");
-//        fault_err(ret);
-//      }
-//      printf("Close the file (2222222F.TXT)\n\r");
-//      ret = f_close(&file);
-//      if (ret) 
-//      {
-//        printf("Close the file (2222222F.TXT) error\n\r");
-//      }
-//    }
     if (SProfile.uiProfile_Status == PROFILE_JUST_UPLOAD)
     {
-//      USART_Cmd(OPM_USART, ENABLE);                                           // ENABLE Oxygen Pulse Meter USART
-      Create_file(SProfile.cHospital_Number, OxygenSaturation_file);                      // Create Oxygen Saturation file
-      Create_file(SProfile.cHospital_Number, FiO2_file);                                  // Create FiO2 file
+      USART_Cmd(OPM_USART, ENABLE);                                           // ENABLE Oxygen Pulse Meter USART
+      Create_file(SProfile.cHospital_Number, OxygenSaturation_file);            // Create Oxygen Saturation file
+      Create_file(SProfile.cHospital_Number, FiO2_file);                        // Create FiO2 file
       SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
 //      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 //      TIM_Cmd(TIM3, ENABLE);
@@ -171,120 +133,6 @@ int main()
     if (SProfile.uiProfile_Status == PROFILE_SETTING_COMPLETE)
     {
       uiCurrent_Status = check_status(uiCurrent_SpO2);
-     
-//      /* Check Oxygen Saturation condition */
-//      if (uiCurrent_SpO2 < SProfile.uiSpO2_Minimum)
-//      {
-//        /* Current Oxygen Saturation less than Minimum Oxygen Saturation */
-//        if ((uiCurrent_Status != STATUS_SpO2_BELOW_L1) & (uiCurrent_Status != STATUS_SpO2_BELOW_L2) & (uiCurrent_Status != STATUS_ALARM))
-//        {
-//          Alarm_Function(ALARM_DISABLE);
-//          uiCurrent_Status = STATUS_SpO2_BELOW_L1;
-//          uiPurpose_FiO2 = SProfile.uiPrefered_FiO2 + 4;
-//          if(uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
-//          {
-//            uiDrive_FiO2 = SProfile.uiFiO2_Maximum;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          else
-//          {
-//            uiDrive_FiO2 = uiPurpose_FiO2;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//            
-//          if(uiCurrent_Status != STATUS_ALARM)
-//          {
-//            Alarm_Function(ALARM_ENABLE);
-//            lcdString(1,5,"Status: Below ");
-//            lcdString(1,6,"Alarm Level 1");
-//          }
-//        }      
-//      }
-//      else if (uiCurrent_SpO2 > SProfile.uiSpO2_Maximum)
-//      {
-//        /* Current Oxygen Saturation more than maximum Oxygen Saturation */
-//        if (uiCurrent_Status != STATUS_SpO2_BEHIGH_L1 & uiCurrent_Status != STATUS_SpO2_BEHIGH_L2 & uiCurrent_Status != STATUS_ALARM)
-//        {
-//          Alarm_Function(ALARM_DISABLE);
-//          uiCurrent_Status = STATUS_SpO2_BEHIGH_L1;
-//          uiPurpose_FiO2 = SProfile.uiPrefered_FiO2 - 4;
-//          if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
-//          {
-//            uiDrive_FiO2 = SProfile.uiFiO2_Minimum;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          else
-//          {
-//            uiDrive_FiO2 = uiPurpose_FiO2;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          Alarm_Function(ALARM_ENABLE);
-//          lcdString(1,5,"Status: Behigh");
-//          lcdString(1,6,"Alarm Level 1");
-//        }
-//      }
-//      else if (uiCurrent_SpO2 - SProfile.uiSpO2_Minimum == 1)
-//      {
-//        if (uiCurrent_Status != STATUS_NORMAL)
-//        {
-//          uiCurrent_Status = STATUS_NORMAL;
-//          uiPurpose_FiO2 = SProfile.uiPrefered_FiO2 + 5;
-//          if(uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
-//          {
-//            uiDrive_FiO2 = SProfile.uiFiO2_Maximum;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          else
-//          {
-//            uiDrive_FiO2 = uiPurpose_FiO2;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          lcdString(1,5,"Status: Normal");
-//          lcdString(1,6,"              ");
-//          Alarm_Function(ALARM_DISABLE);  
-//        }
-//      }
-//      else if (SProfile.uiSpO2_Maximum - uiCurrent_SpO2 == 1)
-//      {
-//        if (uiCurrent_Status!= STATUS_NORMAL)
-//        {
-//          uiCurrent_Status = STATUS_NORMAL;
-//          uiPurpose_FiO2 = SProfile.uiPrefered_FiO2 - 5;
-//          if(uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
-//          {
-//            uiDrive_FiO2 = SProfile.uiFiO2_Minimum;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          else
-//          {
-//            uiDrive_FiO2 = uiPurpose_FiO2;
-//            FiO2_Range(uiDrive_FiO2);
-//          }
-//          lcdString(1,5,"Status: Normal");
-//          lcdString(1,6,"              ");
-//          Alarm_Function(ALARM_DISABLE); 
-//        }
-//      }
-//      else if (uiCurrent_SpO2 >= SProfile.uiSpO2_Minimum & uiCurrent_SpO2 <= SProfile.uiSpO2_Maximum)
-//      {
-//        /* Current Oxygen Saturaiton is between Maximum Oxygen Saturation and Minimum Oxygen Saturation */
-//        if (uiCurrent_Status!= STATUS_NORMAL)
-//        {
-//          uiDrive_FiO2 = SProfile.uiPrefered_FiO2;
-//          FiO2_Range(uiDrive_FiO2);
-//          lcdString(1,5,"Status: Normal");
-//          lcdString(1,6,"              ");
-//          uiCurrent_Status = STATUS_NORMAL;
-//          Alarm_Function(ALARM_DISABLE); 
-//        }
-//        if (uiCurrent_SpO2 >= SProfile.uiSpO2_Minimum & uiCurrent_SpO2 < SProfile.uiSpO2_middleRange)
-//        {
-//          if (uiCurrent_Status != STATUS_MIDDLE_SpO2_BELOW)
-//          {
-//            uiCurrent_Status = STATUS_MIDDLE_SpO2_BELOW;
-//          }
-//        }
-//*/
     }
 
 //------------------------------------------------------------------------------
@@ -359,12 +207,13 @@ static void system_init(void)
   LTC1661_Setup();
   MCP3202_SetUp();
   OxygenSensor_Config();
-  Oxygen_PM_Setup();
+  //Oxygen_PM_Setup();
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   lcdInit();                                                                    //LCD Set Up
   USART_GUI_Connect();                                                          //Set up USART for connecting GUI
   USART_HyperTermianl_Connect();
   Timer6_SetUp();
+  timer7_setup();                                                               // Timer7 use count for setting sampling rate 10 Hz
   FiO2_Check_Timer_Config();                                                    //Timer 3 will get ADC of FiO2 every 1 sec.
   
   //Alarm Timer Setup
@@ -451,7 +300,7 @@ void Run_Button_IRQHandler(void)
     else if (SProfile.uiProfile_Status == RUN_BUTTON_SET)
     {
       SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
-      USART_Cmd(OPM_USART, DISABLE);    
+      USART_Cmd(OPM_USART, ENABLE);    
       TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
       TIM_Cmd(TIM3, DISABLE);
       alarm_timer(TIMER_DISABLE);
@@ -543,7 +392,7 @@ void TIM3_IRQHandler (void)
 */
 //------------------------------------------------------------------------------
 void USART_HyperTermianl_Connect(void)
-{  
+{ 
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
   
@@ -568,7 +417,7 @@ void USART_HyperTermianl_Connect(void)
   
   
   /* USART_InitStruct members default value */
-  USART_InitStruct.USART_BaudRate = 115200;
+  USART_InitStruct.USART_BaudRate = 9600;
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No;
@@ -637,57 +486,57 @@ void USART_HyperTermianl_Connect(void)
   Description : Simulate as Oxygen Pulse Meter. It will send Oxygen Saturation value.
 */
 //------------------------------------------------------------------------------
-void USART3_IRQHandler(void)
-{
-  if(USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
-  {
-    cDataFromOPM_TEST[uiRx_index_OPM] = USART_ReceiveData(USART3);
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-    USART_SendData(USART3, cDataFromOPM_TEST[uiRx_index_OPM]); 
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-    uiRx_index_OPM++;
-    if(uiRx_index_OPM >= 3)
-    {  
-      uiRx_index_OPM = 0;
-      uiCurrent_SpO2 = atoi(cDataFromOPM_TEST);
-      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
-      uiSD_Card_index++;
-      if(uiCurrent_Status != STATUS_ALARM)
-      {
-        lcdString(7,2,cDataFromOPM_TEST);
-        lcdString(10,2,"%  ");
-      }
-      
-    }
-    
-    if((uiCurrent_Status == STATUS_ALARM) & (uiCurrent_SpO2 >= SProfile.uiSpO2_Minimum) & (uiCurrent_SpO2 <= SProfile.uiSpO2_Maximum))
-    {
-      uiCurrent_Status = STATUS_NORMAL;
-      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-      TIM_Cmd(TIM3, ENABLE);
-      lcdClear();
-      lcdUpdate();
-      lcdString (1,1,SProfile.cHospital_Number);
-      lcdString (1,2,"SaO2 : ");
-      lcdString (7,2,cDataFromOPM_TEST);
-      lcdString (10,2, "%");
-      lcdString (1,5,"Status: Normal ");
-      lcdString (1,6,"               ");
-      if (SProfile.uiMode == 0xB7)
-      {
-        /* Select Range Mode */
-        lcdString(1,4,"Mode: Range");
-      }
-      else if (SProfile.uiMode == 0xA2)
-      {
-        /* Selecte Auto Mode */
-        lcdString(1,4,"Mode: Auto");
-      }
-    }
-    
-  }
-  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-}
+//void USART3_IRQHandler(void)
+//{
+//  if(USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
+//  {
+//    cDataFromOPM_TEST[uiRx_index_OPM] = USART_ReceiveData(USART3);
+//    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+//    USART_SendData(USART3, cDataFromOPM_TEST[uiRx_index_OPM]); 
+//    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+//    uiRx_index_OPM++;
+//    if(uiRx_index_OPM >= 3)
+//    {  
+//      uiRx_index_OPM = 0;
+//      uiCurrent_SpO2 = atoi(cDataFromOPM_TEST);
+//      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
+//      uiSD_Card_index++;
+//      if(uiCurrent_Status != STATUS_ALARM)
+//      {
+//        lcdString(7,2,cDataFromOPM_TEST);
+//        lcdString(10,2,"%  ");
+//      }
+//      
+//    }
+//    
+//    if((uiCurrent_Status == STATUS_ALARM) & (uiCurrent_SpO2 >= SProfile.uiSpO2_Minimum) & (uiCurrent_SpO2 <= SProfile.uiSpO2_Maximum))
+//    {
+//      uiCurrent_Status = STATUS_NORMAL;
+//      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+//      TIM_Cmd(TIM3, ENABLE);
+//      lcdClear();
+//      lcdUpdate();
+//      lcdString (1,1,SProfile.cHospital_Number);
+//      lcdString (1,2,"SaO2 : ");
+//      lcdString (7,2,cDataFromOPM_TEST);
+//      lcdString (10,2, "%");
+//      lcdString (1,5,"Status: Normal ");
+//      lcdString (1,6,"               ");
+//      if (SProfile.uiMode == 0xB7)
+//      {
+//        /* Select Range Mode */
+//        lcdString(1,4,"Mode: Range");
+//      }
+//      else if (SProfile.uiMode == 0xA2)
+//      {
+//        /* Selecte Auto Mode */
+//        lcdString(1,4,"Mode: Auto");
+//      }
+//    }
+//    
+//  }
+//  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+//}
 
 // SD Card Section -------------------------------------------------------------
 void Create_file(char Hospital_Number[], uint8_t File_Type)

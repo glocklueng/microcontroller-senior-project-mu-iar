@@ -22,6 +22,7 @@ void Timer6_SetUp (void);
 float Convert_FiO2 (float fFiO2_ADC);
 //void TestControlValve (void);
 void FiO2_LCD_Display (float fFiO2_Current_Percent);
+void testOxygenSensor (void);
 
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

@@ -29,7 +29,7 @@ void TestControlValve (void)
   float FiO2_Test_Buffer[50];
   
   uint16_t Air_Drive, Oxygen_Drive;
-  uint8_t count = 0, adc_time;
+  uint8_t count = 0, adc_time,index;
   float current_FiO2[5];
   float FiO2_P;
   char FiO2_Percent_Ch_TEST[16];
@@ -74,13 +74,13 @@ void TestControlValve (void)
                 count_text[2] = '0'+((uint32_t)count%10)/1;
                 count_text[3] = ' ';
                 // import crate function send data via USART
-                textTransmission_USART (count_text);
-//                for(index = 0 ; index < 4 ; index++)
-//                {
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-//                  USART_SendData(USART3, count_text[index]); 
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-//                }
+//                textTransmission_USART (count_text);
+                for(index = 0 ; index < 4 ; index++)
+                {
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+                  USART_SendData(USART3, count_text[index]); 
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+                }
                 
                 AVG_FiO2 = ((current_FiO2[0] + current_FiO2[1] + current_FiO2[2] + current_FiO2[3] + current_FiO2[4])/5);
                 FiO2_Test_Buffer[count] = AVG_FiO2;
@@ -164,28 +164,28 @@ void TestControlValve (void)
                 AirFlow_Text[25] = '\n';
                 AirFlow_Text[26] = '\r';
             
-                textTransmission_USART(FiO2_Percent_Ch_TEST);
-//                for(x = 0 ; x < 16 ; x++)
-//                {
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-//                  USART_SendData(USART3, FiO2_Percent_Ch_TEST[x]); 
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-//                }
+//                textTransmission_USART(FiO2_Percent_Ch_TEST);
+                for(index = 0 ; index < 16 ; index++)
+                {
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+                  USART_SendData(USART3, FiO2_Percent_Ch_TEST[index]); 
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+                }
 
-                textTransmission_USART(OxygenFlow_Text);
-//                for (x = 0; x < 24; x++)
-//                {
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-//                  USART_SendData(USART3, OxygenFlow_Text[x]); 
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-//                }
-                textTransmission_USART(AirFlow_Text);
-//                for (x = 0; x < 27; x++)
-//                {
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-//                  USART_SendData(USART3, AirFlow_Text[x]); 
-//                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-//                }
+//                textTransmission_USART(OxygenFlow_Text);
+                for (index = 0; index < 24; index++)
+                {
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+                  USART_SendData(USART3, OxygenFlow_Text[index]); 
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+                }
+//                textTransmission_USART(AirFlow_Text);
+                for (index = 0; index < 27; index++)
+                {
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+                  USART_SendData(USART3, AirFlow_Text[index]); 
+                  while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+                }
               }
             }
           }
@@ -213,7 +213,7 @@ void textTransmission_USART(char cTextString[])
   for (uiIndex = 0; uiIndex < sizeof(cTextString); uiIndex++)
   {
     while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
-    USART_SendData(USART3, cTextString[uiIndex]); 
+    USART_SendData(USART3, cTextString[uiIndex]);
     while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
   }
 }

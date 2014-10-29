@@ -2,9 +2,24 @@
 Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term Infants
 Microcontroller : STM32F4 Discovery (STM32F407VG)
 File : Oxygen_Pulse_Meter.c
-Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SaO2)
+Function : Receive Data form Oxygen Pulse Meter such as Oxygen Saturation (SpO2)
 Deverloper : Phattaradanai Kiratiwudhikul
 Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
+*/
+
+/*
+                               Note
+1. Function 
+    1. Oxygen_PM_Setup : Setting USART for communication to Oxygen Pulse Meter via USART
+    2. OPM_IRQHandler (Interrupt S.R.)
+    3. Get_OxygenSat : find Oxygen Saturation value from ucDataFromOPM Buffer and convert String to uint
+    4. TIM4_IRQHandler : 
+2. Define global variable :
+    char ucDataFromOPM[133]
+    uint8_t uiCurrent_SpO2
+    uint8_t uiSD_Card_index
+    uint8_t uiRx_index_OPM
+    uint8_t uiOxygenSat_buffer[10]
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -12,7 +27,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
-unsigned char ucDataFromOPM[133]; 
+char ucDataFromOPM[133]; 
 //------------------------------------------------------------------------------
 uint8_t uiCurrent_SpO2;
 uint8_t uiSD_Card_index = 0;
@@ -24,6 +39,9 @@ uint8_t uiOxygenSat_buffer[10];                                                 
   Input : None
   Return : None
   Description : Setup driver for connecting Oxygen Pulse Meter with USART
+                Set Baud rate 9600
+                Format 8-N-1
+                Enable Rx_interrupt
 */
 void Oxygen_PM_Setup(void)
 {
@@ -51,8 +69,8 @@ void Oxygen_PM_Setup(void)
   GPIO_Init(OPM_Port, &GPIO_InitStruct);
   
   /* USART_InitStruct members default value */
-  //USART_InitStruct.USART_BaudRate = 4800;
-  USART_InitStruct.USART_BaudRate = 115200;
+  USART_InitStruct.USART_BaudRate = 9600;
+  //USART_InitStruct.USART_BaudRate = 115200;
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No ;
@@ -78,7 +96,7 @@ void Oxygen_PM_Setup(void)
   USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);
   
   //DIsable OPM_USART (USART6)
-  USART_Cmd(OPM_USART, DISABLE);
+  USART_Cmd(OPM_USART, ENABLE);
 
   //Set Up Timer 4
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -100,7 +118,7 @@ void Oxygen_PM_Setup(void)
   */
   /* Time base configuration */
   TIM_TimeBaseStructure.TIM_Period = 5000;            
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000;        // 42 MHz Clock down to 1 kHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 42 MHz Clock down to 1 kHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
@@ -135,6 +153,7 @@ void OPM_IRQHandler(void)
   {
     USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);
   }
+  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 }
 //--------------------------------------------------------------------------------------
 /*
@@ -152,8 +171,8 @@ int Get_OxygenSat(void)
     Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
   */
   char cOxygenSat_string[3];
-  uint8_t cOxygenSat_Percent, uiIndexString;
-  cOxygenSat_Percent = 0 ;
+  uint8_t uiOxygenSat_Percent, uiIndexString;
+  uiOxygenSat_Percent = 0 ;
 
   /* check this command is getting SaO2 or Headding Command */
   if (ucDataFromOPM[0] == '+' && ucDataFromOPM[4] == 'P' && ucDataFromOPM[5] == 'V' && ucDataFromOPM[6] == 'I')
@@ -163,8 +182,8 @@ int Get_OxygenSat(void)
     {
       cOxygenSat_string[uiIndexString] = ucDataFromOPM[37 + uiIndexString];
     }
-    cOxygenSat_Percent = atoi(cOxygenSat_string);                               // atoi is function convert from String to Int 
-    uiCurrent_SpO2 = cOxygenSat_Percent;
+    uiOxygenSat_Percent = atoi(cOxygenSat_string);                              // atoi is function convert from String to Int 
+    uiCurrent_SpO2 = uiOxygenSat_Percent;
   }
   else
   {
@@ -174,11 +193,11 @@ int Get_OxygenSat(void)
       uiRx_index_OPM = 0;
       ucDataFromOPM[uiIndexString] = '\0';
     }
-    cOxygenSat_Percent = '\0';
-    
+    uiOxygenSat_Percent = '\0';
+    uiCurrent_SpO2 = uiOxygenSat_Percent;
   }
   
-  return cOxygenSat_Percent;
+  return uiOxygenSat_Percent;
 }
 //------------------------------------------------------------------------------------
 /* Timer 4 Check Timer Out of Receving data from Oxygen Pulse Meter? */
