@@ -23,6 +23,7 @@ float fFiO2_Percent;
 float fADC_Voltage;
 
 float fFiO2_Buffer[10];
+float fFiO2[30];
 
 uint16_t uiADC_Value;
 
@@ -201,7 +202,7 @@ float Oxygen_convert(void)
   uiADC_Value = ADC_GetConversionValue(OxygenSensor);
   
   fADC_Voltage = '\0';
-  fADC_Voltage = (uiADC_Value*2.91)/1023;                                       //VDD is vary (time1 = 3.02, time2 = 2.94)
+  fADC_Voltage = (uiADC_Value*2.91)/1024;                                       //VDD is vary (time1 = 3.02, time2 = 2.94)
 
   return fADC_Voltage;
 }
@@ -289,15 +290,9 @@ void Calibrate_OxygenSensor(void)
 void testOxygenSensor (void)
 {
   //float fFiO2_Buffer[10];                                                       // Buffer for store FiO2 every 100 ms
-  float fFiO2[30];
+  //float fFiO2[30];
   float fFiO2_avg;
   uint8_t index;
-  
-  // Updata LCD
-//  lcdClear();
-//  lcdString(3,1,"Waitting....");
-//  lcdString(3,3,"Set  Up...");
-//  lcdString(1,4,"Oxygen Sensor");
 
   //LED 6 is off
   STM_EVAL_LEDOff(LED6);
@@ -309,7 +304,7 @@ void testOxygenSensor (void)
   
   TIM_Cmd(TIM6, ENABLE);
 
-  while(time <= 30)                                                             
+  while(time < 30)                                                             
   {
     if(TIM_GetFlagStatus(TIM6, TIM_FLAG_Update) != RESET)
     {
@@ -321,14 +316,24 @@ void testOxygenSensor (void)
         if(TIM_GetFlagStatus(TIM7, TIM_FLAG_Update) != RESET)
         {
           fFiO2_Buffer[index] = Oxygen_convert();
-          fFiO2_Percent = Convert_FiO2(fFiO2_Buffer[time]);
-          fFiO2_avg = fFiO2_avg + fFiO2_Buffer[time];
+          fFiO2_Percent = Convert_FiO2(fFiO2_Buffer[index]);
           index++;
           TIM_ClearFlag(TIM7, TIM_FLAG_Update);
         }
       }
       index = 0;
-      fFiO2_avg = fFiO2_avg/5.0;
+      fFiO2_avg = 0;
+      for(uint8_t index_buffer = 0; index_buffer < 10; index_buffer++)
+      {
+        fFiO2_avg = fFiO2_avg + fFiO2_Buffer[index_buffer];
+      }
+      fFiO2_avg = fFiO2_avg/10.0;
+      
+      for(uint8_t index_buffer = 0; index_buffer < 10; index_buffer++)
+      {
+        fFiO2_Buffer[index_buffer] = 0;
+      }
+      
       fFiO2[time] = fFiO2_avg;
       TIM_Cmd(TIM7, DISABLE);
       time = time + 1;
