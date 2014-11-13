@@ -1,21 +1,25 @@
 /*
 Project : Programmable Control of Airflow System for Maintaining Oxygen Saturation in Pre-term infant 
 Microcontroller : STM32F4 Discovery (STM32F407VG)
-File : opm_test.c
+File : opm.c
 Deverloper : Phattaradanai Kiratiwudhikul
 Reseach & Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahidol University
 */
 //------------------------------------------------------------------------------
 /*
 Note: 
-1. Use for receive data from Oxygen Pulse Meter and send data to Computer via RS-232
-2. Use USART 3 for receiving data from oxygen pulse meter 
-3. USART 3 is setting : Baud rate 9600, 8-N-1, Full duplex communication, enable receive interrupt
-4. Size of buffer for storing information from oxygen pulse meter per a time is 174 Bytes
-5. Use Timer4 for count time in receive data per a time. If time is more than 0.5 sec, the system will clear Buffer.
+  This file MCU will working as same as Oxygen pulse meter. It will read data form SD card
+  and send data, Oxygen saturation information, to Microcontroller every 1 second.
+
+  1. Use for read data from SD card and send to MCU via USART
+  2. Use USART 3 for sending data to another Microcontroller
+  3. USART 3 is setting : Baud rate 9600, 8-N-1, Half-duplex communication (Tx), disable interrupt USART3
+  4. Size of buffer for storing Oxygen Saturation Protocal per a time is 174 Bytes
+  5. Use Timer3 for checking time every 1 sec.
+  6. File name for store information in SD card is "r_SpO2.TXT"
 */
 #include "main.h"
-#include "stdbool.h"    
+#include "stdbool.h"                                                            // use declar boolean variable type
 #include "DAC_LTC1661.h"
 #include "MCP3202.h"
 #include "system_init.h"
@@ -60,54 +64,72 @@ uint8_t buff[174];
 // Golbol Function -------------------------------------------------------------
 void system_init(void);
 void usart_OPM_setup(void);
-
+void Timer3_SetUp(void);
 //------------------------------------------------------------------------------
 // Profile Variable ------------------------------------------------------------
-char FileName[] = "w_SpO2.TXT";                                                 // File name : w_SpO2.TXT for record Oxygen Saturation value from preterm Infants
+char HospitalNumber_File[] = "r_SpO2.TXT";
 char Buffer[174];
 uint8_t uiCurrent_Status;
 uint8_t Time_AlarmLevel = 0;
 uint8_t uiPurpose_FiO2;
 
-bool bWritePermission = FALSE;
+bool bRead_data_permission = FALSE;
+
+extern uint8_t time;
+
 // Main Function ---------------------------------------------------------------
 
 int main(void)
 {
   /* Set Up config  System*/
   system_init();
-  
+   
   /*Check SD card mount*/
   if (f_mount(0, &filesystem) != FR_OK)
   {
     while(1);
   }
   
-  /* Create text file */
-  ret = f_open(&file, FileName, FA_WRITE | FA_CREATE_ALWAYS);
+  /* find profile Record */
+  ret = f_open(&file, HospitalNumber_File, FA_READ);
   if (ret) 
   {
     printf("r_SpO2.TXT file error\n\r");
   } 
-  
-  while(1)
+  else if (ret == 0)
   {
-    if (bWritePermission == TRUE)
+    printf("Type the file content(r_SpO2.TXT)\n\r");
+    for (;;) 
     {
-      // Open Oxygen Saturation file
-      ret = f_open(&file, FileName, FA_WRITE);
-      if (ret) 
+      if (bRead_data_permission == TRUE)
       {
-        fault_err(ret);                                                         // ERROR
-      } 
-      else 
-      {  
-        ret = f_lseek(&file,f_size(&file));
-        ret = f_write(&file, ucDataFromOPM, 174, &bw);                          // Store all information from Oxygen Pulse Meter (Size 174 Bytes)
-        ret = f_close(&file);
-      }  
+        ret = f_read(&file, buff, sizeof(buff), &br); /* Read a chunk of file */
+        if (ret || !br) 
+        {
+          break;      /* Error or end of file */
+        }
+        buff[br] = 0;
+        for(uint16_t length = 0; length < sizeof(buff); length++)
+        {
+          Buffer[length] = buff[length];
+          USART_SendData(USART3, Buffer[length]);
+          while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+        }
+        bRead_data_permission = FALSE;
+      }
     }
-    bWritePermission = FALSE;
+    
+    if (ret) 
+    {
+      printf("Read file (r_SpO2.TXT) error\n\r");
+      fault_err(ret);
+    }
+    printf("Close the file (r_SpO2.TXT)\n\r");
+    ret = f_close(&file);
+    if (ret) 
+    {
+      printf("Close the file (r_SpO2.TXT) error\n\r");
+    }
   }
 }
 // End of Main Function --------------------------------------------------------
@@ -121,14 +143,15 @@ int main(void)
 void system_init(void)
 {
   usart_OPM_setup();
+  Timer3_SetUp();
 }
 //------------------------------------------------------------------------------
 /*
   Function : usart_OPM_setup
   Input : none
   Output : none
-  Description : set up usart for receive infromation from oxygen pulse meter
-                use USART3 (PD8, PD9), Baud Rate = 9600, 8-N-1, Enable Rx_interrupt
+  Description : set up usart for sending infromation to Microcontroller
+                use USART3 (PD8, PD9), Baud Rate = 9600, 8-N-1, Enable Rx_interrupt, Half-duplex communication (Tx)
 */
 void usart_OPM_setup(void)
 {
@@ -159,149 +182,55 @@ void usart_OPM_setup(void)
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No;
-  USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  USART_InitStruct.USART_Mode = USART_Mode_Tx;
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
   USART_Init(USART3, &USART_InitStruct);
-  
-  /*USART Interrupt*/
-  /* Set interrupt: NVIC_Setup */
-  NVIC_InitTypeDef NVIC_InitStruct;
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-  
-  /*ENABLE USART3 Interruper*/
-  NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStruct);
-
-  /* Set Interrupt Mode*/
-  /*ENABLE the USART Receive Interrupt*/
-  USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
 
   /*Enable USART3 */
   USART_Cmd(USART3, ENABLE);
-  
-  //Set Up Timer 3
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  NVIC_InitTypeDef NVIC_InitStructure;
-  //Enable Clock Timer3
-  RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM3, ENABLE);
-
-  /* Enable the TIM4 gloabal Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  
-  /*
-    Pre-Scale : APB1 Prescale 4
-    System Clock 168MHz /4 = 42 MHz
-    Timer Prescale 4200
-  */
-  /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 500;            
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 42 MHz Clock down to 1 kHz (adjust per your clock)
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-  /* TIM IT enable */
-  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-  /* TIM4 enable counter */
-  TIM_Cmd(TIM3, DISABLE);
 }
 //------------------------------------------------------------------------------
 /*
-  Note : USART3_IRQHandler is at Oxygen_Pulse_Meter.c 
-*/
-//USART_IRQHandler -------------------------------------------------------------
-void USART3_IRQHandler(void)
-{
-  uint8_t uiIndexString;
-  if(USART_GetITStatus(OPM_USART, USART_IT_RXNE) != RESET)
-  {
-    if (uiRx_index_OPM == 0)
-    {
-      //Start Receive Data from Oxygen Pulse Meter
-      TIM_Cmd(TIM3, ENABLE);
-    }
-    ucDataFromOPM[uiRx_index_OPM++] = USART_ReceiveData(OPM_USART);
-    if(uiRx_index_OPM >= (sizeof(ucDataFromOPM) - 1))
-    {  
-      bWritePermission = TRUE;                                                  // Enable write data to SD card 
-      TIM_Cmd(TIM3, DISABLE);
-      uiRx_index_OPM = 0;
-      uiCurrent_SpO2 = Get_OxygenSat();
-      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
-      uiSD_Card_index++;
-    }
-  }
-  if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
-  {
-    USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);
-  }
-  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-}
-//--------------------------------------------------------------------------------------
-/*
-  Function : Get_OxygenSat
+  Function : Timer3_SetUp
   Input : None
-  Return : int cOxygenSat_Percent
-  Description : This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter
-                via RS-232 Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
+  Output : None
+  Description : count every 1 sec.
 */
-
-int Get_OxygenSat(void)
+void Timer3_SetUp(void)
 {
-  /* 
-    This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter via RS-232
-    Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
-  */
-  char cOxygenSat_string[3];
-  uint8_t uiOxygenSat_Percent, uiIndexString;
-  uiOxygenSat_Percent = 0 ;
-
-  /* check this command is getting SaO2 or Headding Command */
-  if ((ucDataFromOPM[18] == 'S') && (ucDataFromOPM[19] == 'N') && (ucDataFromOPM[126] == 'P') && (ucDataFromOPM[127] == 'V') && (ucDataFromOPM[128] == 'I'))
-  {
-    // Case : Correct
-    for(uiIndexString = 0; uiIndexString < 3; uiIndexString++)
-    {
-      cOxygenSat_string[uiIndexString] = ucDataFromOPM[37 + uiIndexString];
-    }
-    uiOxygenSat_Percent = atoi(cOxygenSat_string);                              // atoi is function convert from String to Int 
-    uiCurrent_SpO2 = uiOxygenSat_Percent;
-  }
-  else
-  {
-    // Case : Error
-    for (uiIndexString = 0; uiIndexString < (sizeof(ucDataFromOPM) - 1); uiIndexString++)
-    {
-      uiRx_index_OPM = 0;
-      ucDataFromOPM[uiIndexString] = '\0';
-    }
-    uiOxygenSat_Percent = '\0';
-    uiCurrent_SpO2 = uiOxygenSat_Percent;
-  }
-  
-  return uiOxygenSat_Percent;
+  /*Timer Interrupt*/
+  /* Set interrupt: NVIC_Setup */
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+  /* Enable the TIM3 gloabal Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+   
+  /* TIM3 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 2000;                                      // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+  /* TIM IT enable */
+  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+  /* TIM3 enable counter */
+  TIM_Cmd(TIM3, ENABLE);
 }
-//------------------------------------------------------------------------------------
-/* Timer 3 Check Timer Out of Receving data from Oxygen Pulse Meter? */
+
+//------------------------------------------------------------------------------
+/* Timer 3 count every 1 second */
 void TIM3_IRQHandler (void)
 {
-  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+  if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
   {
-    uint8_t uiRx_index_OPM = 0;
-    //Clear Buffer Data from Oxygen Pulse Meter (OPM)
-    for (uiRx_index_OPM = 0; uiRx_index_OPM < (sizeof(ucDataFromOPM) - 1); uiRx_index_OPM++)
-    {
-      ucDataFromOPM[uiRx_index_OPM] = '\0';
-    }
-    uiRx_index_OPM = 0;
-    //Diable Timer3
-    TIM_Cmd(TIM3, DISABLE);
+    time = time + 1;
+    bRead_data_permission = TRUE;
     TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
   }
 }
