@@ -13,6 +13,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 void Oxygen_PM_Setup(void);
 //int fputc(int ch, FILE *f);
 int Get_OxygenSat(void);
+void clear_OPM_buffer(void);
 
 //------------------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------

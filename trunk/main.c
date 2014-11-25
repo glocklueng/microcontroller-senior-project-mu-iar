@@ -55,7 +55,7 @@ void Convert_SaO2_InttoString(uint8_t DataInt[]);
 void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer);
 void USART_HyperTermianl_Connect(void);
 void Create_file(char Hospital_Number[], uint8_t File_Type);
-
+char ConvertToString (uint8_t uiDataInt);
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
 char Character;
@@ -80,7 +80,7 @@ extern uint8_t uiSD_Card_index;
 extern uint8_t uiRx_index_OPM;
 extern uint8_t uiCurrent_SpO2;
 extern float FiO2_DataTest[24];
-
+extern bool bReadCorrect;
 uint8_t uiCurrent_Status;
 uint8_t Time_AlarmLevel = 0;
 
@@ -539,13 +539,20 @@ void USART_HyperTermianl_Connect(void)
 //}
 
 // SD Card Section -------------------------------------------------------------
+/*
+Function : Create_file
+Input : char Hospital_Number[], uint8_t File_Type
+Output : None
+Description : Create text file in SD card. The filename is last 8 digit of HN (Limitation of FATFS)
+              Start of textfile has Profile setting.
+*/
 void Create_file(char Hospital_Number[], uint8_t File_Type)
 {
   //ret = f_mount(0, &filesystem);
-  /* crate text file that have 7 last digit form Hospital Number(HN) */
-  for (int i = 0; i < 7; i++)
+  /* crate text file that have 8 last digit form Hospital Number(HN) */
+  for (int i = 0; i < 8; i++)
   {
-    HospitalNumber_File[i] = Hospital_Number[i+6];
+    HospitalNumber_File[i] = Hospital_Number[i+5];
   }
   HospitalNumber_File[8] = '.';
   HospitalNumber_File[9] = 'T';
@@ -553,53 +560,87 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
   HospitalNumber_File[11] = 'T';
   HospitalNumber_File[12] = '\0';
     
-  /*
-  @  File_Type = 0 : Oxygen Saturation record
-  @  File_Type = 1 : FiO2 record
-  */
-  if(File_Type == 0)
-  {
-    HospitalNumber_File[7] = 'O';
-    
-    // Create Oxygen Saturation file
-    ret = f_open(&file_O, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
-    if (ret) 
-    {
-      /* ERROR */
-      fault_err(ret);
-    } 
-    else 
-    {  
-      ret = f_write(&file_O, "Hospital Number : ", 20, &bw);
-      ret = f_lseek(&file_O,f_size(&file_O));
-      ret = f_write(&file_O, HospitalNumber_File, 13, &bw);
-      ret = f_lseek(&file_O,f_size(&file_O));
-      ret = f_write(&file_O, "\r\nFile: Oxygen Saturation\r\n", 27, &bw);
-      ret = f_close(&file_O);
-    }  
-  }
-  else if (File_Type == 1)
-  {
-    HospitalNumber_File[7] = 'F';
-    // Create FiO2 File
-    ret = f_open(&file_F, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
-    if (ret) 
-    {
-      /* ERROR */
-      fault_err(ret);
-    } 
-    else 
-    {
-      ret = f_write(&file_F, "Hospital Number : ", 20, &bw);
-      ret = f_lseek(&file_F,f_size(&file_F));
-      ret = f_write(&file_F, HospitalNumber_File, 13, &bw);
-      ret = f_lseek(&file_F,f_size(&file_F));
-      ret = f_write(&file_F, "\r\nFile: FiO2\r\n", 15, &bw);
-      ret = f_close(&file_F);
-    }
-  }
-}
+  /* Convert int to String with function : ConvertToString */
+  char cSpO2_Minimum[3] = ConvertToString(SProfile.uiSpO2_Minimum); 
+  char cSpO2_Maximum[3] = ConvertToString(SProfile.uiSpO2_Maximum);
+  char cFiO2_Minimum[3] = ConvertToString(SProfile.uiFiO2_Minimum);
+  char cFiO2_Maximum[3] = ConvertToString(SProfile.uiFiO2_Maximum);
+  char cPrefered_FiO2[3] = ConvertToString(SProfile.uiPrefered_FiO2);
+  char cRespondsTime[3] = ConvertToString(SProfile.uiRespondsTime);
+  char cAlarm_Level1[3] = ConvertToString(SProfile.uiAlarm_Level1);
+  char cAlarm_Level2[3] = ConvertToString(SProfile.uiAlarm_Level2);
 
+    
+  // Create Oxygen Saturation file
+  ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
+  if (ret) 
+  {
+    /* ERROR */
+    fault_err(ret);
+  } 
+  else 
+  {  
+    /* Write Header of File and record profile setting */
+    ret = f_write(&file, "Hospital Number : ", 20, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, HospitalNumber_File, 13, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, "\r\nProfile Setting\r\n", 19, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, "Minimum SpO2 : ", 15, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cSpO2_Minimum, sizeof(cSpO2_Minimum), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " %\r\nMaximum SpO2 : ", 19, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cSpO2_Maximum, sizeof(cSpO2_Maximum), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " %\r\nMinimum FiO2 : ", 19, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cFiO2_Minimum, sizeof(cFiO2_Minimum), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " %\r\nMaximum FiO2 : ", 19, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cFiO2_Maximum, sizeof(cFiO2_Maximum), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " %\r\nResponse time : ", 20, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cRespondsTime, sizeof(cRespondsTime), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " sec\r\nAlarm Level 1 : ", 22, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cAlarm_Level1, sizeof(cAlarm_Level1), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " sec\r\nAlarm Level 2 : ", 22, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cAlarm_Level2, sizeof(cAlarm_Level2), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, "sec\r\n\r\n", 7, &bw);
+    ret = f_close(&file);
+    if (ret)
+    {
+      fault_err(ret);   //Error
+    }
+  }  
+
+}
+//------------------------------------------------------------------------------
+/*
+Function : ConvertToString
+Input : uint8_t uiDataInt 
+Output : char cConvString[3];
+Description : convert int value to String. The size of String array have 3 Bytes.
+*/
+char ConvertToString (uint8_t uiDataInt)
+{
+  char cConvString[3];
+
+  cConvString[0] = (uiDataInt/100);
+  cConvString[1] = ((uiDataInt%100)/10);
+  cConvString[2] = ((uiDataInt%10)/1);
+
+  return cConvString[3];
+}
 //------------------------------------------------------------------------------
 void Convert_SaO2_InttoString(uint8_t DataInt[])
 {

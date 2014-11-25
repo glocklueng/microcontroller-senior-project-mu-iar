@@ -360,7 +360,7 @@ void EXTI0_IRQHandler(void)
   if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
   {
     STM_EVAL_LEDOff(LED5);
-    USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);
+    //USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);                           // fix comment
     //TestControlValve();
     //Calibrate_OxygenSensor();
     testOxygenSensor();

@@ -13,6 +13,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
     USART1 - Tx -> Port D Pin PB6
     USART1 - Rx -> Port D Pin PB7
     Baud Rate = 115200
+    Enable Rx Interrupt
     package = 8-n-1
     
 */
@@ -112,31 +113,32 @@ const uint8_t kETX = 0x33;                                                      
                 Baud Rate = 115200
                 Tx Pin : PB6
                 Rx Pin : PB7
+                Enable RX interrupt
 */
 void USART_GUI_Connect(void)
 {  
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  RCC_APB2PeriphClockCmd(GUI_USART_CLK, ENABLE);
+  RCC_AHB1PeriphClockCmd(GUI_Port_CLK, ENABLE);
 	
   /*
     Use Port B Pin PD6 
     Use Port B Pin PD7 
   */
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_6 | GPIO_Pin_7;
+  GPIO_InitStruct.GPIO_Pin  = GUI_TX_Pin | GUI_RX_Pin;
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);
+  GPIO_Init(GUI_Port, &GPIO_InitStruct);
   
   /* Connect PXx to USARTx_Tx*/
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_USART1);
+  GPIO_PinAFConfig(GUI_Port, GUI_TX_Souce, GUI_TX_AF);
   /* Connect PXx to USARTx_Rx*/
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);
+  GPIO_PinAFConfig(GUI_Port, GUI_RX_Souce, GUI_RX_AF);
   
   
   /* USART_InitStruct members default value */
@@ -146,13 +148,14 @@ void USART_GUI_Connect(void)
   USART_InitStruct.USART_Parity = USART_Parity_No;
   USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
-  USART_Init(USART1, &USART_InitStruct);
+  USART_Init(GUI_USART, &USART_InitStruct);
   
   /*USART Interrupt*/
   /* Set interrupt: NVIC_Setup */
   NVIC_InitTypeDef NVIC_InitStruct;
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-  //ENABLE USART1 Interruper
+  
+  /* Configuration USART1 Interrupt */
   NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
@@ -160,11 +163,9 @@ void USART_GUI_Connect(void)
   NVIC_Init(&NVIC_InitStruct);
 
   /* Set Interrupt Mode*/
-  //ENABLE the USART Receive Interrupt
-  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);                                //ENABLE the USART Receive Interrupt
 
-  //Enable USART1
-  USART_Cmd(USART1, ENABLE);
+  USART_Cmd(USART1, ENABLE);                                                    //Enable USART1
   
 //  //Set Up Timer 3
 //  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -300,7 +301,6 @@ void GUI_IRQHandler (void)
 //        else 
           if (ret == 0)
           {
-            printf("Type the file content(2222222F.TXT)\n\r");
             for (;;) 
             {
               ret = f_read(&file, buff, sizeof(buff), &br); /* Read a chunk of file */
@@ -315,8 +315,6 @@ void GUI_IRQHandler (void)
                 USART_SendData(USART6, Buffer[length]);
                 while (USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET);
               }
-//          printf("%s",Buffer);
-              printf("\n\r");
             }
             if (ret) 
             {

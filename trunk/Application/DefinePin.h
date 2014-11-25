@@ -117,8 +117,9 @@ Credit:
 
 //------------------------------------------------------------------------------
 //Define Connect GUI (Tx-PD8, Rx-PD9)
+/* USART 1 and USART 6 only use RCC_APB2, other use RCC_APB1*/
 #define  GUI_USART							USART1
-#define  GUI_USART_CLK					RCC_APB1Periph_USART1
+#define  GUI_USART_CLK					RCC_APB2Periph_USART1
 #define  GUI_Port								GPIOB
 #define  GUI_Port_CLK						RCC_AHB1Periph_GPIOB
 #define  GUI_IRQn								USART1_IRQn
