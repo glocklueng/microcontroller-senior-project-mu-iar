@@ -13,9 +13,10 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
     1. Oxygen_PM_Setup : Setting USART for communication to Oxygen Pulse Meter via USART
     2. OPM_IRQHandler (Interrupt S.R.)
     3. Get_OxygenSat : find Oxygen Saturation value from ucDataFromOPM Buffer and convert String to uint
-    4. TIM4_IRQHandler : 
+    4. clear_OPM_buffer : clear data in ucDataFromOPM Buffer
+    5. TIM4_IRQHandler : 
 2. Define global variable :
-    char ucDataFromOPM[133]
+    char ucDataFromOPM[174]
     uint8_t uiCurrent_SpO2
     uint8_t uiSD_Card_index
     uint8_t uiRx_index_OPM
@@ -26,13 +27,15 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "Oxygen_Pulse_Meter.h"
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
-//Variable store for Data input from Oxygen Pulse Meter, Buffer size 133 Bytes
-char ucDataFromOPM[133]; 
+//Variable store for Data input from Oxygen Pulse Meter, Buffer size 174 Bytes
+char ucDataFromOPM[174]; 
 //------------------------------------------------------------------------------
 uint8_t uiCurrent_SpO2;
 uint8_t uiSD_Card_index = 0;
 uint8_t uiRx_index_OPM = 0;
 uint8_t uiOxygenSat_buffer[10];                                                 // Oxygen Saturation Buffer for Store Data to SD Card
+
+bool bReadCorrect = false; 
 //------------------------------------------------------------------------------
 /*
   Function : Oxygen_PM_Setup
@@ -70,7 +73,6 @@ void Oxygen_PM_Setup(void)
   
   /* USART_InitStruct members default value */
   USART_InitStruct.USART_BaudRate = 9600;
-  //USART_InitStruct.USART_BaudRate = 115200;
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No ;
@@ -129,6 +131,13 @@ void Oxygen_PM_Setup(void)
 }
 
 //USART_IRQHandler -------------------------------------------------------------
+/*
+  Function : OPM_IRQHandler
+  Input : None
+  Output : None
+  Description : Interrupt Service Routine from OPM_USART
+                Enable IT source : USART_IT_RXNE
+*/
 void OPM_IRQHandler(void)
 {
   if(USART_GetITStatus(OPM_USART, USART_IT_RXNE) != RESET)
@@ -140,20 +149,24 @@ void OPM_IRQHandler(void)
     }
     ucDataFromOPM[uiRx_index_OPM++] = USART_ReceiveData(OPM_USART);
   
-    if(uiRx_index_OPM >= (sizeof(ucDataFromOPM) - 1))
+    if(uiRx_index_OPM == (sizeof(ucDataFromOPM)))
     {  
       TIM_Cmd(TIM4, DISABLE);
       uiRx_index_OPM = 0;
       uiCurrent_SpO2 = Get_OxygenSat();
-      uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
-      uiSD_Card_index++;
+      if(bReadCorrect == true)
+      {
+        uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
+        uiSD_Card_index++;
+      }
     }
   }
   if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
   {
-    USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);
+    USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);                                   // Disable USART_IT_TXE flag
+    USART_ClearITPendingBit(OPM_USART, USART_IT_TXE);                                   // Clear  USART_IT_TXE flag
   }
-  USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+  USART_ClearITPendingBit(OPM_USART, USART_IT_RXNE);
 }
 //--------------------------------------------------------------------------------------
 /*
@@ -175,29 +188,46 @@ int Get_OxygenSat(void)
   uiOxygenSat_Percent = 0 ;
 
   /* check this command is getting SaO2 or Headding Command */
-  if (ucDataFromOPM[0] == '+' && ucDataFromOPM[4] == 'P' && ucDataFromOPM[5] == 'V' && ucDataFromOPM[6] == 'I')
+  if ((ucDataFromOPM[18] == 'S') && (ucDataFromOPM[19] == 'N') && (ucDataFromOPM[126] == 'P') && (ucDataFromOPM[127] == 'V') && (ucDataFromOPM[128] == 'I'))
   {
-    // Case : Correct
+    /* Case : Read Correct */
     for(uiIndexString = 0; uiIndexString < 3; uiIndexString++)
     {
       cOxygenSat_string[uiIndexString] = ucDataFromOPM[37 + uiIndexString];
     }
+    
     uiOxygenSat_Percent = atoi(cOxygenSat_string);                              // atoi is function convert from String to Int 
     uiCurrent_SpO2 = uiOxygenSat_Percent;
+    
+    bReadCorrect = true;                                                        // Clear data in Buffer
   }
   else
   {
-    // Case : Error
-    for (uiIndexString = 0; uiIndexString < 133; uiIndexString++)
-    {
-      uiRx_index_OPM = 0;
-      ucDataFromOPM[uiIndexString] = '\0';
-    }
+    /* Case :  Read Error */
+    printf("ucDataFromOPM is incorrect\n\r");
+    clear_OPM_buffer();
     uiOxygenSat_Percent = '\0';
     uiCurrent_SpO2 = uiOxygenSat_Percent;
   }
   
   return uiOxygenSat_Percent;
+}
+//------------------------------------------------------------------------------
+/*
+Function : clear_OPM_buffer
+Input : none
+Output : none
+Description : Clear data in ucDataFromOPM Buffer in case of incorrect.
+*/
+void clear_OPM_buffer(void)
+{
+  uint8_t uiIndex_OPM_buffer = 0;
+  /*Clear data in Buffer*/
+  for (uiIndex_OPM_buffer = 0; uiIndex_OPM_buffer < (sizeof(ucDataFromOPM) - 1); uiIndex_OPM_buffer++)
+  {
+    ucDataFromOPM[uiIndex_OPM_buffer] = '\0';
+  }
+  uiRx_index_OPM = 0;
 }
 //------------------------------------------------------------------------------------
 /* Timer 4 Check Timer Out of Receving data from Oxygen Pulse Meter? */
@@ -207,12 +237,11 @@ void TIM4_IRQHandler (void)
   {
     uint8_t uiRx_index_OPM = 0;
     //Clear Buffer Data from Oxygen Pulse Meter (OPM)
-    for (uiRx_index_OPM = 0; uiRx_index_OPM < 133; uiRx_index_OPM++)
+    for (uiRx_index_OPM = 0; uiRx_index_OPM < (sizeof(ucDataFromOPM) - 1); uiRx_index_OPM++)
     {
       ucDataFromOPM[uiRx_index_OPM] = '\0';
     }
-    //Diable Timer4
-    TIM_Cmd(TIM4, DISABLE);
+    TIM_Cmd(TIM4, DISABLE);                                                     //Diable Timer4
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
   }
 }

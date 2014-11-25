@@ -14,6 +14,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 #include <stdlib.h>
+#include <stdbool.h>
 #include "stm32f4_discovery.h"
 #include "stm32f4_discovery_audio_codec.h"
 #include "stm32f4_discovery_lis302dl.h"
