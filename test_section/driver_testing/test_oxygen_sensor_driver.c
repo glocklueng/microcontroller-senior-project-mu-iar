@@ -361,8 +361,7 @@ void EXTI0_IRQHandler(void)
   {
     STM_EVAL_LEDOff(LED5);
     //USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);                           // fix comment
-    //TestControlValve();
-    //Calibrate_OxygenSensor();
+    
     testOxygenSensor();
     STM_EVAL_LEDOn(LED5);
   }

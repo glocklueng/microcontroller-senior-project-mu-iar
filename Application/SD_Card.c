@@ -18,13 +18,13 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 // SD Card Typedef -------------------------------------------------------------
 /* Private typedef -----------------------------------------------------------*/
 //SD_Error Status = SD_OK;
-//FATFS filesystem;		                                                // volume lable
-//FRESULT ret;			                                                // Result code
-//FIL file;				                                        // File object
-//DIR dir;				                                        // Directory object
-//FILINFO fno;			                                                // File information object
-//UINT bw, br;
-//uint8_t buff[128];
+extern FATFS filesystem;		                                                    // volume lable
+extern FRESULT ret;			                                                        // Result code
+extern FIL file;				                                                        // File object
+extern DIR dir;				                                                          // Directory object
+extern FILINFO fno;			                                                        // File information object
+extern UINT bw, br;
+extern uint8_t buff[128];
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 static void fault_err (FRESULT rc)

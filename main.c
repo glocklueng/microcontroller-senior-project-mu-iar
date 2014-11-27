@@ -51,23 +51,23 @@ void Alarm_Function(uint8_t Command);
 void Timer3_Config(void);
 
 /* Private function prototypes -----------------------------------------------*/
-void Convert_SaO2_InttoString(uint8_t DataInt[]);
-void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer);
+void Convert_SpO2_InttoString(uint8_t DataInt);
+void Convert_FiO2_FloattoString(float FiO2_float);
 void USART_HyperTermianl_Connect(void);
-void Create_file(char Hospital_Number[], uint8_t File_Type);
-char ConvertToString (uint8_t uiDataInt);
+void Create_file(char Hospital_Number[]);
+void SD_Write(char FileName[], char cDataTimeSD[], uint8_t uiSpO2_SD, float fFiO2_SD, uint8_t uiStatus);
 // Variable --------------------------------------------------------------------
 unsigned char msg ;
 char Character;
 uint32_t count;
 uint8_t uiSD_Test[50];
-char cSD_String[50];
+uint8_t uiIndex_SD_buffer;                                                       // uiIndex_SD_buffer variable for checking data in buffer
 uint8_t index = 0;                                                                  //for count receving Data form Hyperterminal for controling Drive Circuit
 char cDataFromOPM_TEST[3];
 
 float FiO2_Current;
-float FiO2_Buffer[10];
-char cFiO2_Buffer_String[50];
+float fFiO2_Percent;
+float fFiO2_Buffer[10];
 char FiO2_Test_String[120];
 uint8_t uiFiO2_index;
 uint8_t uiPurpose_FiO2, uiDrive_FiO2;
@@ -79,19 +79,28 @@ extern uint8_t uiOxygenSat_buffer[10];
 extern uint8_t uiSD_Card_index;
 extern uint8_t uiRx_index_OPM;
 extern uint8_t uiCurrent_SpO2;
+extern uint8_t ucDataFromOPM[174];
 extern float FiO2_DataTest[24];
 extern bool bReadCorrect;
+
+/* Variable for store in SD card */
+extern char cDateTime[17][3];                                                   //from file : Oxygen_Pulse_Meter.c
+uint8_t uiSpO2_SDcard_buffer[3];
+float fFiO2_SDcard_buffer[3];
+uint8_t uiStatus_Buffer[3];
+char cFiO2_SDcard[6];
+char cSpO2_SDcard[3];
+
 uint8_t uiCurrent_Status;
 uint8_t Time_AlarmLevel = 0;
 
 // Profile Variable ------------------------------------------------------------
-char HospitalNumber_File[13];
+char cHospitalNumber_File[13];
 char Buffer[128];
   
 // Main Function ---------------------------------------------------------------
- int main()
-{  
-
+int main()
+{
   /* Set Up config  System*/
   system_init();
   lcdString (1,1,"Please Upload Profile");
@@ -102,9 +111,8 @@ char Buffer[128];
   {    
     if (SProfile.uiProfile_Status == PROFILE_JUST_UPLOAD)
     {
-      USART_Cmd(OPM_USART, ENABLE);                                           // ENABLE Oxygen Pulse Meter USART
-      Create_file(SProfile.cHospital_Number, OxygenSaturation_file);            // Create Oxygen Saturation file
-      Create_file(SProfile.cHospital_Number, FiO2_file);                        // Create FiO2 file
+      USART_Cmd(USART3, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
+      Create_file(SProfile.cHospital_Number);                                   // Create textfile
       SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
 //      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 //      TIM_Cmd(TIM3, ENABLE);
@@ -124,7 +132,7 @@ char Buffer[128];
     }
     else if (SProfile.uiProfile_Status == PROFILE_NOTUPLOAD)
     {
-      USART_Cmd(OPM_USART, DISABLE);                                            // DISABLE Oxygen Pulse Meter USART
+      USART_Cmd(USART3, DISABLE);                                            // DISABLE Oxygen Pulse Meter USART
       SentData_DAC(0x00,3);                                                     // Close air and oxygen valve
     }
 
@@ -133,45 +141,23 @@ char Buffer[128];
     if (SProfile.uiProfile_Status == PROFILE_SETTING_COMPLETE)
     {
       uiCurrent_Status = check_status(uiCurrent_SpO2);
+      uiStatus_Buffer[uiSD_Card_index] = uiCurrent_Status;
     }
 
 //------------------------------------------------------------------------------
       /* Store uiOxygenSat_buffer in SD Card */
-      if (uiSD_Card_index >= sizeof(uiOxygenSat_buffer))
+      if (uiSD_Card_index >= sizeof(uiSpO2_SDcard_buffer))
       {
-        HospitalNumber_File[7] = 'O';
         uiSD_Card_index = 0;
-        Convert_SaO2_InttoString(uiOxygenSat_buffer);
-        ret = f_open(&file_O, HospitalNumber_File, FA_WRITE);
-        if (ret) 
+        char cDateTimeBuffer[17];
+        for (int i = 0; i < 3; ++i)
         {
-          fault_err(ret);
-        } 
-        else 
-        {  
-          ret = f_lseek(&file_O,f_size(&file_O));
-          ret = f_write(&file_O, cSD_String, 50, &bw);
-          ret = f_close(&file_O);
-        }  
-      }
-      
-      /* Store FiO2_Buffer in SD Card */
-      if ((uiFiO2_index*4) >= sizeof(FiO2_Buffer))
-      {
-        HospitalNumber_File[7] = 'F';
-        uiFiO2_index = 0;
-        Convert_FiO2_FloattoString(FiO2_Buffer,10);
-        ret = f_open(&file_F, HospitalNumber_File, FA_WRITE);
-        if (ret)
-        {
-          fault_err(ret);
-        } 
-        else
-        {  
-          ret = f_lseek(&file_F,f_size(&file_F));
-          ret = f_write(&file_F, cFiO2_Buffer_String, 50, &bw);
-          ret = f_close(&file_F);
-        } 
+          for (int j =0; j < 17; j++)
+          {
+            cDateTimeBuffer[j] = cDateTime[j][i];
+          }
+          SD_Write(cHospitalNumber_File, cDateTimeBuffer, uiSpO2_SDcard_buffer[i], fFiO2_Buffer[i], uiStatus_Buffer[i]);
+        }
       }
   }
 }
@@ -207,7 +193,7 @@ static void system_init(void)
   LTC1661_Setup();
   MCP3202_SetUp();
   OxygenSensor_Config();
-  //Oxygen_PM_Setup();
+  usart_OPM_setup();
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   lcdInit();                                                                    //LCD Set Up
   USART_GUI_Connect();                                                          //Set up USART for connecting GUI
@@ -254,8 +240,8 @@ static void system_init(void)
     &USR_cb);
 }
 
-//----------------- GPIO Interrupt Service Routine -------------------------
-//Button Down IRQHandler --------------------------------------------------
+//----------------- GPIO Interrupt Service Routine -----------------------------
+//Button Down IRQHandler -------------------------------------------------------
 //void Button_Down_IRQHandler(void)
 //{
 //  if(EXTI_GetITStatus(Button_Down_EXTI_Line) != RESET)
@@ -270,7 +256,7 @@ static void system_init(void)
 //}
 
 
-// Button Up IRQHandler ------------------------------------------------------
+// Button Up IRQHandler --------------------------------------------------------
 //void Button_Up_IRQHandler(void)
 //{
 //  if (EXTI_GetITStatus(Button_Up_EXTI_Line) != RESET)
@@ -284,7 +270,7 @@ static void system_init(void)
 //  }
 //}
 
-// Run Button IRQHandler ------------------------------------------------------
+// Run Button IRQHandler -------------------------------------------------------
 void Run_Button_IRQHandler(void)
 {
   if (EXTI_GetITStatus(Run_Button_EXTI_Line) != RESET)
@@ -339,49 +325,45 @@ void Run_Button_IRQHandler(void)
 */
 void TIM3_IRQHandler (void)
 {
-  uint8_t j;
-  float current_FiO2_Sampling[5], AVG_FiO2_Current;
+  float fFiO2_avg;
   
   if (TIM_GetITStatus (TIM3, TIM_IT_Update) != RESET)
   {
-    if(Sampling_time >= 5)
+    /* Sampling 10 Hz */
+    TIM_Cmd(TIM7, ENABLE);
+    while(index < 10)
     {
-      STM_EVAL_LEDOff(LED5);
-      for(j = 0; j < 5 ; j++)
+      fFiO2_avg = 0;
+      // Set ADC every 10 ms
+      if(TIM_GetFlagStatus(TIM7, TIM_FLAG_Update) != RESET)
       {
-        current_FiO2_Sampling[j] = '\0';
-        current_FiO2_Sampling[j] = Oxygen_convert();
-        if(j == 4)
-        {
-          AVG_FiO2_Current = ((current_FiO2_Sampling[0] + current_FiO2_Sampling[1] + current_FiO2_Sampling[2] + current_FiO2_Sampling[3] + current_FiO2_Sampling[4])/5);
-          FiO2_percentage = Convert_FiO2(AVG_FiO2_Current);
-          FiO2_LCD_Display (FiO2_percentage);
-          FiO2_Buffer[uiFiO2_index] = FiO2_percentage;
-          uiFiO2_index++;
-        }
+        fFiO2_Buffer[index] = Oxygen_convert();                                   // Function :Oxygen_convert return voltage value from ADC to fFiO2_Buffer
+        index++;
+        TIM_ClearFlag(TIM7, TIM_FLAG_Update);
       }
-      Sampling_time = 0;
     }
-    Sampling_time++;
+    TIM_Cmd(TIM7, DISABLE);
+
+    index = 0;
+    fFiO2_avg = 0;
+
+    /* Avg. FiO2 value */
+    for(uint8_t index_buffer = 0; index_buffer < 10; index_buffer++)
+    {
+      fFiO2_avg = fFiO2_avg + fFiO2_Buffer[index_buffer];
+    }
+    fFiO2_avg = fFiO2_avg/10.0;                                              // Avarage fFiO2 value
+    fFiO2_SDcard_buffer[uiSD_Card_index]  = Convert_FiO2(fFiO2_avg);         // Converting voltage value to FiO2 percentage
+    
+    /* Clear Buffer */
+    for(uint8_t index_buffer = 0; index_buffer < 10; index_buffer++)
+    {
+      fFiO2_Buffer[index_buffer] = 0;
+    }
   }
   STM_EVAL_LEDOn(LED5);
   TIM_ClearITPendingBit (TIM3, TIM_IT_Update);
 }
-
-
-//// Delay ---------------------------------------------------------------------
-///**
-//  * @brief  Delay
-//  * @param  None
-//  * @retval None
-//  */
-//static void Delay(__IO uint32_t nCount)
-//{
-//  __IO uint32_t index = 0; 
-//  for (index = (100000 * nCount); index != 0; index--);
-//}
-
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 /* USART 3: This function use for simulation Oxygen Pulse Meter */
 /*
@@ -421,7 +403,7 @@ void USART_HyperTermianl_Connect(void)
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No;
-  USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  USART_InitStruct.USART_Mode = USART_Mode_Rx;
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
   USART_Init(USART3, &USART_InitStruct);
   
@@ -442,8 +424,46 @@ void USART_HyperTermianl_Connect(void)
   USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
 
   /*Enable USART3 */
-  USART_Cmd(USART3, ENABLE);
+  USART_Cmd(USART3, DISABLE);
 }
+//USART_IRQHandler -------------------------------------------------------------
+///*
+//  Function : OPM_IRQHandler
+//  Input : None
+//  Output : None
+//  Description : Interrupt Service Routine from OPM_USART
+//                Enable IT source : USART_IT_RXNE
+//*/
+//void USART3_IRQHandler(void)
+//{
+//  if(USART_GetITStatus(OPM_USART, USART_IT_RXNE) != RESET)
+//  {
+//    if (uiRx_index_OPM == 0)
+//    {
+//      //Start Receive Data from Oxygen Pulse Meter
+//      TIM_Cmd(TIM4, DISABLE);
+//    }
+//    ucDataFromOPM[uiRx_index_OPM] = USART_ReceiveData(OPM_USART);
+//    uiRx_index_OPM = uiRx_index_OPM + 1;
+//    if(uiRx_index_OPM == (sizeof(ucDataFromOPM)))
+//    {  
+//      TIM_Cmd(TIM4, DISABLE);
+//      uiRx_index_OPM = 0;
+//      uiCurrent_SpO2 = Get_OxygenSat();
+//      if(bReadCorrect == true)
+//      {
+//        uiSpO2_SDcard_buffer[uiSD_Card_index] = uiCurrent_SpO2;
+//        uiSD_Card_index++;
+//      }
+//    }
+//  }
+//  if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
+//  {
+//    USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);                                   // Disable USART_IT_TXE flag
+//    USART_ClearITPendingBit(OPM_USART, USART_IT_TXE);                                   // Clear  USART_IT_TXE flag
+//  }
+//  USART_ClearITPendingBit(OPM_USART, USART_IT_RXNE);
+//}
 //------------------------------------------------------------------------------
 // USART3 use for Debug and send command to Microcontroller
 //------------------------------------------------------------------------------
@@ -546,33 +566,65 @@ Output : None
 Description : Create text file in SD card. The filename is last 8 digit of HN (Limitation of FATFS)
               Start of textfile has Profile setting.
 */
-void Create_file(char Hospital_Number[], uint8_t File_Type)
+void Create_file(char Hospital_Number[])
 {
   //ret = f_mount(0, &filesystem);
   /* crate text file that have 8 last digit form Hospital Number(HN) */
   for (int i = 0; i < 8; i++)
   {
-    HospitalNumber_File[i] = Hospital_Number[i+5];
+    cHospitalNumber_File[i] = Hospital_Number[i+5];
   }
-  HospitalNumber_File[8] = '.';
-  HospitalNumber_File[9] = 'T';
-  HospitalNumber_File[10] = 'X';
-  HospitalNumber_File[11] = 'T';
-  HospitalNumber_File[12] = '\0';
+  cHospitalNumber_File[8] = '.';
+  cHospitalNumber_File[9] = 'T';
+  cHospitalNumber_File[10] = 'X';
+  cHospitalNumber_File[11] = 'T';
+  cHospitalNumber_File[12] = '\0';
     
-  /* Convert int to String with function : ConvertToString */
-  char cSpO2_Minimum[3] = ConvertToString(SProfile.uiSpO2_Minimum); 
-  char cSpO2_Maximum[3] = ConvertToString(SProfile.uiSpO2_Maximum);
-  char cFiO2_Minimum[3] = ConvertToString(SProfile.uiFiO2_Minimum);
-  char cFiO2_Maximum[3] = ConvertToString(SProfile.uiFiO2_Maximum);
-  char cPrefered_FiO2[3] = ConvertToString(SProfile.uiPrefered_FiO2);
-  char cRespondsTime[3] = ConvertToString(SProfile.uiRespondsTime);
-  char cAlarm_Level1[3] = ConvertToString(SProfile.uiAlarm_Level1);
-  char cAlarm_Level2[3] = ConvertToString(SProfile.uiAlarm_Level2);
+  /* Convert int to String */
+  char cSpO2_Minimum[3]; 
+  char cSpO2_Maximum[3];
+  char cFiO2_Minimum[3];
+  char cFiO2_Maximum[3];
+  char cPrefered_FiO2[3];
+  char cRespondsTime[3];
+  char cAlarm_Level1[3];
+  char cAlarm_Level2[3];
 
-    
+  cSpO2_Minimum[0] = '0' + (SProfile.uiSpO2_Minimum / 100); 
+  cSpO2_Minimum[1] = '0' + ((SProfile.uiSpO2_Minimum % 100)/10); 
+  cSpO2_Minimum[2] = '0' + ((SProfile.uiSpO2_Minimum % 10)/1);
+
+  cSpO2_Maximum[0] = '0' + (SProfile.uiSpO2_Maximum / 100);
+  cSpO2_Maximum[1] = '0' + ((SProfile.uiSpO2_Maximum % 100)/10);
+  cSpO2_Maximum[2] = '0' + ((SProfile.uiSpO2_Maximum % 10)/1);
+ 
+  cFiO2_Minimum[0] = '0' + (SProfile.uiFiO2_Minimum / 100);
+  cFiO2_Minimum[1] = '0' + ((SProfile.uiFiO2_Minimum % 100)/10);
+  cFiO2_Minimum[2] = '0' + ((SProfile.uiFiO2_Minimum % 10)/1);
+
+  cFiO2_Maximum[0] = '0' + (SProfile.uiFiO2_Maximum / 100);
+  cFiO2_Maximum[1] = '0' + ((SProfile.uiFiO2_Maximum % 100)/10);
+  cFiO2_Maximum[2] = '0' + ((SProfile.uiFiO2_Maximum % 10)/1);
+
+
+  cPrefered_FiO2[0] = '0' + (SProfile.uiPrefered_FiO2 / 100);
+  cPrefered_FiO2[1] = '0' + ((SProfile.uiPrefered_FiO2 % 100) / 10);
+  cPrefered_FiO2[2] = '0' + ((SProfile.uiPrefered_FiO2 % 10) / 1);
+
+  cRespondsTime[0] = '0' + (SProfile.uiRespondsTime / 100);
+  cRespondsTime[1] = '0' + ((SProfile.uiRespondsTime % 100) / 10);
+  cRespondsTime[2] = '0' + ((SProfile.uiRespondsTime % 10) / 1);
+
+  cAlarm_Level1[0] = '0' + (SProfile.uiAlarm_Level1 / 100);
+  cAlarm_Level1[1] = '0' + ((SProfile.uiAlarm_Level1 % 100)/10);
+  cAlarm_Level1[2] = '0' + ((SProfile.uiAlarm_Level1 % 10)/1);
+
+  cAlarm_Level2[0] = '0' + (SProfile.uiAlarm_Level2 / 100);
+  cAlarm_Level2[1] = '0' + ((SProfile.uiAlarm_Level2 % 100)/10);
+  cAlarm_Level2[2] = '0' + ((SProfile.uiAlarm_Level2 % 10)/1);
+
   // Create Oxygen Saturation file
-  ret = f_open(&file, HospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
+  ret = f_open(&file, cHospitalNumber_File, FA_WRITE | FA_CREATE_ALWAYS);
   if (ret) 
   {
     /* ERROR */
@@ -583,7 +635,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     /* Write Header of File and record profile setting */
     ret = f_write(&file, "Hospital Number : ", 20, &bw);
     ret = f_lseek(&file, f_size(&file));
-    ret = f_write(&file, HospitalNumber_File, 13, &bw);
+    ret = f_write(&file, cHospitalNumber_File, 13, &bw);
     ret = f_lseek(&file, f_size(&file));
     ret = f_write(&file, "\r\nProfile Setting\r\n", 19, &bw);
     ret = f_lseek(&file, f_size(&file));
@@ -594,6 +646,10 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     ret = f_write(&file, " %\r\nMaximum SpO2 : ", 19, &bw);
     ret = f_lseek(&file, f_size(&file));
     ret = f_write(&file, cSpO2_Maximum, sizeof(cSpO2_Maximum), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " %\r\nPrepered FiO2 : ", 20, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cPrefered_FiO2, sizeof(cPrefered_FiO2), &bw);
     ret = f_lseek(&file, f_size(&file));
     ret = f_write(&file, " %\r\nMinimum FiO2 : ", 19, &bw);
     ret = f_lseek(&file, f_size(&file));
@@ -615,7 +671,7 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
     ret = f_lseek(&file, f_size(&file));
     ret = f_write(&file, cAlarm_Level2, sizeof(cAlarm_Level2), &bw);
     ret = f_lseek(&file, f_size(&file));
-    ret = f_write(&file, "sec\r\n\r\n", 7, &bw);
+    ret = f_write(&file, " sec\r\n\r\n", 8, &bw);
     ret = f_close(&file);
     if (ret)
     {
@@ -625,55 +681,79 @@ void Create_file(char Hospital_Number[], uint8_t File_Type)
 
 }
 //------------------------------------------------------------------------------
+void Convert_SpO2_InttoString(uint8_t DataInt)
+{
+  cSpO2_SDcard[0] = '0' + (DataInt / 100);
+  cSpO2_SDcard[1] = '0' + ((DataInt % 100)/10);
+  cSpO2_SDcard[2] = '0' + ((DataInt % 10)/1);
+}
+
+//------------------------------------------------------------------------------
+void Convert_FiO2_FloattoString(float FiO2_float)
+{ 
+  cFiO2_SDcard[0] = '0' + (uint32_t)FiO2_float / 100;
+  cFiO2_SDcard[1] = '0' + ((uint32_t)FiO2_float % 100) /10;
+  cFiO2_SDcard[2] = '0' + ((uint32_t)FiO2_float % 10) /1;
+  cFiO2_SDcard[3] = '.';
+  cFiO2_SDcard[4] = '0' + ((uint32_t)FiO2_float * 10) % 10;
+  cFiO2_SDcard[5] = '0' + ((uint32_t)FiO2_float * 100) % 10;
+}
+
+//------------------------------------------------------------------------------
 /*
-Function : ConvertToString
-Input : uint8_t uiDataInt 
-Output : char cConvString[3];
-Description : convert int value to String. The size of String array have 3 Bytes.
+Function : SD_Write
+Input : char cFileName[], char cDataTimeSD[], uint8_t uiSpO2_SD_buffer[], float fFiO2_SD_buffer[]
+        uint8_t uiStatus;
+Output : None
+Description : 
 */
-char ConvertToString (uint8_t uiDataInt)
+void SD_Write(char FileName[], char cDataTimeSD[], uint8_t uiSpO2_SD, float fFiO2_SD, uint8_t uiStatus)
 {
-  char cConvString[3];
+  char cStatus[2];
 
-  cConvString[0] = (uiDataInt/100);
-  cConvString[1] = ((uiDataInt%100)/10);
-  cConvString[2] = ((uiDataInt%10)/1);
+  /* Convert to String */
+  Convert_SpO2_InttoString(uiSpO2_SD);
+  Convert_FiO2_FloattoString(fFiO2_SD);
 
-  return cConvString[3];
-}
-//------------------------------------------------------------------------------
-void Convert_SaO2_InttoString(uint8_t DataInt[])
-{
-  uint8_t i,j;
-  for(i = 0; i < 10; i++)
+  /* check Status */
+  if (uiStatus == STATUS_NORMAL)
   {
-    j = i*5;
-    cSD_String[j] = '0' + (DataInt[i]/100);
-    cSD_String[j+1] = '0' + ((DataInt[i]%100)/10);
-    cSD_String[j+2] = '0' + ((DataInt[i]%10)/1);
-    cSD_String[j+3] = '\r';
-    cSD_String[j+4] = '\n';
+    strcpy(cStatus, "NN");
   }
-}
-
-//------------------------------------------------------------------------------
-void Convert_FiO2_FloattoString(float FiO2_float[], uint8_t Size_Buffer)
-{
-  uint8_t i,j;
-  for(i = 0; i < Size_Buffer; i++)
+  else if (uiStatus == STATUS_SpO2_BELOW_L1)
   {
-    j = i*5;
-    cFiO2_Buffer_String[j] = '0'+(uint32_t)FiO2_float[i]/100;
-    cFiO2_Buffer_String[j+1] = '0'+((uint32_t)FiO2_float[i]%100)/10;
-    cFiO2_Buffer_String[j+2] = '0'+((uint32_t)FiO2_float[i]%10)/1;
-    cFiO2_Buffer_String[j+3] = '\r';
-    cFiO2_Buffer_String[j+4] = '\n';
+    strcpy(cStatus, "L1");
   }
-}
+  else if (uiStatus == STATUS_SpO2_BELOW_L2)
+  {
+    strcpy(cStatus, "L2");
+  }
+  else if (uiStatus == STATUS_SpO2_BEHIGH_L1)
+  {
+    strcpy(cStatus, "H1");
+  }
+  else if (uiStatus == STATUS_SpO2_BEHIGH_L2)
+  {
+    strcpy(cStatus, "H2");
+  }
+  else if (uiStatus == STATUS_ALARM)
+  {
+    strcpy(cStatus, "AA");
+  }
+  else if (uiStatus == STATUS_MIDDLE_SpO2_BELOW)
+  {
+    strcpy(cStatus, "ML");
+  }
+  else if (uiStatus == STATUS_MIDDLE_SpO2_BEHIGH)
+  {
+    strcpy(cStatus, "MH");
+  }
+  else if (uiStatus == STATUS_MIDDLE_SpO2)
+  {
+    strcpy(cStatus, "MM");
+  }
 
-//------------------------------------------------------------------------------
-void SD_Write(char FileName[], char SD_Data[], unsigned int Data_size)
-{
+  /* Start write data to SD card*/
   ret = f_open(&file, FileName, FA_WRITE);
   if (ret) 
   {
@@ -681,8 +761,22 @@ void SD_Write(char FileName[], char SD_Data[], unsigned int Data_size)
   } 
   else 
   {
-    ret = f_lseek (&file,f_size(&file));
-    ret = f_write(&file, SD_Data, Data_size, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cDataTimeSD, 17, &bw);     // DataTime
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " SpO2 = ", 8, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cSpO2_SDcard, sizeof(cSpO2_SDcard), &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " % FiO2 = ", 10, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cFiO2_SDcard, sizeof(cFiO2_SDcard), &bw); //FiO2
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, " % STATUS = ", 12, &bw);
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, cStatus, 2, &bw);   //Status
+    ret = f_lseek(&file, f_size(&file));
+    ret = f_write(&file, "\r\n", 2, &bw);
     ret = f_close(&file);
   }  
 }

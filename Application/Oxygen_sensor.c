@@ -19,10 +19,11 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 // Define Variable -------------------------------------------------------------
 volatile uint16_t  time = 0;
 float fFiO2_Upper, fFiO2_Lower;
-float fFiO2_Percent;
+
 float fADC_Voltage;
 
-float fFiO2_Buffer[10];
+extern float fFiO2_Percent;
+extern float fFiO2_Buffer[10];
 
 uint16_t uiADC_Value;
 
@@ -191,7 +192,7 @@ void timer7_setup (void)
   Function: Oxygen_convert
   Input : None
   Return: float fADC_Voltage
-  Description: Start ADC Voltage form Oxygen Sensor and calculate Hexdicimal to Voltage_Valve
+  Description: Start ADC (Voltage value) form Oxygen Sensor and calculate Hexdicimal to Voltage_Valve
 */
 float Oxygen_convert(void)
 {
@@ -383,7 +384,7 @@ void TIM6_DAC_IRQHandler(void)
   Function: Convert_FiO2
   Input: float FiO2_ADC
   return: float fFiO2_Percent
-  Description: Convert Voltage of FiO2 to Percent of FiO2 and Show on LCD Display
+  Description: Convert FiO2 voltage to FiO2 percentage and Show on LCD Display
 */
 float Convert_FiO2 (float fFiO2_ADC)
 {

@@ -24,6 +24,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 */
 //------------------------------------------------------------------------------
 #include "main.h"
+#include "DefinePin.h"
 #include "Oxygen_Pulse_Meter.h"
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
@@ -35,50 +36,54 @@ uint8_t uiSD_Card_index = 0;
 uint8_t uiRx_index_OPM = 0;
 uint8_t uiOxygenSat_buffer[10];                                                 // Oxygen Saturation Buffer for Store Data to SD Card
 
+char cDateTime[17][3];                                                          // create array 2D for stroe Date and time
 bool bReadCorrect = false; 
+
+extern uint8_t uiSpO2_SDcard_buffer[3];
 //------------------------------------------------------------------------------
 /*
   Function : Oxygen_PM_Setup
   Input : None
   Return : None
   Description : Setup driver for connecting Oxygen Pulse Meter with USART
-                Set Baud rate 9600
-                Format 8-N-1
+                Set Baud rate 9600, 8-N-1
+                Enable Rx communication ONLY
                 Enable Rx_interrupt
 */
-void Oxygen_PM_Setup(void)
+void usart_OPM_setup(void)
 {
   //Set Up USART
   GPIO_InitTypeDef GPIO_InitStruct;
   USART_InitTypeDef USART_InitStruct;
 	
-  RCC_APB2PeriphClockCmd(OPM_USART_CLK, ENABLE);
-  RCC_AHB1PeriphClockCmd(OPM_Port_CLK, ENABLE);
-  /* Connect PXx to USARTx_Tx*/
-  GPIO_PinAFConfig(OPM_Port, OPM_TX_Souce, OPM_TX_AF);
-  /* Connect PXx to USARTx_Rx*/
-  GPIO_PinAFConfig(OPM_Port, OPM_RX_Souce, OPM_RX_AF);
+  RCC_APB2PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	
   /*
     Use Port A Pin PA2 to Tx
     Use Port A Pin PA3 to Rx
   */
   /* set GPIO init structure parameters values */
-  GPIO_InitStruct.GPIO_Pin  = OPM_TX_Pin | OPM_RX_Pin;
+  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_8 | GPIO_Pin_9;
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(OPM_Port, &GPIO_InitStruct);
+  GPIO_Init(GPIOD, &GPIO_InitStruct);
+  
+   /* Connect PXx to USARTx_Tx*/
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_USART3);
+  /* Connect PXx to USARTx_Rx*/
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_USART3);
   
   /* USART_InitStruct members default value */
   USART_InitStruct.USART_BaudRate = 9600;
   USART_InitStruct.USART_WordLength = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits = USART_StopBits_1;
   USART_InitStruct.USART_Parity = USART_Parity_No ;
-  USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  USART_InitStruct.USART_Mode = USART_Mode_Rx;
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
-  USART_Init(OPM_USART, &USART_InitStruct);
+  USART_Init(USART3, &USART_InitStruct);
   
   /*USART Interrupt*/
   /* Set interrupt: NVIC_Setup */
@@ -93,12 +98,12 @@ void Oxygen_PM_Setup(void)
 
   /* Set Interrupt Mode*/
   //ENABLE the USART Receive Interrupt
-  USART_ITConfig(OPM_USART, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
   //DISABLE the USART Transmit and Receive Interrupt
-  USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);
+  USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
   
-  //DIsable OPM_USART (USART6)
-  USART_Cmd(OPM_USART, ENABLE);
+  //DIsable OPM_USART (USART3)
+  USART_Cmd(USART3, DISABLE);
 
   //Set Up Timer 4
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -119,7 +124,7 @@ void Oxygen_PM_Setup(void)
     Timer Prescale 4200
   */
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 5000;            
+  TIM_TimeBaseStructure.TIM_Period = 1000;            
   TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 42 MHz Clock down to 1 kHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -138,17 +143,17 @@ void Oxygen_PM_Setup(void)
   Description : Interrupt Service Routine from OPM_USART
                 Enable IT source : USART_IT_RXNE
 */
-void OPM_IRQHandler(void)
+void USART3_IRQHandler(void)
 {
   if(USART_GetITStatus(OPM_USART, USART_IT_RXNE) != RESET)
   {
     if (uiRx_index_OPM == 0)
     {
       //Start Receive Data from Oxygen Pulse Meter
-      TIM_Cmd(TIM4, ENABLE);
+      TIM_Cmd(TIM4, DISABLE);
     }
-    ucDataFromOPM[uiRx_index_OPM++] = USART_ReceiveData(OPM_USART);
-  
+    ucDataFromOPM[uiRx_index_OPM] = USART_ReceiveData(OPM_USART);
+    uiRx_index_OPM = uiRx_index_OPM + 1;
     if(uiRx_index_OPM == (sizeof(ucDataFromOPM)))
     {  
       TIM_Cmd(TIM4, DISABLE);
@@ -156,7 +161,7 @@ void OPM_IRQHandler(void)
       uiCurrent_SpO2 = Get_OxygenSat();
       if(bReadCorrect == true)
       {
-        uiOxygenSat_buffer[uiSD_Card_index] = uiCurrent_SpO2;
+        uiSpO2_SDcard_buffer[uiSD_Card_index] = uiCurrent_SpO2;
         uiSD_Card_index++;
       }
     }
@@ -199,12 +204,17 @@ int Get_OxygenSat(void)
     uiOxygenSat_Percent = atoi(cOxygenSat_string);                              // atoi is function convert from String to Int 
     uiCurrent_SpO2 = uiOxygenSat_Percent;
     
+    /* Transfer data and time from Oxygen Pulse Meter to Buffer*/
+    for (uint8_t uiIndexTime = 0; uiIndexTime < 17; uiIndexTime++)
+    {
+      cDateTime[uiIndexTime][uiSD_Card_index] = ucDataFromOPM[uiIndexTime];
+    }
+    
     bReadCorrect = true;                                                        // Clear data in Buffer
   }
   else
   {
     /* Case :  Read Error */
-    printf("ucDataFromOPM is incorrect\n\r");
     clear_OPM_buffer();
     uiOxygenSat_Percent = '\0';
     uiCurrent_SpO2 = uiOxygenSat_Percent;

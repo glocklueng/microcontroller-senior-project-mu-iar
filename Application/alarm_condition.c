@@ -105,7 +105,7 @@ void TIM2_IRQHandler(void)
       {
         GPIO_SetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
         uiCurrent_Status = STATUS_ALARM;
-        USART_Cmd(OPM_USART, DISABLE);                                          // ENABLE Oxygen Pulse Meter USART
+        USART_Cmd(OPM_USART, ENABLE);                                          // ENABLE Oxygen Pulse Meter USART
         TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
         TIM_Cmd(TIM3, DISABLE);
       
