@@ -10,7 +10,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "main.h"
 #include <stdlib.h>
 // Function --------------------------------------------------------------------
-void Oxygen_PM_Setup(void);
+void usart_OPM_setup(void);
 //int fputc(int ch, FILE *f);
 int Get_OxygenSat(void);
 void clear_OPM_buffer(void);

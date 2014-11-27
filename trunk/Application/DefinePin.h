@@ -38,7 +38,6 @@ Credit:
 
 #define  OPM_USART							USART3
 #define  OPM_USART_CLK					RCC_APB1Periph_USART3
-#define  OPM_UART_CLK_INIT			RCC_APB1PeriphClockCmd
 #define  OPM_IRQn								USART3_IRQn
 #define  OPM_IRQHandler					USART3_IRQHandler
 #define  OPM_Port								GPIOD

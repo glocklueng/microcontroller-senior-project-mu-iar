@@ -22,8 +22,8 @@ void fault_err (FRESULT rc);
 
 void Check_Mount(void);
 static void Delay(__IO uint32_t nCount);
-void Create_file(char FileName[], uint8_t File_Type);
-void SD_Write(char FileName[], char SD_Data[], UINT Data_size);
+void Create_file(char FileName[]);
+void SD_Write(char FileName[], char cDataTimeSD[], uint8_t uiSpO2_SD, float fFiO2_SD, uint8_t uiStatus);
 //------------------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

@@ -63,7 +63,7 @@ uint8_t tx_index_GUI=0;
 static uint8_t suiData_GUI[28];
 
 extern char cSD_String[50];
-extern char HospitalNumber_File[13];
+extern char cHospitalNumber_File[13];
 
 extern char Buffer[128];
 
@@ -293,7 +293,7 @@ void GUI_IRQHandler (void)
         else if (suiData_GUI[1] == kRead_Command)
         {
           /* find profile Record */
-          ret = f_open(&file_O, HospitalNumber_File, FA_READ);
+          ret = f_open(&file_O, cHospitalNumber_File, FA_READ);
 //        if (ret) 
 //        {
 //          printf("2222222F.TXT file error\n\r");

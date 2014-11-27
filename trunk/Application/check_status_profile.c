@@ -59,12 +59,12 @@ uint8_t check_status(uint8_t uiCurrent_SpO2)
 
 			/* Updata Text on LCD*/
 			lcdString(1,5,"Status: Below ");
-		lcdString(1,6,"Alarm Level 1");
-
-		uiPurpose_FiO2 = uiPurpose_FiO2 + 4;                                      // increase FiO2 more than present 4 percent
-
-		Time_AlarmLevel = 0;
-		alarm_timer(TIMER_ENABLE);                                           
+			lcdString(1,6,"Alarm Level 1");
+	
+			uiPurpose_FiO2 = uiPurpose_FiO2 + 4;                                      // increase FiO2 more than present 4 percent
+	
+			Time_AlarmLevel = 0;
+			alarm_timer(TIMER_ENABLE);                                           
 		}
 
 		/* Check Limit of FiO2 */
@@ -80,18 +80,18 @@ uint8_t check_status(uint8_t uiCurrent_SpO2)
 	if (uiCurrent_SpO2 > (SProfile.uiSpO2_Maximum + 3))
 	{
 		/* Current Oxygen Saturation more than maximum Oxygen Saturation */
-			if (uiCurrent_Status != STATUS_SpO2_BEHIGH_L2)
+		if (uiCurrent_Status != STATUS_SpO2_BEHIGH_L2)
 		{
 			/* Update Status */
 			uiCurrent_Status = STATUS_SpO2_BEHIGH_L2;
 			/* Update Text on LCD*/
 			lcdString(1,5,"Status: Behigh ");
-		lcdString(1,6,"Alarm Level 2");
+			lcdString(1,6,"Alarm Level 2");
 
-		uiPurpose_FiO2 = uiPurpose_FiO2 - 6;                                      // decrese FiO2 more than present 6 percent
+			uiPurpose_FiO2 = uiPurpose_FiO2 - 6;                                      // decrese FiO2 more than present 6 percent
 
-		Time_AlarmLevel = 0;
-		alarm_timer(TIMER_ENABLE);
+			Time_AlarmLevel = 0;
+			alarm_timer(TIMER_ENABLE);
 		}
 		
 		/* Check Limit of FiO2 */
@@ -111,12 +111,12 @@ uint8_t check_status(uint8_t uiCurrent_SpO2)
 
 			/* Updata Text on LCD*/
 			lcdString(1,5,"Status: Behigh ");
-		lcdString(1,6,"Alarm Level 1");
+			lcdString(1,6,"Alarm Level 1");
 
-		uiPurpose_FiO2 = uiPurpose_FiO2 - 4;                                      // decrease FiO2 more than present 4 percent
-		  
-		Time_AlarmLevel = 0;
-		alarm_timer(TIMER_ENABLE);
+			uiPurpose_FiO2 = uiPurpose_FiO2 - 4;                                      // decrease FiO2 more than present 4 percent
+			  
+			Time_AlarmLevel = 0;
+			alarm_timer(TIMER_ENABLE);
 	  }
 		
 		/* Check Limit of FiO2 */
@@ -139,7 +139,7 @@ uint8_t check_status(uint8_t uiCurrent_SpO2)
 		{
 			/* Update Status*/
 			uiCurrent_Status = STATUS_MIDDLE_SpO2_BELOW;
-		uiPurpose_FiO2 = uiPurpose_FiO2 + 2;                                    // increase FiO2 more than present 2 percent
+			uiPurpose_FiO2 = uiPurpose_FiO2 + 2;                                    // increase FiO2 more than present 2 percent
 		  
 		if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
 		{
