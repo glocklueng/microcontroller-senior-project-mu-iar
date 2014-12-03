@@ -215,6 +215,42 @@ void Alarm_Timer_SetUp (void)
   /* TIM2 ALARM_DISABLE counter */
   TIM_Cmd(TIM2, DISABLE);
 }
+//------------------------------------------------------------------------------
+/*
+Function : timer4_setup
+Input : None
+Output : None
+Description : Timer 4 use timing receiving data from Oxygen Pulse Meter.
+*/
+void timer4_setup(void)
+{
+  /* Set Up Timer 4 */
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+  
+   /* TIM4 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+  
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 1000;                                      // setting overflow every 0.5 second
+  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+  
+  /* Enable the TIM4 Gloabal Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+ 
+  /* TIM IT enable */
+  TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+  
+  /* TIM2 ALARM_DISABLE counter */
+  TIM_Cmd(TIM4, DISABLE);
+}
 // End of File -------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University

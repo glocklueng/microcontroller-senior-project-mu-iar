@@ -61,8 +61,8 @@ unsigned char msg ;
 char Character;
 uint32_t count;
 uint8_t uiSD_Test[50];
-uint8_t uiIndex_SD_buffer;                                                       // uiIndex_SD_buffer variable for checking data in buffer
-uint8_t index = 0;                                                                  //for count receving Data form Hyperterminal for controling Drive Circuit
+uint8_t uiIndex_SD_buffer;                                                      // uiIndex_SD_buffer variable for checking data in buffer
+uint8_t index = 0;                                                              //for count receving Data form Hyperterminal for controling Drive Circuit
 char cDataFromOPM_TEST[3];
 
 float FiO2_Current;
@@ -111,7 +111,7 @@ int main()
   {    
     if (SProfile.uiProfile_Status == PROFILE_JUST_UPLOAD)
     {
-      USART_Cmd(USART3, ENABLE);                                             // ENABLE Oxygen Pulse Meter USART
+      USART_Cmd(USART3, ENABLE);                                                // ENABLE Oxygen Pulse Meter USART
       Create_file(SProfile.cHospital_Number);                                   // Create textfile
       SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
 //      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
@@ -132,7 +132,7 @@ int main()
     }
     else if (SProfile.uiProfile_Status == PROFILE_NOTUPLOAD)
     {
-      USART_Cmd(USART3, DISABLE);                                            // DISABLE Oxygen Pulse Meter USART
+      USART_Cmd(USART3, DISABLE);                                               // DISABLE Oxygen Pulse Meter USART
       SentData_DAC(0x00,3);                                                     // Close air and oxygen valve
     }
 
@@ -171,7 +171,7 @@ void delay(void)
     for(j=0;j<500;j++);
   }
 }
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /*
   Function : System_Init
   Input: None
@@ -201,6 +201,8 @@ static void system_init(void)
   Timer6_SetUp();
   timer7_setup();                                                               // Timer7 use count for setting sampling rate 10 Hz
   FiO2_Check_Timer_Config();                                                    //Timer 3 will get ADC of FiO2 every 1 sec.
+  
+  timer4_setup();
   
   //Alarm Timer Setup
   Alarm_Timer_SetUp();
@@ -240,81 +242,6 @@ static void system_init(void)
     &USR_cb);
 }
 
-//----------------- GPIO Interrupt Service Routine -----------------------------
-//Button Down IRQHandler -------------------------------------------------------
-//void Button_Down_IRQHandler(void)
-//{
-//  if(EXTI_GetITStatus(Button_Down_EXTI_Line) != RESET)
-//  {
-//    uiDrive_FiO2 = uiDrive_FiO2 - 5;
-//    FiO2_Range(uiDrive_FiO2);
-//    
-//    delay_ms(80);
-//    /* Clear the EXTI line pending bit */
-//    EXTI_ClearITPendingBit(Button_Down_EXTI_Line);
-//  }
-//}
-
-
-// Button Up IRQHandler --------------------------------------------------------
-//void Button_Up_IRQHandler(void)
-//{
-//  if (EXTI_GetITStatus(Button_Up_EXTI_Line) != RESET)
-//  {
-//    uiDrive_FiO2 = uiDrive_FiO2 + 5;
-//    FiO2_Range(uiDrive_FiO2);
-//    
-//    delay_ms(80);
-//    /* Clear the EXTI line pending bit */
-//    EXTI_ClearITPendingBit(Button_Up_EXTI_Line);
-//  }
-//}
-
-// Run Button IRQHandler -------------------------------------------------------
-void Run_Button_IRQHandler(void)
-{
-  if (EXTI_GetITStatus(Run_Button_EXTI_Line) != RESET)
-  {
-    if (SProfile.uiProfile_Status == PROFILE_SETTING_COMPLETE)
-    {
-      SProfile.uiProfile_Status = RUN_BUTTON_SET;
-      USART_Cmd(OPM_USART, ENABLE); 
-      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-      TIM_Cmd(TIM3, ENABLE);
-      FiO2_Range(SProfile.uiPrefered_FiO2);
-    }
-    else if (SProfile.uiProfile_Status == RUN_BUTTON_SET)
-    {
-      SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
-      USART_Cmd(OPM_USART, ENABLE);    
-      TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
-      TIM_Cmd(TIM3, DISABLE);
-      alarm_timer(TIMER_DISABLE);
-      FiO2_Range(21);
-      SentData_DAC(0, Oxygen_Valve);
-      SentData_DAC(0, Air_Valve);
-    }
-    delay_ms(80);
-    /* Clear the EXTI line pending bit */
-    EXTI_ClearITPendingBit(Run_Button_EXTI_Line);
-  }
-}
-
-// Alarm Button IRQHandler -----------------------------------------------------
-//void Alarm_Button_IRQHandler(void)
-//{
-//  if (EXTI_GetITStatus(Alarm_Button_EXTI_Line) != RESET)
-//  {
-//    lcdClear();
-//    lcdUpdate();
-//    
-//    Button_Up_Down_Init();                                                      // Config Button Up and down with Interrupt Vector
-//    
-//    delay_ms(60);
-//    /* Clear the EXTI line pending bit */
-//    EXTI_ClearITPendingBit(Alarm_Button_EXTI_Line);
-//  }
-//}
 //------------------------------------------------------------------------------
 /*
   Function : TIM3_IRQHandler
@@ -331,13 +258,14 @@ void TIM3_IRQHandler (void)
   {
     /* Sampling 10 Hz */
     TIM_Cmd(TIM7, ENABLE);
+    /* wait unit 10 ms */
     while(index < 10)
     {
       fFiO2_avg = 0;
-      // Set ADC every 10 ms
+      /* Set ADC every 10 ms */
       if(TIM_GetFlagStatus(TIM7, TIM_FLAG_Update) != RESET)
       {
-        fFiO2_Buffer[index] = Oxygen_convert();                                   // Function :Oxygen_convert return voltage value from ADC to fFiO2_Buffer
+        fFiO2_Buffer[index] = Oxygen_convert();                                 // Function :Oxygen_convert return voltage value from ADC to fFiO2_Buffer
         index++;
         TIM_ClearFlag(TIM7, TIM_FLAG_Update);
       }
@@ -352,8 +280,8 @@ void TIM3_IRQHandler (void)
     {
       fFiO2_avg = fFiO2_avg + fFiO2_Buffer[index_buffer];
     }
-    fFiO2_avg = fFiO2_avg/10.0;                                              // Avarage fFiO2 value
-    fFiO2_SDcard_buffer[uiSD_Card_index]  = Convert_FiO2(fFiO2_avg);         // Converting voltage value to FiO2 percentage
+    fFiO2_avg = fFiO2_avg/10.0;                                                 // Avarage fFiO2 value
+    fFiO2_SDcard_buffer[uiSD_Card_index]  = Convert_FiO2(fFiO2_avg);            // Converting voltage value to FiO2 percentage
     
     /* Clear Buffer */
     for(uint8_t index_buffer = 0; index_buffer < 10; index_buffer++)
@@ -371,6 +299,7 @@ void TIM3_IRQHandler (void)
   @ Input : None
   @ Return: None
   Description : Configuration of USART3 for simulating Oxygen Pulse Meter
+                Baud rate 9600, 8-N-1, Enable Rx only, Enable Rx interrupt
 */
 //------------------------------------------------------------------------------
 void USART_HyperTermianl_Connect(void)
@@ -681,6 +610,12 @@ void Create_file(char Hospital_Number[])
 
 }
 //------------------------------------------------------------------------------
+/*
+Function : Convert_SpO2_IntiString
+Input : uint8_ DataInt
+Output : None
+Description : Convert unsigned int 8 bit SpO2 to String 3 Bytes in cSpO2_SDcard variable for writing to SDcard.
+*/
 void Convert_SpO2_InttoString(uint8_t DataInt)
 {
   cSpO2_SDcard[0] = '0' + (DataInt / 100);
@@ -689,6 +624,12 @@ void Convert_SpO2_InttoString(uint8_t DataInt)
 }
 
 //------------------------------------------------------------------------------
+/*
+Function : Convert_FiO2_FloattoString 
+Input : float FiO2_float
+Output : None
+Description : Convert FiO2 in float variable to String cFiO2_SDcard 5 bytes (2 digit decimal).
+*/
 void Convert_FiO2_FloattoString(float FiO2_float)
 { 
   cFiO2_SDcard[0] = '0' + (uint32_t)FiO2_float / 100;
