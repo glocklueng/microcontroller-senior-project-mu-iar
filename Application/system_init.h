@@ -18,6 +18,7 @@ void EXTILine0_Config(void);
 void Button_EXTI_Config (void);
 void Button_Up_Down_Init(void);
 void Alarm_Timer_SetUp(void);
+void timer4_setup(void);
 
 // End of File -------------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------

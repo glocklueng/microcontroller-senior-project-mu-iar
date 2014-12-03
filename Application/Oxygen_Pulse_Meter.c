@@ -21,6 +21,8 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
     uint8_t uiSD_Card_index
     uint8_t uiRx_index_OPM
     uint8_t uiOxygenSat_buffer[10]
+    char cDataTime[17][3] : Store the date and time (lenght 17 Bytes per a time)
+    bool bReadCorrect : boolean in case of Read data from Oxygen Pulse Meter correct or incorrect ?
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -87,52 +89,22 @@ void usart_OPM_setup(void)
   
   /*USART Interrupt*/
   /* Set interrupt: NVIC_Setup */
-  //Data form Oxygen Pulse Meter : Priority 5
+  //Data form Oxygen Pulse Meter : Priority 0
   NVIC_InitTypeDef NVIC_InitStruct;
   //ENABLE USART2 Interruper
   NVIC_InitStruct.NVIC_IRQChannel = OPM_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 5;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannel = ENABLE;
   NVIC_Init(&NVIC_InitStruct);
 
   /* Set Interrupt Mode*/
-  //ENABLE the USART Receive Interrupt
-  USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-  //DISABLE the USART Transmit and Receive Interrupt
-  USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
+  USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);                                // ENABLE the USART Receive Interrupt
+
+  USART_ITConfig(USART3, USART_IT_TXE, DISABLE);                                // DISABLE the USART Transmit  Interrupt
   
-  //DIsable OPM_USART (USART3)
+  /* Disable OPM_USART (USART3) */
   USART_Cmd(USART3, DISABLE);
-
-  //Set Up Timer 4
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  NVIC_InitTypeDef NVIC_InitStructure;
-  //Enable Clock Timer4
-  RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM4, ENABLE);
-
-  /* Enable the TIM4 gloabal Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-   
-  /*
-    Pre-Scale : APB1 Prescale 4
-    System Clock 168MHz /4 = 42 MHz
-    Timer Prescale 4200
-  */
-  /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 1000;            
-  TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 42 MHz Clock down to 1 kHz (adjust per your clock)
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-  /* TIM IT enable */
-  TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
-  /* TIM4 enable counter */
-  TIM_Cmd(TIM4, DISABLE);
 }
 
 //USART_IRQHandler -------------------------------------------------------------
@@ -149,31 +121,30 @@ void USART3_IRQHandler(void)
   {
     if (uiRx_index_OPM == 0)
     {
-      //Start Receive Data from Oxygen Pulse Meter
-      TIM_Cmd(TIM4, DISABLE);
+      /* Start Receive Data from Oxygen Pulse Meter and 
+      Enable Timer 4 for timimg in receive SpO2 from Oxygen Pulse Meter */
+      TIM_Cmd(TIM4, ENABLE);                                                    // Enable Timer 4
     }
+    
     ucDataFromOPM[uiRx_index_OPM] = USART_ReceiveData(OPM_USART);
     uiRx_index_OPM = uiRx_index_OPM + 1;
+    
     if(uiRx_index_OPM == (sizeof(ucDataFromOPM)))
     {  
-      TIM_Cmd(TIM4, DISABLE);
+      TIM_Cmd(TIM4, DISABLE);                                                   // Disable Timer 4
+      TIM4->CNT = 0;                                                            // Clear counter value
       uiRx_index_OPM = 0;
       uiCurrent_SpO2 = Get_OxygenSat();
       if(bReadCorrect == true)
       {
-        uiSpO2_SDcard_buffer[uiSD_Card_index] = uiCurrent_SpO2;
+        uiSpO2_SDcard_buffer[uiSD_Card_index] = uiCurrent_SpO2;                 // Store SpO2 in Buffer
         uiSD_Card_index++;
       }
     }
   }
-  if(USART_GetITStatus(OPM_USART, USART_IT_TXE) != RESET)
-  {
-    USART_ITConfig(OPM_USART, USART_IT_TXE, DISABLE);                                   // Disable USART_IT_TXE flag
-    USART_ClearITPendingBit(OPM_USART, USART_IT_TXE);                                   // Clear  USART_IT_TXE flag
-  }
   USART_ClearITPendingBit(OPM_USART, USART_IT_RXNE);
 }
-//--------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /*
   Function : Get_OxygenSat
   Input : None
@@ -210,7 +181,7 @@ int Get_OxygenSat(void)
       cDateTime[uiIndexTime][uiSD_Card_index] = ucDataFromOPM[uiIndexTime];
     }
     
-    bReadCorrect = true;                                                        // Clear data in Buffer
+    bReadCorrect = true;
   }
   else
   {
@@ -218,44 +189,47 @@ int Get_OxygenSat(void)
     clear_OPM_buffer();
     uiOxygenSat_Percent = '\0';
     uiCurrent_SpO2 = uiOxygenSat_Percent;
+    bReadCorrect = false;
   }
   
   return uiOxygenSat_Percent;
 }
 //------------------------------------------------------------------------------
 /*
-Function : clear_OPM_buffer
-Input : none
-Output : none
-Description : Clear data in ucDataFromOPM Buffer in case of incorrect.
+  Function : clear_OPM_buffer
+  Input : none
+  Output : none
+  Description : Clear data in ucDataFromOPM Buffer in case of incorrect.
 */
 void clear_OPM_buffer(void)
 {
   uint8_t uiIndex_OPM_buffer = 0;
   /*Clear data in Buffer*/
-  for (uiIndex_OPM_buffer = 0; uiIndex_OPM_buffer < (sizeof(ucDataFromOPM) - 1); uiIndex_OPM_buffer++)
+  for (uiIndex_OPM_buffer = 0; uiIndex_OPM_buffer < (sizeof(ucDataFromOPM)); uiIndex_OPM_buffer++)
   {
     ucDataFromOPM[uiIndex_OPM_buffer] = '\0';
   }
   uiRx_index_OPM = 0;
 }
-//------------------------------------------------------------------------------------
-/* Timer 4 Check Timer Out of Receving data from Oxygen Pulse Meter? */
+//------------------------------------------------------------------------------
+/* 
+  Function : TIM4_IRQHandler
+  Input : None (Timer 4 Interrupt)
+  Output : None
+  Description : Timer 4 overflow of Receving data from Oxygen Pulse Meter ? 
+                clear ucDataFromOPM buffer and reset uiRx_index_OPM.
+*/
 void TIM4_IRQHandler (void)
 {
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
   {
-    uint8_t uiRx_index_OPM = 0;
-    //Clear Buffer Data from Oxygen Pulse Meter (OPM)
-    for (uiRx_index_OPM = 0; uiRx_index_OPM < (sizeof(ucDataFromOPM) - 1); uiRx_index_OPM++)
-    {
-      ucDataFromOPM[uiRx_index_OPM] = '\0';
-    }
-    TIM_Cmd(TIM4, DISABLE);                                                     //Diable Timer4
-    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+    /* Clear Buffer Data from Oxygen Pulse Meter (OPM) */
+    clear_OPM_buffer();                                                         // Clear OPM Buffer
+    uiRx_index_OPM = 0;
+    TIM_Cmd(TIM4, DISABLE);                                                     // Diable Timer4
   }
+  TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 }
-
 //------------------------------------------------------------------------------
 // Function can use printf(); in sent data
 //int fputc(int ch, FILE *f)
@@ -269,8 +243,6 @@ void TIM4_IRQHandler (void)
 //  return ch;
 //}
 //------------------------------------------------------------------------------
-
-
 
 // End of File -----------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------

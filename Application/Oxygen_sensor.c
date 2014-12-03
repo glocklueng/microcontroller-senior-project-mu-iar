@@ -33,7 +33,7 @@ uint16_t uiADC_Value;
   Funciton : OxygenSensor_Config
   @ Input : None
   @ Return : None
-  Description : Configuration ADC for FiO2, Resolution 10-bits
+  Description : Configuration ADC for FiO2, Resolution 10-bits, disable scan mode
 */
 void OxygenSensor_Config(void)
 {
@@ -81,10 +81,9 @@ void OxygenSensor_Config(void)
   ADC_CommonInitStruct.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
   ADC_CommonInit(&ADC_CommonInitStruct);
   
-  ADC_RegularChannelConfig(OxygenSensor, ADC_Channel_3, 1,ADC_SampleTime_28Cycles);
+  ADC_RegularChannelConfig(OxygenSensor, ADC_Channel_3, 1,ADC_SampleTime_3Cycles);
   
-  //Enable OxygenSensor
-  ADC_Cmd(OxygenSensor, ENABLE);
+  ADC_Cmd(OxygenSensor, ENABLE);                                                // Enable ADC Oxygen sensor
 }
 //------------------------------------------------------------------------------
 /*
@@ -143,7 +142,7 @@ void FiO2_Check_Timer_Config(void)
   /* TIM3 clock enable */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 2000;                                       // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Period = 2000;                                      // 1 MHz down to 1 KHz (1 ms)
   TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -176,7 +175,7 @@ void timer7_setup (void)
   /* TIM9 clock enable */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
   /* Time base configuration */
-  TIM_TimeBaseStructure.TIM_Period = 200;                                        // 1 MHz down to 1 KHz (1 ms)
+  TIM_TimeBaseStructure.TIM_Period = 20;                                        
   TIM_TimeBaseStructure.TIM_Prescaler = 42000;                                  // 24 MHz Clock down to 1 MHz (adjust per your clock)
   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -209,10 +208,10 @@ float Oxygen_convert(void)
 
 //------------------------------------------------------------------------------
 /*
-Function : Calibrate_OxygenSensro
-Input : None
-Output : None
-Description : This function use Calibrate the new Oxygen Sensor
+  Function : Calibrate_OxygenSensro
+  Input : None
+  Output : None
+  Description : This function use Calibrate the new Oxygen Sensor
 */
 void Calibrate_OxygenSensor(void)
 {

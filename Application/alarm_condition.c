@@ -160,6 +160,82 @@ void TIM2_IRQHandler(void)
   }
 }
 
+//----------------- GPIO Interrupt Service Routine -----------------------------
+//Button Down IRQHandler -------------------------------------------------------
+//void Button_Down_IRQHandler(void)
+//{
+//  if(EXTI_GetITStatus(Button_Down_EXTI_Line) != RESET)
+//  {
+//    uiDrive_FiO2 = uiDrive_FiO2 - 5;
+//    FiO2_Range(uiDrive_FiO2);
+//    
+//    delay_ms(80);
+//    /* Clear the EXTI line pending bit */
+//    EXTI_ClearITPendingBit(Button_Down_EXTI_Line);
+//  }
+//}
+
+
+// Button Up IRQHandler --------------------------------------------------------
+//void Button_Up_IRQHandler(void)
+//{
+//  if (EXTI_GetITStatus(Button_Up_EXTI_Line) != RESET)
+//  {
+//    uiDrive_FiO2 = uiDrive_FiO2 + 5;
+//    FiO2_Range(uiDrive_FiO2);
+//    
+//    delay_ms(80);
+//    /* Clear the EXTI line pending bit */
+//    EXTI_ClearITPendingBit(Button_Up_EXTI_Line);
+//  }
+//}
+
+// Run Button IRQHandler -------------------------------------------------------
+void Run_Button_IRQHandler(void)
+{
+  if (EXTI_GetITStatus(Run_Button_EXTI_Line) != RESET)
+  {
+    if (SProfile.uiProfile_Status == PROFILE_SETTING_COMPLETE)
+    {
+      SProfile.uiProfile_Status = RUN_BUTTON_SET;
+      USART_Cmd(OPM_USART, ENABLE); 
+      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+      TIM_Cmd(TIM3, ENABLE);
+      FiO2_Range(SProfile.uiPrefered_FiO2);
+    }
+    else if (SProfile.uiProfile_Status == RUN_BUTTON_SET)
+    {
+      SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
+      USART_Cmd(OPM_USART, ENABLE);    
+      TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
+      TIM_Cmd(TIM3, DISABLE);
+      alarm_timer(TIMER_DISABLE);
+      FiO2_Range(21);
+      SentData_DAC(0, Oxygen_Valve);
+      SentData_DAC(0, Air_Valve);
+    }
+    delay_ms(80);
+    /* Clear the EXTI line pending bit */
+    EXTI_ClearITPendingBit(Run_Button_EXTI_Line);
+  }
+}
+
+// Alarm Button IRQHandler -----------------------------------------------------
+//void Alarm_Button_IRQHandler(void)
+//{
+//  if (EXTI_GetITStatus(Alarm_Button_EXTI_Line) != RESET)
+//  {
+//    lcdClear();
+//    lcdUpdate();
+//    
+//    Button_Up_Down_Init();                                                      // Config Button Up and down with Interrupt Vector
+//    
+//    delay_ms(60);
+//    /* Clear the EXTI line pending bit */
+//    EXTI_ClearITPendingBit(Alarm_Button_EXTI_Line);
+//  }
+//}
+
 // End of File -----------------------------------------------------------------
 /*--------------------------------------------------------------------------------------------------
 (C) Copyright 2014, Department of Electrical Engineering, Faculty of Engineering, Mahidol University
