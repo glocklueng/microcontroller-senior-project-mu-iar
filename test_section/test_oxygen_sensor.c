@@ -136,7 +136,7 @@ void usart_OPM_setup(void)
   
   /*ENABLE USART3 Interruper*/
   NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
   NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStruct);

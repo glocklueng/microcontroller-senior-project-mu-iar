@@ -134,7 +134,7 @@ void FiO2_Check_Timer_Config(void)
 
   /* Enable the TIM3 gloabal Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
@@ -167,7 +167,7 @@ void timer7_setup (void)
 
   /* Enable the TIM7 gloabal Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
@@ -355,7 +355,7 @@ void EXTI0_IRQHandler(void)
   if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
   {
     STM_EVAL_LEDOff(LED5);
-    USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);
+    //USART_ITConfig(USART3, USART_IT_RXNE, DISABLE);
     //TestControlValve();
     //Calibrate_OxygenSensor();
     testOxygenSensor();
