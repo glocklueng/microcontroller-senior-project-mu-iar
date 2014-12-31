@@ -77,16 +77,17 @@ uint8_t Sampling_time;
 
 extern uint8_t uiOxygenSat_buffer[10];
 extern uint8_t uiSD_Card_index;
-extern uint8_t uiRx_index_OPM;
 extern uint8_t uiCurrent_SpO2;
-extern uint8_t ucDataFromOPM[174];
+extern uint8_t uiPrevious_SpO2;
 extern float FiO2_DataTest[24];
 extern bool bReadCorrect;
+extern bool bReceiveCorrect;
 
 /* Variable for store in SD card */
 extern char cDateTime[17][3];                                                   //from file : Oxygen_Pulse_Meter.c
 uint8_t uiSpO2_SDcard_buffer[3];
 float fFiO2_SDcard_buffer[3];
+float fFiO2_SDCard_buffer_sim[3];                                               // FiO2 buffer for store data in case of simulation
 uint8_t uiStatus_Buffer[3];
 char cFiO2_SDcard[6];
 char cSpO2_SDcard[3];
@@ -145,18 +146,28 @@ int main()
     }
 
 //------------------------------------------------------------------------------
+//    if(bReceiveCorrect == true)
+//    {
+//      bReceiveCorrect = false;
+//      uiCurrent_SpO2 = Get_OxygenSat();
+//      if(bReadCorrect == true)
+//      {
+//        uiSpO2_SDcard_buffer[uiSD_Card_index] = uiCurrent_SpO2;                 // Store SpO2 in Buffer
+//        uiSD_Card_index++;
+//      }
+//    }
       /* Store uiOxygenSat_buffer in SD Card */
       if (uiSD_Card_index >= sizeof(uiSpO2_SDcard_buffer))
       {
         uiSD_Card_index = 0;
         char cDateTimeBuffer[17];
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; i++)
         {
           for (int j =0; j < 17; j++)
           {
             cDateTimeBuffer[j] = cDateTime[j][i];
           }
-          SD_Write(cHospitalNumber_File, cDateTimeBuffer, uiSpO2_SDcard_buffer[i], fFiO2_Buffer[i], uiStatus_Buffer[i]);
+          SD_Write(cHospitalNumber_File, cDateTimeBuffer, uiSpO2_SDcard_buffer[i], fFiO2_SDCard_buffer_sim[i], uiStatus_Buffer[i]);
         }
       }
   }
@@ -189,6 +200,9 @@ void delay(void)
 */
 static void system_init(void)
 {
+  /* Setup NVIC group */
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+    
   SPI2_SetUp();
   LTC1661_Setup();
   MCP3202_SetUp();
@@ -197,7 +211,7 @@ static void system_init(void)
   STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
   lcdInit();                                                                    //LCD Set Up
   USART_GUI_Connect();                                                          //Set up USART for connecting GUI
-  USART_HyperTermianl_Connect();
+//  USART_HyperTermianl_Connect();
   Timer6_SetUp();
   timer7_setup();                                                               // Timer7 use count for setting sampling rate 10 Hz
   FiO2_Check_Timer_Config();                                                    //Timer 3 will get ADC of FiO2 every 1 sec.
@@ -289,6 +303,7 @@ void TIM3_IRQHandler (void)
       fFiO2_Buffer[index_buffer] = 0;
     }
   }
+  fFiO2_SDCard_buffer_sim[uiSD_Card_index] = (float)(uiPurpose_FiO2);           // using in simulation
   STM_EVAL_LEDOn(LED5);
   TIM_ClearITPendingBit (TIM3, TIM_IT_Update);
 }
@@ -657,42 +672,73 @@ void SD_Write(char FileName[], char cDataTimeSD[], uint8_t uiSpO2_SD, float fFiO
   Convert_FiO2_FloattoString(fFiO2_SD);
 
   /* check Status */
-  if (uiStatus == STATUS_NORMAL)
+  switch(uiStatus)
   {
+  case STATUS_NORMAL :
     strcpy(cStatus, "NN");
-  }
-  else if (uiStatus == STATUS_SpO2_BELOW_L1)
-  {
-    strcpy(cStatus, "L1");
-  }
-  else if (uiStatus == STATUS_SpO2_BELOW_L2)
-  {
+    break;
+  case STATUS_SpO2_BELOW_L1:
+    strcpy(cStatus ,"L1");
+    break;
+  case STATUS_SpO2_BELOW_L2:
     strcpy(cStatus, "L2");
-  }
-  else if (uiStatus == STATUS_SpO2_BEHIGH_L1)
-  {
+    break;
+  case STATUS_SpO2_BEHIGH_L1:
     strcpy(cStatus, "H1");
-  }
-  else if (uiStatus == STATUS_SpO2_BEHIGH_L2)
-  {
+    break;
+  case STATUS_SpO2_BEHIGH_L2:
     strcpy(cStatus, "H2");
-  }
-  else if (uiStatus == STATUS_ALARM)
-  {
+    break;
+  case STATUS_ALARM:
     strcpy(cStatus, "AA");
-  }
-  else if (uiStatus == STATUS_MIDDLE_SpO2_BELOW)
-  {
+    break;
+  case STATUS_MIDDLE_SpO2_BELOW:
     strcpy(cStatus, "ML");
-  }
-  else if (uiStatus == STATUS_MIDDLE_SpO2_BEHIGH)
-  {
+    break;
+  case STATUS_MIDDLE_SpO2_BEHIGH:
     strcpy(cStatus, "MH");
-  }
-  else if (uiStatus == STATUS_MIDDLE_SpO2)
-  {
+    break;
+  case STATUS_MIDDLE_SpO2:
     strcpy(cStatus, "MM");
+    break;
   }
+    
+//  if (uiStatus == STATUS_NORMAL)
+//  {
+//    strcpy(cStatus, "NN");
+//  }
+//  else if (uiStatus == STATUS_SpO2_BELOW_L1)
+//  {
+//    strcpy(cStatus, "L1");
+//  }
+//  else if (uiStatus == STATUS_SpO2_BELOW_L2)
+//  {
+//    strcpy(cStatus, "L2");
+//  }
+//  else if (uiStatus == STATUS_SpO2_BEHIGH_L1)
+//  {
+//    strcpy(cStatus, "H1");
+//  }
+//  else if (uiStatus == STATUS_SpO2_BEHIGH_L2)
+//  {
+//    strcpy(cStatus, "H2");
+//  }
+//  else if (uiStatus == STATUS_ALARM)
+//  {
+//    strcpy(cStatus, "AA");
+//  }
+//  else if (uiStatus == STATUS_MIDDLE_SpO2_BELOW)
+//  {
+//    strcpy(cStatus, "ML");
+//  }
+//  else if (uiStatus == STATUS_MIDDLE_SpO2_BEHIGH)
+//  {
+//    strcpy(cStatus, "MH");
+//  }
+//  else if (uiStatus == STATUS_MIDDLE_SpO2)
+//  {
+//    strcpy(cStatus, "MM");
+//  }
 
   /* Start write data to SD card*/
   ret = f_open(&file, FileName, FA_WRITE);

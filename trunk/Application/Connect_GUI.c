@@ -396,7 +396,6 @@ void Update_Rule(void)
 //  uiPurpose_FiO2 = SProfile.uiPrefered_FiO2;
 
 }
-
 //------------------------------------------------------------------------------
 // Function can use printf(); in sent data
 int fputc(int ch, FILE *f)
