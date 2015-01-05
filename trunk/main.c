@@ -78,7 +78,7 @@ uint8_t Sampling_time;
 extern uint8_t uiOxygenSat_buffer[10];
 extern uint8_t uiSD_Card_index;
 extern uint8_t uiCurrent_SpO2;
-extern uint8_t uiPrevious_SpO2;
+extern uint8_t uiInitial_SpO2;
 extern float FiO2_DataTest[24];
 extern bool bReadCorrect;
 extern bool bReceiveCorrect;
@@ -93,7 +93,6 @@ char cFiO2_SDcard[6];
 char cSpO2_SDcard[3];
 
 uint8_t uiCurrent_Status;
-uint8_t Time_AlarmLevel = 0;
 
 // Profile Variable ------------------------------------------------------------
 char cHospitalNumber_File[13];
@@ -700,6 +699,12 @@ void SD_Write(char FileName[], char cDataTimeSD[], uint8_t uiSpO2_SD, float fFiO
     break;
   case STATUS_MIDDLE_SpO2:
     strcpy(cStatus, "MM");
+    break;
+  case STATUS_SpO2_BEHIGH_ALARM_L1:
+    strcpy(cStatus, "H2");
+    break;
+  case STATUS_SpO2_BELOW_ALARM_L1:
+    strcpy(cStatus, "L2");
     break;
   }
     

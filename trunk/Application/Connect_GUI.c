@@ -354,11 +354,14 @@ void GUI_IRQHandler (void)
   Function : Update_Rule
   Input : None
   Output: None
-  Description : 
+  Description : update pre-term infants' profile
 */
 void Update_Rule(void)
 {
   uint8_t HN_index;
+  volatile uint32_t uiFirst_decimal = 0;
+  volatile float fResult_middle_range = 0;
+  
   /* Update Hospital Number */
   for(HN_index = 3; HN_index < 16 ; HN_index++)
   {
@@ -393,6 +396,14 @@ void Update_Rule(void)
   
   /*Set SpO2 Middle Range */
   SProfile.uiSpO2_middleRange = (uint8_t)((SProfile.uiSpO2_Maximum + SProfile.uiSpO2_Minimum)/2);
+  
+  /* if decimal more than 5, uiSpO2_middleRange plus 1 */  
+  fResult_middle_range = (((float)SProfile.uiSpO2_Maximum + (float)SProfile.uiSpO2_Minimum) / 2) * 10;
+  uiFirst_decimal = (((uint32_t)fResult_middle_range) % 10);
+  if(uiFirst_decimal >= 5)
+  {
+    SProfile.uiSpO2_middleRange = SProfile.uiSpO2_middleRange + 1;
+  }
 //  uiPurpose_FiO2 = SProfile.uiPrefered_FiO2;
 
 }
