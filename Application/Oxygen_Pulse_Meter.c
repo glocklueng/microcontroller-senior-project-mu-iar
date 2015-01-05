@@ -12,11 +12,12 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 1. Function 
     1. Oxygen_PM_Setup : Setting USART for communication to Oxygen Pulse Meter via USART
     2. OPM_IRQHandler (Interrupt S.R.)
-    3. Get_OxygenSat : find Oxygen Saturation value from ucDataFromOPM Buffer and convert String to uint
-    4. clear_OPM_buffer : clear data in ucDataFromOPM Buffer
-    5. TIM4_IRQHandler : 
+    3. DMA1_Stream1_IRQHandler (Interrupt S.R.)
+    4. Get_OxygenSat : find Oxygen Saturation value from ucDataFromOPM Buffer and convert String to uint
+    5. clear_OPM_buffer : clear data in ucDataFromOPM Buffer
+    6. TIM4_IRQHandler : 
 2. Define global variable :
-    char ucDataFromOPM[174]
+    static char scDataFromOPM[174]
     uint8_t uiCurrent_SpO2
     uint8_t uiSD_Card_index
     uint8_t uiRx_index_OPM
@@ -31,17 +32,15 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 174 Bytes
-//char ucDataFromOPM[180];                                                      // 180 bytes for test with Oxygen Pulse Meter
 static char scDataFromOPM[174];                                                 // 174 bytes for simulation with MCU
 //------------------------------------------------------------------------------
-uint8_t uiCurrent_SpO2, uiPrevious_SpO2;
+uint8_t uiCurrent_SpO2, uiInitial_SpO2;
 uint8_t uiSD_Card_index = 0;
 static uint16_t uiRx_index_OPM = 0;
 uint8_t uiOxygenSat_buffer[10];                                                 // Oxygen Saturation Buffer for Store Data to SD Card
 
 char cDateTime[17][3];                                                          // create array 2D for stroe Date and time
 bool bReadCorrect = false; 
-bool bReceiveCorrect = false;
 
 extern uint8_t uiSpO2_SDcard_buffer[3];
 //------------------------------------------------------------------------------
@@ -53,7 +52,7 @@ extern uint8_t uiSpO2_SDcard_buffer[3];
                 Set Baud rate 9600, 8-N-1
                 Enable Rx communication ONLY
                 Disable Rx_interrupt
-                Setting DMA for transfer data from USART Peripheral to Memory (DMA1 Channel 4 Stream 1)
+                Setting DMA for transfer data from USART 3 Peripheral to Memory (DMA1 Channel 4 Stream 1)
                 Enable DMA1_Stream1 Interrupt
 */
 void usart_OPM_setup(void)
@@ -99,11 +98,11 @@ void usart_OPM_setup(void)
   
   DMA_InitStruct.DMA_Channel = DMA_Channel_4;                                   // Setting DMA channel 4
   DMA_InitStruct.DMA_BufferSize = sizeof(scDataFromOPM);                        // DMA buffer size 174 bytes
-  DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t)&USART3->DR;                // USART3_DR_ADDRESS is 0x40004804
+  DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t)&USART3->DR;                // set usart3 address USART3_DR_ADDRESS is 0x40004804
   DMA_InitStruct.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-  DMA_InitStruct.DMA_Memory0BaseAddr = (uint32_t)&scDataFromOPM;
+  DMA_InitStruct.DMA_Memory0BaseAddr = (uint32_t)&scDataFromOPM;                // set address to scDataFromOPM variable for receiving data
   DMA_InitStruct.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-  DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralToMemory;
+  DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralToMemory;                          // transfer data from Peripheral to memory
   DMA_InitStruct.DMA_Mode = DMA_Mode_Circular;
   DMA_InitStruct.DMA_FIFOMode = DMA_FIFOMode_Enable;
   DMA_InitStruct.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
@@ -146,6 +145,12 @@ void usart_OPM_setup(void)
 }
 
 // DMA1_Stream1_IRQHandler -----------------------------------------------------
+/*
+  Function : DMA1_Stream1_IRQHandler
+  Input : None
+  Output : None
+  Description : Interrupt when DMA stream transfer data complete
+*/
 void DMA1_Stream1_IRQHandler(void)
 {
   /* Test on DMA Stream Transfer Complete interrupt */
@@ -197,7 +202,6 @@ void USART3_IRQHandler(void)
       TIM_Cmd(TIM4, DISABLE);                                                   // Disable Timer 4
       TIM4->CNT = 0;                                                            // Clear counter value
       
-      uiPrevious_SpO2 = uiCurrent_SpO2;
       uiCurrent_SpO2 = Get_OxygenSat(scDataFromOPM);
       
       if(bReadCorrect == true)

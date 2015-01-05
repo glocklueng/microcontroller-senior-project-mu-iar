@@ -14,10 +14,13 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include "alarm_condition.h"
 //------------------------------------------------------------------------------
 extern Profile SProfile;
-extern uint8_t Time_AlarmLevel;
 extern uint8_t uiCurrent_Status;
 extern uint8_t uiPurpose_FiO2;
 extern uint8_t uiCurrent_SpO2;
+extern uint8_t uiInitial_SpO2;
+
+uint8_t uiRespond_time;
+uint8_t uiTime_AlarmLevel;
 //------------------------------------------------------------------------------
 // Alarm Function --------------------------------------------------------------
 /*
@@ -38,7 +41,8 @@ void alarm_timer(uint8_t Command)
   else if (Command == TIMER_DISABLE)
   {
     TIM_Cmd(TIM2, DISABLE);
-    Time_AlarmLevel = 0;
+    uiTime_AlarmLevel = 0;
+    uiRespond_time = 0;
   }
 }
 //------------------------------------------------------------------------------
@@ -46,29 +50,30 @@ void alarm_timer(uint8_t Command)
   Function : TIM2_IRQHandler
   Input : None
   Return : None
-  Description : Interrupt Service Routine of Timer for count Alarm Statu of Profile
+  Description : Interrupt Service Routine of Timer for count Alarm Statu? of Profile
 */
 //------------------------------------------------------------------------------
 void TIM2_IRQHandler(void)
 {
   if (TIM_GetITStatus (TIM2, TIM_IT_Update) != RESET)
   {
-    Time_AlarmLevel = Time_AlarmLevel + 1;
+    uiTime_AlarmLevel = uiTime_AlarmLevel + 1;
+    uiRespond_time = uiRespond_time + 1;
     STM_EVAL_LEDOff(LED5);
-
 
     if (uiCurrent_Status == STATUS_SpO2_BELOW_L1 | uiCurrent_Status == STATUS_SpO2_BEHIGH_L1)
     {
-      if (Time_AlarmLevel > SProfile.uiAlarm_Level1)
+      if (uiTime_AlarmLevel > SProfile.uiAlarm_Level1)
       {
-        Time_AlarmLevel = 0;                                                    // Reset Time_AlarmLevel 
-
+        uiTime_AlarmLevel = 0;                                                  // Reset Time_AlarmLevel
+        uiRespond_time = 0;
+        
         /* If Time alarm more than alarm level 1 set */
         if (uiCurrent_Status == STATUS_SpO2_BELOW_L1)
         {
           uiCurrent_Status = STATUS_SpO2_BELOW_ALARM_L1;
           uiPurpose_FiO2 = uiPurpose_FiO2 + 6;
-
+          
           if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
           {
             /* if uiPurpose_FiO2 more than uiFiO2_Maximum */
@@ -76,6 +81,7 @@ void TIM2_IRQHandler(void)
           }
 
           FiO2_Range(uiPurpose_FiO2);
+          
           /* Update LCD */
           lcdString(1,5,"Status: Below ");
           lcdString(1,6,"Alarm Level 2");
@@ -92,16 +98,54 @@ void TIM2_IRQHandler(void)
           }
 
           FiO2_Range(uiPurpose_FiO2);
+          
           /* Update LCD */
           lcdString(1,5,"Status: Behigh ");
           lcdString(1,6,"Alarm Level 2");          
         }
       }
+      else if( uiRespond_time > SProfile.uiRespondsTime)
+      {
+        if( uiCurrent_Status == STATUS_SpO2_BELOW_L1)
+        {
+          /* Check Current SpO2. if SpO2 is lower than last time, the system will increase FiO2 */
+          if (uiCurrent_SpO2 <= uiInitial_SpO2)
+          {
+            uiPurpose_FiO2 = uiPurpose_FiO2 + 4;                                // Increase FiO2 4 percent
+          }
+          uiRespond_time = 0;                                                   // clear Respond time
+          
+          /* Check Limit of FiO2 */
+          if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
+          {
+            uiPurpose_FiO2 = SProfile.uiFiO2_Maximum;
+          }
+          uiInitial_SpO2 = uiCurrent_SpO2;                                      // save current SpO2 at initial
+        }
+        else if(uiCurrent_Status == STATUS_SpO2_BEHIGH_L1)
+        {
+          /* if SpO2 is higher than last time, the system will decrease FiO2*/
+          if(uiCurrent_SpO2 >= uiInitial_SpO2)
+          {
+            uiPurpose_FiO2 = uiPurpose_FiO2 - 4;                                // Decrease FiO2 4 percent
+          }
+          uiRespond_time = 0;                                                   // Clear Respond time
+          
+          /* Check Limit of FiO2 */
+          if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
+          {
+            uiPurpose_FiO2 = SProfile.uiFiO2_Minimum;
+          }
+        }
+      
+        uiInitial_SpO2 = uiCurrent_SpO2;                                        // save new Current SpO2
+        FiO2_Range(uiPurpose_FiO2);
+      }
     }
     else if (uiCurrent_Status == STATUS_SpO2_BEHIGH_L2 | uiCurrent_Status == STATUS_SpO2_BELOW_L2)
     {
       /* Alarm Level 2 */
-      if (Time_AlarmLevel >= SProfile.uiAlarm_Level2)
+      if (uiTime_AlarmLevel >= SProfile.uiAlarm_Level2)
       {
         GPIO_SetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
         uiCurrent_Status = STATUS_ALARM;
@@ -129,31 +173,79 @@ void TIM2_IRQHandler(void)
         lcdString(2,3,"ALARM BUTTON");
         alarm_timer(TIMER_DISABLE);
       }
-    }
-    else if ((uiCurrent_Status == STATUS_MIDDLE_SpO2_BELOW) | (uiCurrent_Status == STATUS_MIDDLE_SpO2_BEHIGH))
-    {
-      if (Time_AlarmLevel >= SProfile.uiRespondsTime)
+      else if (uiRespond_time >= SProfile.uiRespondsTime)
       {
-        /* if time over than Responds time, FiO2 will increse or decrease 2 percent */
-        Time_AlarmLevel = 0;                                                      // clear Time_AlarmLevel
-        
-        if (uiCurrent_SpO2 < SProfile.uiSpO2_middleRange)
+        if(uiCurrent_Status == STATUS_SpO2_BEHIGH_L2)
         {
-          uiPurpose_FiO2 = uiPurpose_FiO2 + 2;                                    // increase FiO2 more than present 2 percent
-          if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
+          /* Is SpO2 higher than last SpO2 ?*/
+          if(uiCurrent_SpO2 >= uiInitial_SpO2)
           {
-            uiPurpose_FiO2 = SProfile.uiFiO2_Maximum;
+            uiPurpose_FiO2 = uiPurpose_FiO2 - 6;                                // Decrease FiO2 6 percent
           }
-        }
-        else if (uiCurrent_SpO2 > SProfile.uiSpO2_middleRange)
-        {
-          uiPurpose_FiO2 = uiPurpose_FiO2 - 2;                                    // decrease FiO2 more than present 2 percent
+          uiRespond_time = 0;                                                   // Clear Respond time
+          
+          /* Check Limit of FiO2 range */
           if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
           {
             uiPurpose_FiO2 = SProfile.uiFiO2_Minimum;
           }
+          
+          uiInitial_SpO2 = uiCurrent_SpO2;                                      // save current SpO2
+        }
+        else if(uiCurrent_Status == STATUS_SpO2_BELOW_L2)
+        {
+          /* Is SpO2 lower than last SpO2 ? */
+          if(uiCurrent_SpO2 <= uiInitial_SpO2)
+          {
+            uiPurpose_FiO2 = uiPurpose_FiO2 + 6;
+          }
+          uiRespond_time = 0;                                                   // clear respond time
+          
+          /* Check Limit of FiO2 range */
+          if(uiPurpose_FiO2 > SProfile.uiSpO2_Maximum)
+          {
+            uiPurpose_FiO2 = SProfile.uiSpO2_Maximum;
+          }
+          
+          uiInitial_SpO2 = uiCurrent_SpO2;                                      // save Current SpO2
+        }
+        
+        FiO2_Range(uiPurpose_FiO2);
+      }
+    }
+    else if ((uiCurrent_Status == STATUS_MIDDLE_SpO2_BELOW) | (uiCurrent_Status == STATUS_MIDDLE_SpO2_BEHIGH))
+    {
+      if (uiRespond_time >= SProfile.uiRespondsTime)
+      {
+        /* if time over than Responds time, FiO2 will increse or decrease 2 percent */
+        uiTime_AlarmLevel = 0;                                                  // clear Time_AlarmLevel
+        uiRespond_time = 0;                                                     // clear respond time
+        
+        if (uiCurrent_SpO2 < SProfile.uiSpO2_middleRange)
+        {
+          uiPurpose_FiO2 = uiPurpose_FiO2 + 2;                                  // increase FiO2 more than present 2 percent
+          
+          if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
+          {
+            uiPurpose_FiO2 = SProfile.uiFiO2_Maximum;
+          }
+          uiInitial_SpO2 = uiCurrent_SpO2;
+        }
+        else if (uiCurrent_SpO2 > SProfile.uiSpO2_middleRange)
+        {
+          uiPurpose_FiO2 = uiPurpose_FiO2 - 2;                                  // decrease FiO2 more than present 2 percent
+          
+          if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
+          {
+            uiPurpose_FiO2 = SProfile.uiFiO2_Minimum;
+          }
+          
+          uiInitial_SpO2 = uiCurrent_SpO2;
         }
       }
+      
+      uiInitial_SpO2 = uiCurrent_SpO2;
+      FiO2_Range(uiPurpose_FiO2);
     }
 
     TIM_ClearITPendingBit (TIM2, TIM_IT_Update);
