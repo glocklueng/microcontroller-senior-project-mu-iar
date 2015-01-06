@@ -53,11 +53,11 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 // variable for SD card
 /* Private typedef -----------------------------------------------------------*/
 SD_Error Status = SD_OK;
-FATFS filesystem;		                                                            // volume lable
-FRESULT ret;			                                                              // Result code
-FIL file_F, file_O, file;		                                                    // File object
-DIR dir;				                                                                // Directory object
-FILINFO fno;			                                                              // File information object
+FATFS filesystem;		                                                // volume lable
+FRESULT ret;			                                                // Result code
+FIL file_F, file_O, file;		                                        // File object
+DIR dir;				                                        // Directory object
+FILINFO fno;			                                                // File information object
 UINT bw, br;
 uint8_t buff[174];
 //------------------------------------------------------------------------------
@@ -67,13 +67,14 @@ void usart_OPM_setup(void);
 void Timer3_SetUp(void);
 //------------------------------------------------------------------------------
 // Profile Variable ------------------------------------------------------------
-char HospitalNumber_File[] = "r_SpO2.TXT";
+char HospitalNumber_File[] = "s_SpO2.TXT";
 char Buffer[174];
 uint8_t uiCurrent_Status;
 uint8_t Time_AlarmLevel = 0;
 uint8_t uiPurpose_FiO2;
 
 bool bRead_data_permission = FALSE;
+uint16_t length;
 
 extern uint8_t time;
 
@@ -109,7 +110,7 @@ int main(void)
           break;      /* Error or end of file */
         }
         buff[br] = 0;
-        for(uint16_t length = 0; length < sizeof(buff); length++)
+        for(length = 0; length < sizeof(buff); length++)
         {
           Buffer[length] = buff[length];
           USART_SendData(USART3, Buffer[length]);

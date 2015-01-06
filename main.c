@@ -18,11 +18,12 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #include "Connect_GUI.h"
 #include "testControlValve.h"
 #include "check_status_profile.h"
+#include "check_status_previous_version.h"
+#include "alarm_condition_previous_version.h"
 #include "alarm_condition.h"
 #include "ff.h"
 #include "usbd_cdc_vcp.h"
 #include <stdlib.h>
-
 //------------------------------------------------------------------------------
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
@@ -33,7 +34,7 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 // extern Profile Structger-----------------------------------------------------
 extern Profile SProfile;
 
-// variable for SD card
+// variable for SD card --------------------------------------------------------
 /* Private typedef -----------------------------------------------------------*/
 SD_Error Status = SD_OK;
 FATFS filesystem;		                                                            // volume lable
@@ -140,7 +141,9 @@ int main()
     //if (SProfile.uiProfile_Status == RUN_BUTTON_SET)
     if (SProfile.uiProfile_Status == PROFILE_SETTING_COMPLETE)
     {
-      uiCurrent_Status = check_status(uiCurrent_SpO2);
+      uiCurrent_Status = check_status_previous_version(uiCurrent_SpO2);         // test algorithm old control model
+      
+//      uiCurrent_Status = check_status(uiCurrent_SpO2);                        // test algorithm new control model
       uiStatus_Buffer[uiSD_Card_index] = uiCurrent_Status;
     }
 
