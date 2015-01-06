@@ -1850,6 +1850,9 @@
   </configuration>
   <group>
     <name>_test_section</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
     <group>
       <name>driver_testing</name>
       <file>
@@ -2054,15 +2057,27 @@
   </group>
   <group>
     <name>User</name>
-    <excluded>
-      <configuration>Debug</configuration>
-    </excluded>
-    <file>
-      <name>$PROJ_DIR$\Application\alarm_condition.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Application\check_status_profile.c</name>
-    </file>
+    <group>
+      <name>Control model v2</name>
+      <excluded>
+        <configuration>Debug</configuration>
+      </excluded>
+      <file>
+        <name>$PROJ_DIR$\Application\alarm_condition.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\Application\check_status_profile.c</name>
+      </file>
+    </group>
+    <group>
+      <name>Control model v1</name>
+      <file>
+        <name>$PROJ_DIR$\Application\alarm_condition_previous_version.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\Application\check_status_previous_version.c</name>
+      </file>
+    </group>
     <file>
       <name>$PROJ_DIR$\Application\Connect_GUI.c</name>
     </file>
