@@ -18,7 +18,6 @@ extern Profile SProfile;
 extern uint8_t uiCurrent_Status;
 extern uint8_t uiTime_AlarmLevel1;
 extern uint8_t uiPurpose_FiO2;
-extern uint8_t Drive_FiO2;
 //------------------------------------------------------------------------------
 // Alarm Function --------------------------------------------------------------
 /*
@@ -60,13 +59,12 @@ void TIM2_IRQHandler(void)
           uiPurpose_FiO2 = SProfile.uiPrefered_FiO2 + 25;
           if (uiPurpose_FiO2 > SProfile.uiFiO2_Maximum)
           {
-            Drive_FiO2 = SProfile.uiFiO2_Maximum;
-            FiO2_Range(Drive_FiO2);
+            uiPurpose_FiO2 = SProfile.uiFiO2_Maximum;
+            FiO2_Range(uiPurpose_FiO2);
           }
           else
           {
-            Drive_FiO2 = uiPurpose_FiO2;
-            FiO2_Range(Drive_FiO2);
+            FiO2_Range(uiPurpose_FiO2);
           }
           lcdString(1,5,"Status: Below ");
           lcdString(1,6,"Alarm Level 2");
@@ -77,13 +75,12 @@ void TIM2_IRQHandler(void)
           uiPurpose_FiO2 = SProfile.uiPrefered_FiO2 - 25;
           if (uiPurpose_FiO2 < SProfile.uiFiO2_Minimum)
           {
-            Drive_FiO2 = SProfile.uiFiO2_Minimum;
-            FiO2_Range(Drive_FiO2);
+            uiPurpose_FiO2 = SProfile.uiFiO2_Minimum;
+            FiO2_Range(uiPurpose_FiO2);
           }
           else
           {
-            Drive_FiO2 = uiPurpose_FiO2;
-            FiO2_Range(Drive_FiO2);
+            FiO2_Range(uiPurpose_FiO2);
           }
           lcdString(1,5,"Status: Behigh");
           lcdString(1,6,"Alarm Level 2");
@@ -97,7 +94,7 @@ void TIM2_IRQHandler(void)
       {
         GPIO_SetBits(Alarm_Set_GPIO_Port, Alarm_Set_Pin);
         uiCurrent_Status = Status_Alarm;
-        USART_Cmd(OPM_USART, DISABLE);                                          // ENABLE Oxygen Pulse Meter USART
+        USART_Cmd(OPM_USART, ENABLE);                                          // ENABLE Oxygen Pulse Meter USART
         TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
         TIM_Cmd(TIM3, DISABLE);
       

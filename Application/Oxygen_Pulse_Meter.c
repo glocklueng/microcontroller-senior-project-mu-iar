@@ -32,7 +32,7 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 174 Bytes
-static char scDataFromOPM[174];                                                 // 174 bytes for simulation with MCU
+static char scDataFromOPM[180];                                                 // 174 bytes for simulation with MCU
 //------------------------------------------------------------------------------
 uint8_t uiCurrent_SpO2, uiInitial_SpO2;
 uint8_t uiSD_Card_index = 0;
@@ -259,7 +259,7 @@ int Get_OxygenSat(char cOPM_protocal[])
   else
   {
     /* Case :  Read Error */
-    //clear_OPM_buffer();
+    clear_OPM_buffer();
     uiSpO2_percent = 0;
     bReadCorrect = false;
   }
