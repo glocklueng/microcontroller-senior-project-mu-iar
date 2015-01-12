@@ -141,9 +141,9 @@ int main()
     //if (SProfile.uiProfile_Status == RUN_BUTTON_SET)
     if (SProfile.uiProfile_Status == PROFILE_SETTING_COMPLETE)
     {
-      uiCurrent_Status = check_status_previous_version(uiCurrent_SpO2);         // test algorithm old control model
+      //uiCurrent_Status = check_status_previous_version(uiCurrent_SpO2);         // test algorithm old control model
       
-//      uiCurrent_Status = check_status(uiCurrent_SpO2);                        // test algorithm new control model
+      uiCurrent_Status = check_status(uiCurrent_SpO2);                        // test algorithm new control model
       uiStatus_Buffer[uiSD_Card_index] = uiCurrent_Status;
     }
 
