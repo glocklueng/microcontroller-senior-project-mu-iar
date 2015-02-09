@@ -19,6 +19,7 @@ void timer_setting (void);
 void FiO2_Check_Timer_Config(void);
 void Calibrate_OxygenSensor(void);
 void Timer6_SetUp (void);
+void timer7_setup (void);
 float Convert_FiO2 (float fFiO2_ADC);
 //void TestControlValve (void);
 void FiO2_LCD_Display (float fFiO2_Current_Percent);
