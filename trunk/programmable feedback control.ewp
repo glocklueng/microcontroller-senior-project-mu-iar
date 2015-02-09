@@ -2071,11 +2071,23 @@
     </group>
     <group>
       <name>Control model v2</name>
+      <excluded>
+        <configuration>Debug</configuration>
+      </excluded>
       <file>
         <name>$PROJ_DIR$\Application\alarm_condition.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\Application\check_status_profile.c</name>
+      </file>
+    </group>
+    <group>
+      <name>Control model v3</name>
+      <file>
+        <name>$PROJ_DIR$\Application\alarm_condition_v3.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\Application\check_status_profile_v3.c</name>
       </file>
     </group>
     <file>

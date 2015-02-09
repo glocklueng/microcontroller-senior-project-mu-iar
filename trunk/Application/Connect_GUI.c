@@ -354,7 +354,7 @@ void GUI_IRQHandler (void)
   Function : Update_Rule
   Input : None
   Output: None
-  Description : update pre-term infants' profile
+  Description : update pre-term infants' profile in Structure name SProfile
 */
 void Update_Rule(void)
 {

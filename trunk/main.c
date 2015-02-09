@@ -21,6 +21,8 @@ Reseach & Deverloped by Department of Electrical Engineering, Faculty of Enginee
 #include "check_status_previous_version.h"
 #include "alarm_condition_previous_version.h"
 #include "alarm_condition.h"
+#include "check_status_profile_v3.h"
+#include "alarm_condition_v3.h"
 #include "ff.h"
 #include "usbd_cdc_vcp.h"
 #include <stdlib.h>
@@ -115,8 +117,10 @@ int main()
       USART_Cmd(USART3, ENABLE);                                                // ENABLE Oxygen Pulse Meter USART
       Create_file(SProfile.cHospital_Number);                                   // Create textfile
       SProfile.uiProfile_Status = PROFILE_SETTING_COMPLETE;
-//      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-//      TIM_Cmd(TIM3, ENABLE);
+      
+      /* Timer use for checking FiO2 value every 1 second. */
+      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+      TIM_Cmd(TIM3, ENABLE);
       
       SentData_DAC(0x0000, Oxygen_Valve);
       SentData_DAC(0x0000, Air_Valve);
@@ -143,7 +147,7 @@ int main()
     {
       //uiCurrent_Status = check_status_previous_version(uiCurrent_SpO2);         // test algorithm old control model
       
-      uiCurrent_Status = check_status(uiCurrent_SpO2);                        // test algorithm new control model
+      uiCurrent_Status = check_status(uiCurrent_SpO2);                          // test algorithm new control model
       uiStatus_Buffer[uiSD_Card_index] = uiCurrent_Status;
     }
 
@@ -158,7 +162,8 @@ int main()
 //        uiSD_Card_index++;
 //      }
 //    }
-      /* Store uiOxygenSat_buffer in SD Card */
+    
+      /* Pre-term Infants profile infromation was wrote to SD card such as Date, time, SpO2, FiO2, Status.  */
       if (uiSD_Card_index >= sizeof(uiSpO2_SDcard_buffer))
       {
         uiSD_Card_index = 0;
@@ -305,7 +310,10 @@ void TIM3_IRQHandler (void)
       fFiO2_Buffer[index_buffer] = 0;
     }
   }
+  
+  /* uiPurpose_FiO2 is used in simualtion. If system would be used the Real FiO2 from Oxygen sensor, you must use fFiO2_SDCard_buffer. */
   fFiO2_SDCard_buffer_sim[uiSD_Card_index] = (float)(uiPurpose_FiO2);           // using in simulation
+  
   STM_EVAL_LEDOn(LED5);
   TIM_ClearITPendingBit (TIM3, TIM_IT_Update);
 }

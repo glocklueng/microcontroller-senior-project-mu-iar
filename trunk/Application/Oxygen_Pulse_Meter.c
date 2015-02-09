@@ -17,13 +17,17 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
     5. clear_OPM_buffer : clear data in ucDataFromOPM Buffer
     6. TIM4_IRQHandler : 
 2. Define global variable :
-    static char scDataFromOPM[174]
+    static char scDataFromOPM[SIZE_OF_DATA_PROTOCAL]
     uint8_t uiCurrent_SpO2
     uint8_t uiSD_Card_index
     uint8_t uiRx_index_OPM
     uint8_t uiOxygenSat_buffer[10]
     char cDataTime[17][3] : Store the date and time (lenght 17 Bytes per a time)
     bool bReadCorrect : boolean in case of Read data from Oxygen Pulse Meter correct or incorrect ?
+3.  SIZE_OF_DATA_PROTOCAL depend on version of Oxygen Pulse Meter
+      Simulation : SIZE_OF_DATA_PROTOCAL is 174 bytes
+      Ward NICU : SIZE_OF_DATA_PROTICAL is 184 bytes (the meter will fill '\0' 6 bytes)
+      Ward Infant4 : SIZE_OF_DATA_PROTOCAL is 135 bytes (this is old version of Oxygen Pulse Meter)
 */
 //------------------------------------------------------------------------------
 #include "main.h"
@@ -32,7 +36,8 @@ Deverloped by Department of Electrical Engineering, Faculty of Engineering, Mahi
 #include <stdlib.h>
 //------------------------------------------------------------------------------                                              
 //Variable store for Data input from Oxygen Pulse Meter, Buffer size 174 Bytes
-static char scDataFromOPM[180];                                                 // 174 bytes for simulation with MCU
+//static char scDataFromOPM[135];                                                 // 174 bytes for simulation with MCU
+static char scDataFromOPM[174];
 //------------------------------------------------------------------------------
 uint8_t uiCurrent_SpO2, uiInitial_SpO2;
 uint8_t uiSD_Card_index = 0;
@@ -41,6 +46,7 @@ uint8_t uiOxygenSat_buffer[10];                                                 
 
 char cDateTime[17][3];                                                          // create array 2D for stroe Date and time
 bool bReadCorrect = false; 
+bool bSpO2ReadComplete = false;
 
 extern uint8_t uiSpO2_SDcard_buffer[3];
 //------------------------------------------------------------------------------
@@ -162,6 +168,8 @@ void DMA1_Stream1_IRQHandler(void)
       uiSpO2_SDcard_buffer[uiSD_Card_index] = uiCurrent_SpO2;                   // Store SpO2 in Buffer
       uiSD_Card_index++;
       bReadCorrect = false;
+      
+      bSpO2ReadComplete = true;
     }
     
     /* Clear DMA Stream Transfer Complete interrupt pending bit */
@@ -228,7 +236,6 @@ void USART3_IRQHandler(void)
   Description : This Function is use for getting Oxygen Saturation Value (Percentage) from Oxygen Pulse Meter
                 via RS-232 Oxygen Saturation Address = number 37 to 39 (start 0) (SpO2=099%)
 */
-
 int Get_OxygenSat(char cOPM_protocal[])
 {
   /* 
@@ -240,6 +247,23 @@ int Get_OxygenSat(char cOPM_protocal[])
 
   /* check this command is getting SaO2 or Headding Command */
   if ((cOPM_protocal[18] == 'S') && (cOPM_protocal[19] == 'N') && (cOPM_protocal[126] == 'P') && (cOPM_protocal[127] == 'V') && (cOPM_protocal[128] == 'I'))
+  {
+    /* Case : Read Correct */
+    for(uiIndexString = 0; uiIndexString < 3; uiIndexString++)
+    {
+      cOxygenSat_string[uiIndexString] = cOPM_protocal[37 + uiIndexString];
+    }
+    uiSpO2_percent = atoi(cOxygenSat_string);                                   // atoi is function convert from String to Int 
+    
+    /* Transfer data and time from Oxygen Pulse Meter to Buffer*/
+    for (uint8_t uiIndexTime = 0; uiIndexTime < 17; uiIndexTime++)
+    {
+      cDateTime[uiIndexTime][uiSD_Card_index] = cOPM_protocal[uiIndexTime];
+    }
+    
+    bReadCorrect = true;
+  }
+  else if ((cOPM_protocal[18] == 'S') && (cOPM_protocal[19] == 'N') && (cOPM_protocal[104] == 'P') && (cOPM_protocal[105] == 'V') && (cOPM_protocal[106] == 'I')) 
   {
     /* Case : Read Correct */
     for(uiIndexString = 0; uiIndexString < 3; uiIndexString++)
